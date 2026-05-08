@@ -16,6 +16,16 @@ CREATE TABLE profiles (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
+-- 2b. Company Memberships (multi-tenant: login selects company)
+CREATE TABLE company_memberships (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  role TEXT DEFAULT 'staff',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+  UNIQUE(user_id, company_id)
+);
+
 -- 3. Create Customers Table (The people calling in)
 CREATE TABLE customers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -39,6 +49,8 @@ CREATE TABLE call_logs (
   summary TEXT,
   urgency_flag TEXT, -- 'high', 'medium', 'low'
   action_items TEXT,
+  recording_url TEXT,
+  meta JSONB, -- provider metadata: { provider, provider_call_id, ... }
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
@@ -68,6 +80,49 @@ CREATE TABLE receipts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
+-- 6b. Inventory Items (Truck stock / shop stock)
+CREATE TABLE inventory_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  sku TEXT,
+  unit TEXT DEFAULT 'ea', -- ea, ft, box, roll, etc.
+  reorder_point NUMERIC(12, 2) DEFAULT 0,
+  reorder_qty NUMERIC(12, 2) DEFAULT 0,
+  preferred_supplier TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+-- 6c. Inventory Transactions (simple ledger)
+CREATE TABLE inventory_txns (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  item_id UUID REFERENCES inventory_items(id) ON DELETE CASCADE,
+  txn_type TEXT NOT NULL, -- 'in', 'out', 'adjust'
+  qty NUMERIC(12, 2) NOT NULL,
+  unit_cost NUMERIC(10, 2),
+  ref_type TEXT, -- 'receipt', 'job', 'manual'
+  ref_id UUID,
+  note TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+-- 6d. Financial Goals (monthly/yearly projections)
+CREATE TABLE financial_goals (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  period_type TEXT NOT NULL, -- 'month' | 'year'
+  period_start DATE NOT NULL,
+  period_end DATE NOT NULL,
+  revenue_goal NUMERIC(12, 2) DEFAULT 0,
+  gross_profit_goal NUMERIC(12, 2) DEFAULT 0,
+  jobs_goal INTEGER DEFAULT 0,
+  leads_goal INTEGER DEFAULT 0,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
 -- 7. Create Permits Table (Permit & Inspection AI)
 CREATE TABLE permits (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -81,6 +136,20 @@ CREATE TABLE permits (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
 );
 
+-- 8. Create Technicians Table (Live Field Status)
+CREATE TABLE technicians (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  company_id UUID REFERENCES companies(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  phone_number TEXT,
+  status TEXT DEFAULT 'available', -- 'available', 'en_route', 'on_site', 'off'
+  current_job_title TEXT,
+  last_location_address TEXT,
+  last_location JSONB, -- { lat, lng, accuracy, source }
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
 -- Enable Row Level Security (RLS) so companies can only see their own data
 ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -89,6 +158,11 @@ ALTER TABLE call_logs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE receipts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE permits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE company_memberships ENABLE ROW LEVEL SECURITY;
+ALTER TABLE technicians ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inventory_txns ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financial_goals ENABLE ROW LEVEL SECURITY;
 
 -- Basic RLS Policies (Example: Users can only select data where company_id matches their profile's company_id)
 -- Note: In production, you'll add specific INSERT/UPDATE policies based on auth.uid() matching the profiles table.

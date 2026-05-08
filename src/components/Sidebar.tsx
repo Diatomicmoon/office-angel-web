@@ -13,7 +13,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-4 space-y-2 mt-4">
-        <Link href="/" className="flex items-center gap-3 px-4 py-3 text-white bg-gray-800 rounded-lg transition-colors font-medium">
+        <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-white bg-gray-800 rounded-lg transition-colors font-medium">
           <Home size={20} />
           <span>Dashboard</span>
         </Link>
@@ -63,7 +63,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-800">
-        <Link href="/" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
           <Settings size={20} />
           <span>Settings</span>
         </Link>

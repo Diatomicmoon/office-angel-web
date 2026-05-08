@@ -3,8 +3,19 @@
 import { MapPin, Search, BarChart3, TrendingUp, TrendingDown, Star, Globe, Smartphone, Camera, CalendarCheck, Send, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
 import { APIProvider, Map } from "@vis.gl/react-google-maps";
+import { NotWired } from "@/components/NotWired";
 
 export default function Marketing() {
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  if (!isDemoMode) {
+    return (
+      <NotWired
+        title="Marketing"
+        subtitle="This screen is still demo UI (fake SEO/traffic). Next step is wiring Google Business Profile + Analytics."
+      />
+    );
+  }
+
   const [postStatus, setPostStatus] = useState("Drafting...");
 
   const handlePost = () => {

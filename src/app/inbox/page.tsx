@@ -1,10 +1,22 @@
 "use client";
 
 import { Inbox, FileText, CheckCircle2, AlertCircle, HardHat, FileSignature, ArrowRight, Settings, UploadCloud, Copy, X, BarChart3, TrendingUp, Building2, Clock, Search, RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+type Receipt = {
+  id: string;
+  supplier_name?: string;
+  total_amount?: number;
+  status?: string;
+  created_at?: string;
+};
 
 export default function InboxPage() {
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(!isDemoMode);
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [showPermitAnalytics, setShowPermitAnalytics] = useState(false);
   const [showSupplyDetails, setShowSupplyDetails] = useState(false);
 
@@ -15,6 +27,73 @@ export default function InboxPage() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  useEffect(() => {
+    if (isDemoMode) return;
+    setLoading(true);
+    fetch("/api/receipts?limit=25")
+      .then((r) => r.json())
+      .then((json) => {
+        setReceipts(json.receipts || []);
+        setLoading(false);
+      })
+      .catch(() => {
+        setReceipts([]);
+        setLoading(false);
+      });
+  }, [isDemoMode]);
+
+  if (!isDemoMode) {
+    return (
+      <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Inbox</h1>
+          <p className="text-gray-500 mt-2">Receipts + cost intake. (Material Cost Engine — live DB)</p>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Forward receipts to:</p>
+            <p className="text-sm text-gray-600 font-mono mt-1">{forwardAddress}</p>
+          </div>
+          <button
+            onClick={handleCopy}
+            className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+          >
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+            <h2 className="font-semibold text-gray-900">Recent Receipts</h2>
+            <a href="/dashboard" className="text-xs font-bold text-blue-700 hover:text-blue-900">Back to Dashboard →</a>
+          </div>
+
+          {loading ? (
+            <div className="p-6 text-sm text-gray-500">Loading…</div>
+          ) : receipts.length === 0 ? (
+            <div className="p-8 text-center text-sm text-gray-500">No receipts yet.</div>
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {receipts.map((r) => (
+                <div key={r.id} className="p-5 flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold text-gray-900">{r.supplier_name || "Supplier"}</p>
+                    <p className="text-xs text-gray-500 mt-1">{r.created_at ? new Date(r.created_at).toLocaleString() : ""}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-gray-900">{typeof r.total_amount === 'number' ? `$${r.total_amount.toFixed(2)}` : ""}</p>
+                    <p className="text-xs font-semibold text-gray-500 mt-1">{r.status}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   const inboxItems = [
     {

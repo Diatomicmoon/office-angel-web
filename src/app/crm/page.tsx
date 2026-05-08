@@ -3,8 +3,19 @@
 import { Map as MapIcon, Kanban, List, Search, MoreVertical, DollarSign, MapPin, Zap, CheckCircle2, Navigation, Phone } from "lucide-react";
 import { useState } from "react";
 import { APIProvider, Map as GoogleMap } from "@vis.gl/react-google-maps";
+import { NotWired } from "@/components/NotWired";
 
 export default function CRM() {
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  if (!isDemoMode) {
+    return (
+      <NotWired
+        title="CRM"
+        subtitle="This screen is still demo UI (fake leads/pipeline/heatmap). Next step is wiring customers + jobs from Supabase."
+      />
+    );
+  }
+
   const [viewMode, setViewMode] = useState<'board' | 'list' | 'map'>('board');
 
   return (

@@ -4,8 +4,19 @@ import { useState } from "react";
 import { Search, Filter, FileText, MapPin, Calendar, Clock, DollarSign, CheckCircle2, AlertCircle, RefreshCcw, FolderOpen, Download, PlusCircle, Phone, Mail, Sparkles } from "lucide-react";
 
 import Link from "next/link";
+import { NotWired } from "@/components/NotWired";
 
 export default function JobArchive() {
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  if (!isDemoMode) {
+    return (
+      <NotWired
+        title="Projects"
+        subtitle="This screen is still demo UI (fake job archive). Next step is wiring jobs + customer profiles from Supabase."
+      />
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)]">
       {/* Header */}

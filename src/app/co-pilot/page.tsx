@@ -2,8 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { Mic, PhoneCall, User, MapPin, Zap, CheckCircle2, AlertCircle, Save, X, Activity } from "lucide-react";
+import { NotWired } from "@/components/NotWired";
 
 export default function CoPilot() {
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  if (!isDemoMode) {
+    return (
+      <NotWired
+        title="Co-Pilot"
+        subtitle="Co-Pilot is still demo UI right now. Next step is wiring Twilio/Vapi live transcription into Supabase + auto-fill job ticket."
+      />
+    );
+  }
+
   const [isListening, setIsListening] = useState(true);
   const [transcript, setTranscript] = useState([
     { speaker: "Dispatcher (Sarah)", text: "Thanks for calling Hardhat Electric, this is Sarah." }

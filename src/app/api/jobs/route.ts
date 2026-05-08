@@ -1,0 +1,95 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { resolveCompanyIdOrThrow } from "@/lib/tenant";
+
+export async function GET(req: Request) {
+  try {
+    const { companyId } = await resolveCompanyIdOrThrow();
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const url = new URL(req.url);
+    const view = url.searchParams.get("view"); // 'unassigned' or 'assigned'
+    // In a real app we'd filter by date range, but for beta we'll just grab recent
+
+    let q = supabase
+      .from("jobs")
+      .select("*, customers(first_name, last_name, phone_number)")
+      .eq("company_id", companyId)
+      .order("created_at", { ascending: false });
+
+    if (view === "unassigned") {
+      q = q.is("technician_id", null);
+    } else if (view === "assigned") {
+      q = q.not("technician_id", "is", null);
+    }
+
+    const { data, error } = await q;
+
+    if (error) {
+      return NextResponse.json({ jobs: [], error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ jobs: data || [] });
+  } catch (error: any) {
+    return NextResponse.json({ jobs: [], error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const { companyId } = await resolveCompanyIdOrThrow();
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const body = await req.json();
+
+    const payload: any = {
+      company_id: companyId,
+      customer_id: body.customer_id,
+      title: body.title,
+      status: body.status || 'Lead',
+      address: body.address,
+      quoted_amount: body.quoted_amount,
+      technician_id: body.technician_id,
+      scheduled_start: body.scheduled_start,
+      scheduled_end: body.scheduled_end,
+      priority: body.priority || 'normal',
+    };
+
+    // Remove undefined
+    for (const k of Object.keys(payload)) if (payload[k] === undefined) delete payload[k];
+
+    if (body.id) {
+      // Update
+      const { data, error } = await supabase
+        .from("jobs")
+        .update(payload)
+        .eq("id", body.id)
+        .eq("company_id", companyId)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return NextResponse.json({ job: data });
+    } else {
+      // Insert
+      const { data, error } = await supabase
+        .from("jobs")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return NextResponse.json({ job: data });
+    }
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

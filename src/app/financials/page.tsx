@@ -2,8 +2,19 @@
 
 import { useState } from "react";
 import { TrendingUp, DollarSign, Clock, ArrowUpRight, FileText, CheckCircle2, Mail, Star, RefreshCw, AlertCircle, ShieldCheck, Wallet, HardHat, Award, BarChart3, PieChart, Activity, PhoneMissed, X } from "lucide-react";
+import { NotWired } from "@/components/NotWired";
 
 export default function Financials() {
+  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  if (!isDemoMode) {
+    return (
+      <NotWired
+        title="Financials"
+        subtitle="This screen is still demo UI (fake KPIs/invoices). We’ll wire it to Supabase + QuickBooks/Stripe next."
+      />
+    );
+  }
+
   const [syncing, setSyncing] = useState(false);
   const [actionStatus, setActionStatus] = useState<Record<string, string>>({});
   const [viewingPunches, setViewingPunches] = useState<string | null>(null);

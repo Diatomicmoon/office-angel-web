@@ -1,0 +1,49 @@
+
+> office-angel-web@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.7.125:3000
+- Environments: .env.local
+✓ Ready in 276ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of /home/jakob/package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * /home/jakob/.openclaw/workspace/office-angel-web/package-lock.json
+
+⚠ Turbopack's filesystem cache has been deleted because we previously detected an internal error in Turbopack. Builds or page loads may be slower as a result.
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+⨯ Error: Your project's URL and Key are required to create a Supabase client!
+
+Check your Supabase project's API settings to find these values
+
+https://supabase.com/dashboard/project/_/settings/api
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at <unknown> (https://supabase.com/dashboard/project/_/settings/api)
+    at middleware (.openclaw/workspace/office-angel-web/src/middleware.ts:9:38)
+   7 |   })
+   8 |
+>  9 |   const supabase = createServerClient(
+     |                                      ^
+  10 |     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  11 |     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  12 |     {
+✓ Compiled in 2ms
+
+=============================================
+🚨 [VAPI WEBHOOK] CALL FINISHED 🚨
+=============================================
+📞 Caller ID: Unknown
+⏱️ Duration: 0 seconds
+📝 Summary:
+test test
+
+💬 Transcript Snippet:
+No transcript available.
+=============================================
+
+ POST /api/call-finished 200 in 304ms (next.js: 280ms, application-code: 25ms)

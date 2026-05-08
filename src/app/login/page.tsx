@@ -26,9 +26,9 @@ export default function Login() {
       setErrorMsg(error.message);
       setLoading(false);
     } else {
-      // Force a refresh to update any server components, then push to root
+      // Force a refresh to update any server components, then push to dashboard
       router.refresh();
-      router.push("/");
+      router.push("/dashboard");
     }
   };
 
