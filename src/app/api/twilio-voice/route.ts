@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
     console.log(`[TWILIO VOICE] Incoming call from ${callerPhone} to ${twilioNumber}`);
 
-    const vapiAssistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+    const vapiAssistantId = process.env.VAPI_ASSISTANT_ID || process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
 
     // Connect call to Vapi via SIP — Vapi handles transcription, AI summary,
     // and fires the end-of-call webhook to /api/call-finished automatically.
