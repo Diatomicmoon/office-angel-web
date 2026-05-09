@@ -54,7 +54,10 @@ export async function POST(req: Request) {
       const phoneNumber = call?.customer?.number || 'Unknown';
       const durationSeconds = call?.duration || 0;
       const providerCallId = call?.id || call?.callId || payload?.message?.callId;
-      const recordingUrl = call?.recordingUrl || payload?.message?.recordingUrl;
+      const recordingUrl = call?.recordingUrl || payload?.message?.recordingUrl || payload?.message?.artifact?.recordingUrl;
+      // Structured outputs from Vapi analysis plan
+      const structuredOutputs = payload?.message?.analysis?.structuredData || payload?.message?.artifact?.structuredData || null;
+      console.log('📊 Structured outputs:', JSON.stringify(structuredOutputs));
       
       console.log(`📞 Caller ID: ${phoneNumber}`);
       console.log(`⏱️ Duration: ${durationSeconds} seconds`);
@@ -148,6 +151,7 @@ export async function POST(req: Request) {
         meta: {
           provider: 'vapi',
           provider_call_id: providerCallId,
+          structured: structuredOutputs,
         },
       };
 

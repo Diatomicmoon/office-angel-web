@@ -13,6 +13,8 @@ type Call = {
   urgency_flag?: "high" | "medium" | "low" | string;
   action_items?: string;
   created_at?: string;
+  recording_url?: string;
+  meta?: any;
   customers?: {
     first_name?: string;
     last_name?: string;
@@ -45,6 +47,16 @@ function normalizeTranscript(t: any): TranscriptLine[] {
   if (!t) return [];
   if (Array.isArray(t)) return t;
   if (typeof t === "string") {
+    // Handle "AI: ...\nUser: ..." string format from Vapi
+    if (t.includes("\n") || t.includes("AI:") || t.includes("User:")) {
+      return t.split("\n").filter(Boolean).map((line) => {
+        const colonIdx = line.indexOf(":");
+        if (colonIdx > 0) {
+          return { speaker: line.slice(0, colonIdx).trim(), text: line.slice(colonIdx + 1).trim() };
+        }
+        return { speaker: "Unknown", text: line.trim() };
+      });
+    }
     try {
       const parsed = JSON.parse(t);
       return Array.isArray(parsed) ? parsed : [];
@@ -173,8 +185,12 @@ export default function CallLogs() {
             </div>
 
             <div className="bg-gray-900 rounded-lg p-3 flex items-center justify-between gap-4">
-              <div className="text-sm text-gray-200 font-medium">Audio playback: not wired yet</div>
-              <div className="text-white text-sm font-mono">{fmtDuration(selectedCall?.duration_seconds) || ""}</div>
+              {selectedCall?.recording_url ? (
+                <audio controls src={selectedCall.recording_url} className="w-full h-8" style={{filter: 'invert(1)'}} />
+              ) : (
+                <div className="text-sm text-gray-400 font-medium">No recording available</div>
+              )}
+              <div className="text-white text-sm font-mono whitespace-nowrap">{fmtDuration(selectedCall?.duration_seconds) || ""}</div>
             </div>
           </div>
 
@@ -202,14 +218,18 @@ export default function CallLogs() {
                     <MapPin size={16} className="text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-xs text-gray-500 font-medium">Address</p>
-                      <p className="text-sm text-gray-900 font-semibold">{selectedCall?.customers?.address || "(Not captured yet)"}</p>
+                      <p className="text-sm text-gray-900 font-semibold">
+                        {selectedCall?.meta?.structured?.address || selectedCall?.customers?.address || "(Not captured yet)"}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <Briefcase size={16} className="text-gray-400 mt-0.5" />
                     <div>
                       <p className="text-xs text-gray-500 font-medium">Job Type</p>
-                      <p className="text-sm text-gray-900 font-semibold">{selectedCall?.urgency_flag === "high" ? "Emergency" : "Standard"}</p>
+                      <p className="text-sm text-gray-900 font-semibold">
+                        {selectedCall?.meta?.structured?.job_type || (selectedCall?.urgency_flag === "high" ? "Emergency" : "Standard")}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
