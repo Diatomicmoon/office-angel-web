@@ -42,6 +42,8 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // Resolve company.
+    // In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
     let companyId: string | null = process.env.OFFICE_ANGEL_COMPANY_ID || null;
     if (!companyId) {
       const { data: c0 } = await supabase.from('companies').select('id').order('created_at', { ascending: true }).limit(1);
@@ -102,4 +104,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Failed' }, { status: 500 });
   }
 }
-

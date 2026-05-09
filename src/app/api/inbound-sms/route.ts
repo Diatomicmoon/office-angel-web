@@ -46,12 +46,19 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Resolve company by inbound "To" number (or fall back to first company / env).
+    // Resolve company.
+    // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
+    // - In auth tenant mode, map by inbound "To" number.
     let companyId: string | null = null;
-    if (to) {
+
+    const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
+    if (tenantMode !== 'auth') {
+      companyId = process.env.OFFICE_ANGEL_COMPANY_ID || null;
+    } else if (to) {
       const { data } = await supabase.from('companies').select('id').eq('phone_number', to).limit(1);
       companyId = data?.[0]?.id || null;
     }
+
     if (!companyId) companyId = process.env.OFFICE_ANGEL_COMPANY_ID || null;
     if (!companyId) {
       const { data: c0 } = await supabase.from('companies').select('id').order('created_at', { ascending: true }).limit(1);
