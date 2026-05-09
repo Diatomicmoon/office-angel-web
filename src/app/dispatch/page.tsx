@@ -522,8 +522,12 @@ export default function Dispatch() {
                   const h24 = GRID_START_HOUR + Math.floor(i / 2);
                   const isHalf = i % 2 === 1;
                   return (
-                    <div key={i} className="border-b border-gray-200 text-right pr-3 pt-2 relative" style={{ height: GRID_SLOT_PX }}>
-                      <span className={`text-xs ${isHalf ? 'text-gray-300' : 'text-gray-500'} font-medium absolute -top-2.5 right-3 bg-gray-50 px-1`}>
+                    <div
+                      key={i}
+                      className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                      style={{ height: GRID_SLOT_PX }}
+                    >
+                      <span className={`text-[11px] ${isHalf ? 'text-gray-300' : 'text-gray-600'} font-medium mt-1`}>
                         {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
                       </span>
                     </div>
