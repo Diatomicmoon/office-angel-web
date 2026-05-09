@@ -50,6 +50,15 @@ function UrgencyBadge({ urgency }: { urgency: string }) {
   return <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">📞 Standard</span>;
 }
 
+function extractAddressFromSummary(summary: string): string | null {
+  if (!summary) return null;
+  // Match "at [number] [street...], [city], [state]" patterns
+  const match = summary.match(
+    /\bat\s+(\d+\s+[^.]+?(?:Street|St|Drive|Dr|Avenue|Ave|Boulevard|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^,]*(?:,\s*[^,\n]+)?(?:,\s*(?:Minnesota|MN|Wisconsin|WI|Iowa|IA))?)/i
+  );
+  return match ? match[1].trim().replace(/[,.]$/, "") : null;
+}
+
 function extractNormalized(meta: any) {
   const structured = meta?.structured || {};
   const out: Record<string, any> = {};
@@ -231,7 +240,11 @@ export default function CRM() {
             ? `${c.customers.first_name} ${c.customers.last_name || ""}`.trim() : "";
           const callerName = norm.caller_name || customerName || (phone ? formatPhone(phone) : "Unknown Caller");
 
-          const address = norm.address || c.customers?.address || "Address unknown";
+          const address =
+            norm.address ||
+            c.customers?.address ||
+            extractAddressFromSummary(c.summary || "") ||
+            "Address unknown";
 
           let jobType = norm.job_type || "";
           if (!jobType || jobType.toLowerCase() === "electrical") {

@@ -112,10 +112,12 @@ export default function CallLogs() {
   const extractedAddress = useMemo(() => {
     if (normalizedStructured?.address) return normalizedStructured.address;
     if (selectedCall?.customers?.address) return selectedCall.customers.address;
-    // Parse from summary
+    // Parse from summary — handle multiple patterns
     const s = selectedCall?.summary || '';
-    const match = s.match(/(?:at|located at|address[:\s]+)([\d]+[^,.]+(?:Drive|Dr|Street|St|Ave|Avenue|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^,.]*(?:,\s*[^,.]+)?)/i);
-    return match ? match[1].trim() : null;
+    const match = s.match(
+      /\bat\s+(\d+\s+[^.]+?(?:Street|St|Drive|Dr|Avenue|Ave|Boulevard|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^,]*(?:,\s*[^,\n]+)?(?:,\s*(?:Minnesota|MN|Wisconsin|WI|Iowa|IA))?)/i
+    );
+    return match ? match[1].trim().replace(/[,.]$/, '') : null;
   }, [selectedCall]);
 
   const extractedJobType = useMemo(() => {
