@@ -95,11 +95,13 @@ export default function Dispatch() {
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
   const [now, setNow] = useState<Date>(() => new Date());
   const dayScrollRef = useRef<HTMLDivElement | null>(null);
+  const didAutoScrollRef = useRef(false);
 
   const jumpToNow = () => {
     const el = dayScrollRef.current;
     if (!el) return;
-    const minutes = (new Date().getHours() - GRID_START_HOUR) * 60 + new Date().getMinutes();
+    const n = new Date();
+    const minutes = (n.getHours() - GRID_START_HOUR) * 60 + n.getMinutes();
     const y = clamp((minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_TOTAL_PX);
     // Wait for layout; Safari can ignore immediate scrollTop on first paint.
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -265,9 +267,23 @@ export default function Dispatch() {
   // Auto-scroll Day View to around "now" (so you don’t land at midnight).
   useLayoutEffect(() => {
     if (viewMode !== 'day') return;
+    if (didAutoScrollRef.current) return;
+    didAutoScrollRef.current = true;
+    // Try a few times in case Safari hasn't fully laid out yet.
     jumpToNow();
+    setTimeout(jumpToNow, 50);
+    setTimeout(jumpToNow, 250);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode]);
+
+  // If the tech/job columns pop in after fetch, re-center once.
+  useEffect(() => {
+    if (viewMode !== 'day') return;
+    if (!didAutoScrollRef.current) return;
+    if (techs.length === 0) return;
+    setTimeout(jumpToNow, 50);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [techs.length]);
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-6 p-8 h-[calc(100vh-2rem)] flex flex-col">
@@ -544,7 +560,11 @@ export default function Dispatch() {
               )}
             </div>
           ) : (
-            <div ref={dayScrollRef} className="flex-1 flex overflow-auto relative">
+            <div
+              ref={dayScrollRef}
+              className="flex-1 flex overflow-auto relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
+            >
               <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20" style={{ width: GUTTER_W }}>
                 <div className="h-20 border-b border-gray-200 bg-gray-50"></div>
                 {slots.map((i) => {
