@@ -38,11 +38,19 @@ const GRID_START_HOUR = 8; // 8am
 const GRID_HOURS = 8; // 8am–3pm demo window
 const GRID_HEADER_PX = 80; // h-20
 const GRID_HOUR_PX = 128; // h-32
+const GRID_SLOT_MINUTES = 30;
+const GRID_SLOT_PX = GRID_HOUR_PX / 2;
 
 function hourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
   const ampm = h24 >= 12 ? 'PM' : 'AM';
   return `${h} ${ampm}`;
+}
+
+function halfHourLabel(h24: number) {
+  const h = ((h24 + 11) % 12) + 1;
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  return `${h}:30 ${ampm}`;
 }
 
 function getLatLng(loc: any): { lat: number; lng: number } | null {
@@ -76,6 +84,7 @@ export default function Dispatch() {
   const [now, setNow] = useState<Date>(() => new Date());
 
   const hours = useMemo(() => Array.from({ length: GRID_HOURS }, (_, i) => GRID_START_HOUR + i), []);
+  const slots = useMemo(() => Array.from({ length: GRID_HOURS * (60 / GRID_SLOT_MINUTES) }, (_, i) => i), []);
 
   const timeLineTop = useMemo(() => {
     const h = now.getHours();
@@ -479,11 +488,17 @@ export default function Dispatch() {
             <div className="flex-1 flex overflow-x-auto relative">
               <div className="w-20 border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20">
                 <div className="h-20 border-b border-gray-200 bg-gray-50"></div>
-                {hours.map((h) => (
-                  <div key={h} className="h-32 border-b border-gray-200 text-right pr-3 pt-2 relative">
-                    <span className="text-xs font-medium text-gray-500 absolute -top-2.5 right-3 bg-gray-50 px-1">{hourLabel(h)}</span>
-                  </div>
-                ))}
+                {slots.map((i) => {
+                  const h24 = GRID_START_HOUR + Math.floor(i / 2);
+                  const isHalf = i % 2 === 1;
+                  return (
+                    <div key={i} className="border-b border-gray-200 text-right pr-3 pt-2 relative" style={{ height: GRID_SLOT_PX }}>
+                      <span className={`text-xs ${isHalf ? 'text-gray-300' : 'text-gray-500'} font-medium absolute -top-2.5 right-3 bg-gray-50 px-1`}>
+                        {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
               <div className="flex-1 flex min-w-max relative bg-gray-50/30">
                 {timeLineTop !== null && (
@@ -508,8 +523,12 @@ export default function Dispatch() {
                       </div>
                     </div>
                     <div className="relative h-[1024px]">
-                      {[...Array(GRID_HOURS)].map((_, i) => (
-                        <div key={i} className="h-32 border-b border-gray-100 w-full absolute" style={{ top: `${i * GRID_HOUR_PX}px` }}></div>
+                      {[...Array(GRID_HOURS * 2)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                          style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                        />
                       ))}
                       {assignedJobs.filter(j => j.technician_id === tech.id).map((job, idx) => (
                         // Render assigned jobs (mock position for beta)
