@@ -49,8 +49,8 @@ function hourLabel(h24: number) {
 
 function halfHourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
-  const ampm = h24 >= 12 ? 'PM' : 'AM';
-  return `${h}:30 ${ampm}`;
+  // Keep this compact so it doesn't wrap in the gutter.
+  return `${h}:30`;
 }
 
 function minutesSinceGridStart(d: Date) {
@@ -516,7 +516,7 @@ export default function Dispatch() {
             </div>
           ) : (
             <div className="flex-1 flex overflow-x-auto relative">
-              <div className="w-20 border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20">
+              <div className="w-24 border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20">
                 <div className="h-20 border-b border-gray-200 bg-gray-50"></div>
                 {slots.map((i) => {
                   const h24 = GRID_START_HOUR + Math.floor(i / 2);
@@ -527,7 +527,13 @@ export default function Dispatch() {
                       className="border-b border-gray-200 pr-3 flex items-start justify-end"
                       style={{ height: GRID_SLOT_PX }}
                     >
-                      <span className={`text-[11px] ${isHalf ? 'text-gray-300' : 'text-gray-600'} font-medium mt-1`}>
+                      <span
+                        className={`whitespace-nowrap leading-tight mt-1 ${
+                          isHalf
+                            ? 'text-[10px] text-gray-300'
+                            : 'text-[11px] text-gray-700 font-semibold'
+                        }`}
+                      >
                         {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
                       </span>
                     </div>
