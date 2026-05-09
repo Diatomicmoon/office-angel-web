@@ -1,200 +1,402 @@
 "use client";
 
-import { MapPin, Phone, Mail, Clock, DollarSign, Calendar, FileText, Image as ImageIcon, PlusCircle, ArrowLeft, Star, ShieldAlert, CheckCircle2, Navigation } from "lucide-react";
+import { useEffect, useState, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  MapPin, Phone, Mail, Clock, Calendar, FileText,
+  PlusCircle, ArrowLeft, Star, ShieldAlert, CheckCircle2,
+  Navigation, Edit3, Save, X, Tag, AlertTriangle, ChevronRight,
+} from "lucide-react";
 import Link from "next/link";
 
-export default function CustomerProfile() {
+type Call = {
+  id: string;
+  summary?: string;
+  urgency_flag?: string;
+  action_items?: string;
+  created_at?: string;
+  duration_seconds?: number;
+  meta?: any;
+};
+
+type Customer = {
+  id: string;
+  first_name?: string;
+  last_name?: string;
+  phone_number?: string;
+  email?: string;
+  address?: string;
+  property_notes?: string;
+  tags?: string[];
+  created_at?: string;
+};
+
+function formatPhone(phone?: string) {
+  const d = (phone || "").replace(/\D/g, "");
+  if (d.length === 11 && d[0] === "1") return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  return phone || "—";
+}
+
+function fmtDate(iso?: string) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function fmtDuration(sec?: number) {
+  if (!sec) return "";
+  return `${Math.floor(sec / 60)}m ${sec % 60}s`;
+}
+
+function jobTypeFromCall(call: Call) {
+  const s = call.meta?.structured || {};
+  let name = "";
+  Object.values(s).forEach((item: any) => {
+    if (item?.name === "job_type" && item?.result) name = item.result;
+  });
+  if (!name && s.job_type && typeof s.job_type === "string") name = s.job_type;
+  if (!name || name.toLowerCase() === "electrical") {
+    // try job_details
+    let details = "";
+    Object.values(s).forEach((item: any) => {
+      if (item?.name === "job_details" && item?.result) details = item.result;
+    });
+    if (!details && s.job_details && typeof s.job_details === "string") details = s.job_details;
+    if (details) name = details.replace(/^The caller (is |wants |requested? |need[s]? )*/i, "").split(/[,.]/)[0].slice(0, 60).trim();
+  }
+  if (!name) name = call.urgency_flag === "high" ? "Emergency" : "Service Call";
+  return name;
+}
+
+const PRESET_TAGS = ["Dog in yard", "VIP", "Commercial", "Repeat customer", "Gate code needed", "Call before arriving"];
+
+function ProfileContent() {
+  const params = useSearchParams();
+  const id = params.get("id");
+
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [calls, setCalls] = useState<Call[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editingNotes, setEditingNotes] = useState(false);
+  const [notesVal, setNotesVal] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [tagInput, setTagInput] = useState("");
+
+  const load = useCallback(() => {
+    if (!id) { setLoading(false); return; }
+    fetch(`/api/customers?id=${id}`)
+      .then((r) => r.json())
+      .then((json) => {
+        setCustomer(json.customer);
+        setNotesVal(json.customer?.property_notes || "");
+        setCalls(json.calls || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const saveNotes = async () => {
+    if (!customer) return;
+    setSaving(true);
+    await fetch("/api/customers", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: customer.id, property_notes: notesVal }),
+    });
+    setCustomer((prev) => prev ? { ...prev, property_notes: notesVal } : prev);
+    setSaving(false);
+    setEditingNotes(false);
+  };
+
+  const toggleTag = async (tag: string) => {
+    if (!customer) return;
+    const lowerTag = tag.toLowerCase();
+    const current = customer.tags || [];
+    const next = current.includes(lowerTag)
+      ? current.filter((t) => t !== lowerTag)
+      : [...current, lowerTag];
+    setCustomer((prev) => prev ? { ...prev, tags: next } : prev);
+    await fetch("/api/customers", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: customer.id, tags: next }),
+    });
+  };
+
+  const addCustomTag = async () => {
+    if (!tagInput.trim() || !customer) return;
+    const next = [...(customer.tags || []), tagInput.trim().toLowerCase()];
+    setCustomer((prev) => prev ? { ...prev, tags: next } : prev);
+    setTagInput("");
+    await fetch("/api/customers", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: customer.id, tags: next }),
+    });
+  };
+
+  if (loading) {
+    return <div className="flex-1 flex items-center justify-center text-gray-400">Loading customer profile...</div>;
+  }
+
+  if (!customer && id) {
+    return <div className="flex-1 flex items-center justify-center text-gray-400">Customer not found.</div>;
+  }
+
+  const name = customer?.first_name && customer.first_name !== "New"
+    ? `${customer.first_name} ${customer.last_name || ""}`.trim()
+    : formatPhone(customer?.phone_number);
+
+  const initials = (customer?.first_name && customer.first_name !== "New")
+    ? `${customer.first_name[0]}${(customer.last_name || "?")[0]}`.toUpperCase()
+    : "?";
+
+  const hasDogTag = (customer?.tags || []).includes("dog in yard") ||
+    (customer?.property_notes || "").toLowerCase().includes("dog");
+
+  const lifetimeCallCount = calls.length;
+
   return (
-    <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto">
-      
-      {/* Back Navigation */}
+    <div className="max-w-7xl mx-auto p-8 flex flex-col min-h-screen overflow-y-auto">
+      {/* Back */}
       <div className="mb-6">
         <Link href="/projects" className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors w-fit">
           <ArrowLeft size={16} /> Back to Archive
         </Link>
       </div>
 
-      {/* Header Profile Section */}
+      {/* Header Card */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 flex items-start justify-between">
         <div className="flex gap-6">
-          <div className="h-20 w-20 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-3xl font-bold flex-shrink-0">
-            JM
+          <div className="h-20 w-20 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-3xl font-bold shrink-0">
+            {initials}
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              John Martinez
-              <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                <Star size={12} className="fill-green-700" /> VIP Customer
-              </span>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3 flex-wrap">
+              {name}
+              {lifetimeCallCount >= 2 && (
+                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
+                  <Star size={12} className="fill-green-700" /> Repeat Customer
+                </span>
+              )}
+              {hasDogTag && (
+                <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded">
+                  🐕 Dog in yard
+                </span>
+              )}
             </h1>
-            
-            <div className="flex gap-6 mt-3 text-sm text-gray-600">
-              <span className="flex items-center gap-1.5"><Phone size={16} className="text-gray-400" /> (763) 555-8822</span>
-              <span className="flex items-center gap-1.5"><Mail size={16} className="text-gray-400" /> john.martinez@email.com</span>
-              <span className="flex items-center gap-1.5 text-blue-600 font-medium cursor-pointer hover:underline">
-                <MapPin size={16} className="text-blue-500" /> 8890 Maple Ln, Maple Grove, MN
-              </span>
+            <div className="flex flex-wrap gap-5 mt-3 text-sm text-gray-600">
+              {customer?.phone_number && (
+                <a href={`tel:${customer.phone_number}`} className="flex items-center gap-1.5 text-blue-600 hover:underline">
+                  <Phone size={15} className="text-gray-400" /> {formatPhone(customer.phone_number)}
+                </a>
+              )}
+              {customer?.email && (
+                <span className="flex items-center gap-1.5">
+                  <Mail size={15} className="text-gray-400" /> {customer.email}
+                </span>
+              )}
+              {customer?.address && (
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(customer.address)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-blue-600 hover:underline"
+                >
+                  <MapPin size={15} className="text-blue-400" /> {customer.address}
+                </a>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="text-right">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Lifetime Value</p>
-          <p className="text-3xl font-bold text-gray-900">$3,950.00</p>
-          <button className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+        <div className="text-right shrink-0">
+          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Calls</p>
+          <p className="text-4xl font-bold text-gray-900">{lifetimeCallCount}</p>
+          <p className="text-xs text-gray-400 mt-1">Since {fmtDate(customer?.created_at)}</p>
+          <button className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ml-auto">
             <PlusCircle size={16} /> Book New Job
           </button>
         </div>
       </div>
 
-      {/* Main Split Grid */}
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column: Property DNA & Permanent Notes */}
-        <div className="space-y-8">
-          
+
+        {/* LEFT: Property DNA + Tags */}
+        <div className="space-y-6">
+
           {/* Property DNA */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <ShieldAlert size={18} className="text-orange-500" />
-                Property DNA (Site Notes)
+                Property DNA
               </h2>
-              <button className="text-xs text-blue-600 font-medium">Edit</button>
+              {!editingNotes ? (
+                <button onClick={() => setEditingNotes(true)} className="text-xs text-blue-600 font-medium flex items-center gap-1 hover:text-blue-800">
+                  <Edit3 size={12} /> Edit
+                </button>
+              ) : (
+                <div className="flex gap-2">
+                  <button onClick={saveNotes} disabled={saving} className="text-xs text-green-700 font-medium flex items-center gap-1">
+                    <Save size={12} /> {saving ? "Saving..." : "Save"}
+                  </button>
+                  <button onClick={() => { setEditingNotes(false); setNotesVal(customer?.property_notes || ""); }} className="text-xs text-gray-500">
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
             </div>
-            <div className="p-5 space-y-4">
-              <div className="bg-orange-50 border border-orange-100 text-orange-800 text-sm p-3 rounded-lg flex items-start gap-2">
-                <ShieldAlert size={16} className="mt-0.5 flex-shrink-0" />
-                <p><strong>DOG IN YARD:</strong> Large German Shepherd. Text customer 10 mins before arriving so he can bring the dog inside.</p>
-              </div>
-              <div className="text-sm text-gray-700 space-y-3">
-                <p><strong>Gate Code:</strong> 1492#</p>
-                <p><strong>Panel Info:</strong> Upgraded to 200A Square D (QO) in May 2026. Subpanel in detached garage is still 60A.</p>
-                <p><strong>Water Shutoff:</strong> Buried under the rose bush on the left side of the house.</p>
-              </div>
+            <div className="p-5">
+              {editingNotes ? (
+                <textarea
+                  value={notesVal}
+                  onChange={(e) => setNotesVal(e.target.value)}
+                  className="w-full h-40 text-sm text-gray-800 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  placeholder={"Dog in yard — large German Shepherd, text 10 min before arriving.\nGate code: 1492#\nPanel: Square D 200A, upgraded May 2026.\nSubpanel in garage still 60A."}
+                />
+              ) : notesVal ? (
+                <div className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">
+                  {notesVal.split("\n").map((line, i) => {
+                    const isDanger = /dog|warning|caution|danger|careful|lock|gate/i.test(line);
+                    return (
+                      <div key={i} className={isDanger ? "bg-orange-50 border border-orange-100 text-orange-800 p-2 rounded-lg mb-2 flex items-start gap-2" : "mb-1"}>
+                        {isDanger && <AlertTriangle size={14} className="mt-0.5 shrink-0" />}
+                        {line}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <button onClick={() => setEditingNotes(true)} className="w-full text-center text-sm text-gray-400 hover:text-blue-600 py-4 border-2 border-dashed border-gray-200 rounded-lg transition-colors">
+                  + Add site notes (dog in yard, gate code, panel info...)
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Media Vault Mock */}
+          {/* Tags */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <div className="p-4 border-b border-gray-200 bg-gray-50">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <ImageIcon size={18} className="text-blue-600" />
-                Media Vault
+                <Tag size={16} className="text-blue-500" /> Tags
               </h2>
-              <button className="text-xs text-blue-600 font-medium">View All (12)</button>
             </div>
-            <div className="p-4 grid grid-cols-2 gap-3">
-              <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 hover:border-blue-400 cursor-pointer overflow-hidden relative">
-                <div className="absolute inset-0 bg-blue-900/10"></div>
-                <ImageIcon size={24} className="text-gray-400" />
-                <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-black/50 px-1.5 py-0.5 rounded">Panel_After.jpg</span>
+            <div className="p-4 space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {PRESET_TAGS.map((tag) => {
+                  const active = (customer?.tags || []).includes(tag.toLowerCase());
+                  return (
+                    <button
+                      key={tag}
+                      onClick={() => toggleTag(tag)}
+                      className={`text-xs font-medium px-3 py-1.5 rounded-lg border transition-colors ${
+                        active
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-white text-gray-600 border-gray-300 hover:border-blue-400 hover:text-blue-600"
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  );
+                })}
               </div>
-              <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 hover:border-blue-400 cursor-pointer overflow-hidden relative">
-                <div className="absolute inset-0 bg-blue-900/10"></div>
-                <ImageIcon size={24} className="text-gray-400" />
-                <span className="absolute bottom-2 left-2 text-[10px] font-bold text-white bg-black/50 px-1.5 py-0.5 rounded">Permit_Signoff.pdf</span>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && addCustomTag()}
+                  placeholder="Add custom tag..."
+                  className="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                />
+                <button onClick={addCustomTag} className="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors">
+                  Add
+                </button>
               </div>
             </div>
           </div>
 
         </div>
 
-        {/* Right Columns (Span 2): Job History Timeline */}
+        {/* RIGHT: Call History Timeline */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm h-full flex flex-col overflow-hidden">
-            
-            <div className="p-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col overflow-hidden">
+            <div className="p-5 border-b border-gray-200 bg-gray-50">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <Calendar size={18} className="text-blue-600" />
-                Job History Timeline
+                Call & Job History
+                <span className="ml-auto text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{calls.length}</span>
               </h2>
             </div>
 
-            <div className="p-6 flex-1 overflow-y-auto">
-              <div className="relative border-l-2 border-gray-200 ml-3 space-y-10 pb-4">
-                
-                {/* Timeline Item 1 */}
-                <div className="relative pl-8">
-                  <div className="absolute w-6 h-6 bg-green-500 rounded-full -left-[13px] border-4 border-white flex items-center justify-center">
-                    <CheckCircle2 size={12} className="text-white" />
-                  </div>
-                  
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg">200A Panel Upgrade</h3>
-                      <p className="text-sm text-gray-500 font-medium">Ticket #8842 • Completed May 1, 2026</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">$2,850.00</p>
-                      <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded mt-1 inline-block">PAID</span>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-3">
-                    <div className="flex gap-6 mb-3 text-sm text-gray-600 border-b border-gray-200 pb-3">
-                      <span className="flex items-center gap-1.5"><Clock size={16} className="text-gray-400"/> 8:30 AM - 2:00 PM</span>
-                      <span className="flex items-center gap-1.5"><Navigation size={16} className="text-gray-400"/> Tech: Mike (Truck 1)</span>
-                      <span className="flex items-center gap-1.5"><FileText size={16} className="text-gray-400"/> Invoice: INV-2042</span>
-                    </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      <strong>Tech Notes:</strong> Swapped out old 100A Federal Pacific panel. Installed new 200A Square D QO 42-space outdoor metermain. Ground rods driven, bonded water meter. City inspector (Bob) signed off at 1:30 PM. Customer was very happy.
-                    </p>
-                  </div>
-                </div>
+            <div className="p-6 overflow-y-auto">
+              {calls.length === 0 ? (
+                <p className="text-gray-400 text-sm text-center py-12">No calls recorded yet.</p>
+              ) : (
+                <div className="relative border-l-2 border-gray-200 ml-3 space-y-8 pb-4">
+                  {calls.map((call, i) => {
+                    const isHigh = call.urgency_flag === "high";
+                    const isMed = call.urgency_flag === "medium";
+                    const dotColor = isHigh ? "bg-red-500" : isMed ? "bg-yellow-500" : "bg-blue-500";
+                    const jobType = jobTypeFromCall(call);
 
-                {/* Timeline Item 2 */}
-                <div className="relative pl-8">
-                  <div className="absolute w-6 h-6 bg-blue-500 rounded-full -left-[13px] border-4 border-white flex items-center justify-center">
-                    <CheckCircle2 size={12} className="text-white" />
-                  </div>
-                  
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg">EV Charger Installation</h3>
-                      <p className="text-sm text-gray-500 font-medium">Ticket #6102 • Completed Oct 14, 2025</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">$850.00</p>
-                      <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded mt-1 inline-block">PAID</span>
-                    </div>
-                  </div>
-                  
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mt-3">
-                    <div className="flex gap-6 mb-3 text-sm text-gray-600 border-b border-gray-200 pb-3">
-                      <span className="flex items-center gap-1.5"><Clock size={16} className="text-gray-400"/> 10:00 AM - 12:30 PM</span>
-                      <span className="flex items-center gap-1.5"><Navigation size={16} className="text-gray-400"/> Tech: Dave (Truck 2)</span>
-                    </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      <strong>Tech Notes:</strong> Installed Tesla Wall Connector in attached garage. Pulled 60A circuit from main panel in basement (about 40ft of MC cable). Commissioned charger on customer&apos;s Wi-Fi. Warned customer that main panel is old FPE and should be upgraded soon.
-                    </p>
-                  </div>
-                </div>
+                    return (
+                      <div key={call.id} className="relative pl-8">
+                        <div className={`absolute w-5 h-5 ${dotColor} rounded-full -left-[11px] border-4 border-white flex items-center justify-center`}>
+                          {isHigh
+                            ? <AlertTriangle size={9} className="text-white" />
+                            : <CheckCircle2 size={9} className="text-white" />}
+                        </div>
 
-                {/* Timeline Item 3 */}
-                <div className="relative pl-8">
-                  <div className="absolute w-6 h-6 bg-blue-500 rounded-full -left-[13px] border-4 border-white flex items-center justify-center">
-                    <CheckCircle2 size={12} className="text-white" />
-                  </div>
-                  
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg">Emergency: Tripped Breaker</h3>
-                      <p className="text-sm text-gray-500 font-medium">Ticket #5091 • Completed Jan 2, 2024</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-600">$250.00</p>
-                      <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded mt-1 inline-block">PAID</span>
-                    </div>
-                  </div>
-                </div>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="font-bold text-gray-900">{jobType}</h3>
+                            <p className="text-sm text-gray-500 mt-0.5">{fmtDate(call.created_at)}{call.duration_seconds ? ` · ${fmtDuration(call.duration_seconds)}` : ""}</p>
+                          </div>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded ${isHigh ? "bg-red-100 text-red-700" : isMed ? "bg-yellow-100 text-yellow-700" : "bg-blue-100 text-blue-700"}`}>
+                            {isHigh ? "🚨 Emergency" : isMed ? "📋 Estimate" : "📞 Standard"}
+                          </span>
+                        </div>
 
-              </div>
+                        {call.summary && (
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <p className="text-sm text-gray-700 leading-relaxed">{call.summary}</p>
+                            {call.action_items && (
+                              <div className="mt-3 pt-3 border-t border-gray-100 flex items-start gap-2 text-sm text-yellow-800">
+                                <Clock size={14} className="mt-0.5 shrink-0 text-yellow-500" />
+                                <span>{call.action_items}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <Link
+                          href={`/call-logs?highlight=${call.id}`}
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2"
+                        >
+                          <FileText size={12} /> View full transcript <ChevronRight size={11} />
+                        </Link>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
       </div>
     </div>
+  );
+}
+
+export default function CustomerProfile() {
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center text-gray-400">Loading...</div>}>
+      <ProfileContent />
+    </Suspense>
   );
 }

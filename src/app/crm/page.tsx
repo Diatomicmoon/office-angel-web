@@ -1,10 +1,12 @@
 "use client";
 
-import { Kanban, List, MapPin, Phone, X, Clock, Zap, FileText, ChevronRight, User } from "lucide-react";
+import { Kanban, List, MapPin, Phone, X, Clock, Zap, FileText, ChevronRight, User, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 type Lead = {
   id: string;
+  customer_id: string;
   caller_name: string;
   phone: string;
   address: string;
@@ -212,9 +214,14 @@ function LeadDetail({ lead, onClose }: { lead: Lead; onClose: () => void }) {
           >
             <Phone size={16} /> Call Back
           </a>
-          <button className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors">
-            Schedule Job
-          </button>
+          {lead.customer_id && (
+            <Link
+              href={`/projects/customer-profile?id=${lead.customer_id}`}
+              className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+            >
+              <ExternalLink size={16} /> Full Profile
+            </Link>
+          )}
         </div>
       </div>
     </div>
@@ -262,6 +269,7 @@ export default function CRM() {
 
           return {
             id: c.id,
+            customer_id: c.customer_id || "",
             caller_name: callerName,
             phone,
             address,

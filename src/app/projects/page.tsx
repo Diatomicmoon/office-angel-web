@@ -1,215 +1,196 @@
 "use client";
 
-import { useState } from "react";
-import { Search, Filter, FileText, MapPin, Calendar, Clock, DollarSign, CheckCircle2, AlertCircle, RefreshCcw, FolderOpen, Download, PlusCircle, Phone, Mail, Sparkles } from "lucide-react";
-
+import { useState, useEffect } from "react";
+import { Search, MapPin, Phone, FolderOpen, AlertCircle, PlusCircle, ChevronRight, User } from "lucide-react";
 import Link from "next/link";
-import { NotWired } from "@/components/NotWired";
+
+type Customer = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  phone_number: string;
+  email: string;
+  address: string;
+  property_notes?: string;
+  tags?: string[];
+  created_at: string;
+  call_logs: { id: string; urgency_flag: string; created_at: string; summary: string }[];
+};
+
+function timeAgo(iso?: string) {
+  if (!iso) return "—";
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.round(diff / 86400000);
+  if (days < 1) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 30) return `${days}d ago`;
+  const months = Math.round(days / 30);
+  return `${months}mo ago`;
+}
+
+function formatPhone(phone: string) {
+  const d = phone?.replace(/\D/g, "") || "";
+  if (d.length === 11 && d[0] === "1") return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  return phone || "—";
+}
+
+function initials(first?: string, last?: string) {
+  return `${(first || "?")[0]}${(last || "?")[0]}`.toUpperCase();
+}
+
+const TAG_COLORS: Record<string, string> = {
+  "dog in yard": "bg-orange-100 text-orange-700",
+  "vip": "bg-yellow-100 text-yellow-700",
+  "commercial": "bg-purple-100 text-purple-700",
+  "repeat customer": "bg-green-100 text-green-700",
+};
 
 export default function JobArchive() {
-  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-  if (!isDemoMode) {
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [q, setQ] = useState("");
+
+  useEffect(() => {
+    fetch("/api/customers")
+      .then((r) => r.json())
+      .then((json) => {
+        setCustomers(json.customers || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const filtered = customers.filter((c) => {
+    if (!q) return c.first_name !== "New"; // hide ghost "New Caller" entries by default
+    const s = q.toLowerCase();
     return (
-      <NotWired
-        title="Projects"
-        subtitle="This screen is still demo UI (fake job archive). Next step is wiring jobs + customer profiles from Supabase."
-      />
+      `${c.first_name} ${c.last_name}`.toLowerCase().includes(s) ||
+      (c.phone_number || "").includes(s) ||
+      (c.address || "").toLowerCase().includes(s) ||
+      (c.email || "").toLowerCase().includes(s)
     );
-  }
+  });
 
   return (
     <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)]">
       {/* Header */}
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Job Archive & Customer Profiles</h1>
-          <p className="text-gray-500 mt-2">Permanent record of all jobs, customer contact info, and fast re-booking.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Customer Archive</h1>
+          <p className="text-gray-500 mt-2">Full history, site notes, and lifetime value for every customer.</p>
         </div>
         <div className="flex gap-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search address, email, or name..." 
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black w-64"
+            <input
+              type="text"
+              placeholder="Search name, phone, address..."
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black w-72"
             />
           </div>
-          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
-            <Filter size={18} /> Filters
-          </button>
         </div>
       </div>
 
-      {/* Main Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-hidden flex flex-col">
-        
         {/* Table Header */}
         <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
-          <div className="col-span-3">Customer & Contact Info</div>
-          <div className="col-span-3">Location & Job Scope</div>
-          <div className="col-span-2">Date & Tech</div>
-          <div className="col-span-2">Financials</div>
-          <div className="col-span-2 text-right">Quick Actions</div>
+          <div className="col-span-3">Customer</div>
+          <div className="col-span-3">Address</div>
+          <div className="col-span-2">Calls / Last Contact</div>
+          <div className="col-span-2">Tags / Notes</div>
+          <div className="col-span-2 text-right">Actions</div>
         </div>
 
-        {/* Table Body */}
         <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
-          
-          {/* Row 1: Completed Job */}
-          <div className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors">
-            
-            {/* Customer Info */}
-            <div className="col-span-3 flex items-start gap-3">
-              <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                <FolderOpen size={20} className="text-gray-500" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-900">John Martinez</h4>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                  <Phone size={12} /> (763) 555-8822
-                </p>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                  <Mail size={12} /> john.martinez@email.com
-                </p>
-              </div>
-            </div>
-            
-            {/* Location & Scope */}
-            <div className="col-span-3">
-              <p className="text-sm font-medium text-gray-900">200A Panel Upgrade</p>
-              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                <MapPin size={12} /> 8890 Maple Ln, Maple Grove, MN
-              </p>
-            </div>
+          {loading ? (
+            <div className="p-12 text-center text-gray-400">Loading customers...</div>
+          ) : filtered.length === 0 ? (
+            <div className="p-12 text-center text-gray-400">No customers found.</div>
+          ) : (
+            filtered.map((c) => {
+              const name = c.first_name && c.first_name !== "New"
+                ? `${c.first_name} ${c.last_name || ""}`.trim()
+                : formatPhone(c.phone_number);
+              const callCount = c.call_logs?.length || 0;
+              const lastCall = c.call_logs?.[0]?.created_at;
+              const hasEmergency = c.call_logs?.some((l) => l.urgency_flag === "high");
+              const hasDog = c.tags?.includes("dog in yard") || (c.property_notes || "").toLowerCase().includes("dog");
 
-            {/* Date & Tech */}
-            <div className="col-span-2">
-              <p className="text-sm text-gray-900">May 1, 2026</p>
-              <p className="text-xs text-gray-500 mt-1">Tech: Mike (Truck 1)</p>
-            </div>
+              return (
+                <div key={c.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors group">
+                  {/* Customer */}
+                  <div className="col-span-3 flex items-center gap-3">
+                    <div className="h-10 w-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">
+                      {c.first_name !== "New" ? initials(c.first_name, c.last_name) : <User size={18} />}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{name}</p>
+                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <Phone size={11} /> {formatPhone(c.phone_number)}
+                      </p>
+                    </div>
+                  </div>
 
-            {/* Financials */}
-            <div className="col-span-2">
-              <p className="text-sm font-bold text-green-600">$2,850.00</p>
-              <p className="text-[10px] font-bold text-green-700 bg-green-100 inline-block px-1.5 py-0.5 rounded mt-1">PAID</p>
-            </div>
+                  {/* Address */}
+                  <div className="col-span-3">
+                    {c.address ? (
+                      <p className="text-sm text-gray-700 flex items-start gap-1.5">
+                        <MapPin size={13} className="text-gray-400 mt-0.5 shrink-0" />
+                        <span className="leading-snug">{c.address}</span>
+                      </p>
+                    ) : (
+                      <span className="text-xs text-gray-400">No address on file</span>
+                    )}
+                  </div>
 
-            {/* Actions */}
-            <div className="col-span-2 flex flex-col items-end gap-2">
-              <button className="text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 border border-blue-200" title="Create a new job ticket with this customer's info already filled out.">
-                <PlusCircle size={14} /> New Job
-              </button>
-              <div className="flex items-center gap-3 text-right mt-1">
-                <button className="text-gray-400 hover:text-blue-600 transition-colors" title="Restore old job to CRM">
-                  <RefreshCcw size={16} />
-                </button>
-                <Link href="/projects/customer-profile" className="text-xs font-medium text-blue-600 hover:text-blue-800">
-                  View Full Profile
-                </Link>
-              </div>
-            </div>
+                  {/* Calls */}
+                  <div className="col-span-2">
+                    <div className="flex items-center gap-2">
+                      {hasEmergency ? (
+                        <AlertCircle size={14} className="text-red-500 shrink-0" />
+                      ) : (
+                        <FolderOpen size={14} className="text-gray-400 shrink-0" />
+                      )}
+                      <span className="text-sm font-semibold text-gray-900">{callCount} call{callCount !== 1 ? "s" : ""}</span>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-0.5">{timeAgo(lastCall)}</p>
+                  </div>
 
-          </div>
+                  {/* Tags */}
+                  <div className="col-span-2 flex flex-wrap gap-1">
+                    {hasDog && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700">🐕 Dog in yard</span>
+                    )}
+                    {c.tags?.filter((t) => t !== "dog in yard").map((tag) => (
+                      <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-gray-100 text-gray-600"}`}>
+                        {tag}
+                      </span>
+                    ))}
+                    {!hasDog && (!c.tags || c.tags.length === 0) && (
+                      <span className="text-xs text-gray-400">—</span>
+                    )}
+                  </div>
 
-          {/* Row 3: Lost Bid / Follow Up Opportunity */}
-          <div className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors">
-            
-            <div className="col-span-3 flex items-start gap-3">
-              <div className="h-10 w-10 bg-red-50 border border-red-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                <AlertCircle size={20} className="text-red-500" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-900">Robert Vance</h4>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                  <Phone size={12} /> (952) 555-0912
-                </p>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                  <Mail size={12} /> r.vance.home@email.com
-                </p>
-              </div>
-            </div>
-            
-            <div className="col-span-3">
-              <p className="text-sm font-medium text-gray-900">Basement Remodel Rough-In</p>
-              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                <MapPin size={12} /> 4410 Highwood Dr, Minnetonka, MN
-              </p>
-            </div>
-
-            <div className="col-span-2">
-              <p className="text-sm text-gray-900">Jan 12, 2026</p>
-              <p className="text-xs text-gray-500 mt-1">Status: Ghosted</p>
-            </div>
-
-            <div className="col-span-2">
-              <p className="text-sm font-bold text-gray-500 strike-through line-through">$4,200.00</p>
-              <p className="text-[10px] font-bold text-red-700 bg-red-100 border border-red-200 inline-block px-1.5 py-0.5 rounded mt-1">LOST BID</p>
-            </div>
-
-            <div className="col-span-2 flex flex-col items-end gap-2">
-              <button className="text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 border border-indigo-200 w-full justify-center" title="AI Drafts a 6-month check-in email">
-                <Sparkles size={14} className="text-indigo-500" /> AI Follow-Up
-              </button>
-              <div className="flex items-center gap-3 text-right mt-1">
-                <Link href="/projects/customer-profile" className="text-xs font-medium text-blue-600 hover:text-blue-800">
-                  View Full Profile
-                </Link>
-              </div>
-            </div>
-
-          </div>
-          <div className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors">
-            
-            <div className="col-span-3 flex items-start gap-3 opacity-80">
-              <div className="h-10 w-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                <FolderOpen size={20} className="text-gray-500" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-gray-900">Sarah Jenkins</h4>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                  <Phone size={12} /> (612) 555-0199
-                </p>
-                <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                  <Mail size={12} /> s.jenkins@email.com
-                </p>
-              </div>
-            </div>
-            
-            <div className="col-span-3 opacity-80">
-              <p className="text-sm font-medium text-gray-900">EV Charger Install (Tesla)</p>
-              <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                <MapPin size={12} /> 1442 Grand Ave, St Paul, MN
-              </p>
-            </div>
-
-            <div className="col-span-2 opacity-80">
-              <p className="text-sm text-gray-900">April 28, 2026</p>
-              <p className="text-xs text-gray-500 mt-1">Tech: Dave (Truck 2)</p>
-            </div>
-
-            <div className="col-span-2 opacity-80">
-              <p className="text-sm font-bold text-gray-900">$850.00</p>
-              <p className="text-[10px] font-bold text-gray-700 bg-gray-200 inline-block px-1.5 py-0.5 rounded mt-1">COMPLETED</p>
-            </div>
-
-            <div className="col-span-2 flex flex-col items-end gap-2">
-              <button className="text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1.5 border border-blue-200" title="Create a new job ticket with this customer's info already filled out.">
-                <PlusCircle size={14} /> New Job
-              </button>
-              <div className="flex items-center gap-3 text-right mt-1">
-                <button className="text-gray-400 hover:text-blue-600 transition-colors" title="Restore old job to CRM">
-                  <RefreshCcw size={16} />
-                </button>
-                <Link href="/projects/customer-profile" className="text-xs font-medium text-blue-600 hover:text-blue-800">
-                  View Full Profile
-                </Link>
-              </div>
-            </div>
-
-          </div>
-
+                  {/* Actions */}
+                  <div className="col-span-2 flex items-center justify-end gap-3">
+                    <button className="text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 border border-blue-200">
+                      <PlusCircle size={13} /> New Job
+                    </button>
+                    <Link
+                      href={`/projects/customer-profile?id=${c.id}`}
+                      className="text-xs font-medium text-gray-600 hover:text-blue-600 flex items-center gap-1 transition-colors"
+                    >
+                      Profile <ChevronRight size={13} />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
-
       </div>
     </div>
   );
