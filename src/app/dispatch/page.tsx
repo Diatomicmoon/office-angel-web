@@ -136,6 +136,15 @@ function customerLabel(job: Job) {
   return 'Unknown customer';
 }
 
+function statusPill(status?: string) {
+  const s = String(status || '').toLowerCase();
+  if (s.includes('reschedule')) return 'text-orange-800 bg-orange-100 border-orange-200';
+  if (s.includes('confirm')) return 'text-green-800 bg-green-100 border-green-200';
+  if (s.includes('scheduled')) return 'text-blue-700 bg-blue-100 border-blue-200';
+  if (s.includes('lead')) return 'text-gray-700 bg-gray-100 border-gray-200';
+  return 'text-blue-700 bg-blue-100 border-blue-200';
+}
+
 function toDateInputValue(d: Date) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -458,7 +467,7 @@ export default function Dispatch() {
                   <div className="bg-white border border-gray-200 rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-gray-500 uppercase">Status</span>
-                      <span className="text-xs font-bold px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">{ticket.status || 'Lead'}</span>
+                      <span className={`text-xs font-bold px-2 py-1 rounded border ${statusPill(ticket.status)}`}>{ticket.status || 'Lead'}</span>
                     </div>
                     {ticket.address && (
                       <p className="text-sm text-gray-800 mt-3 flex items-start gap-2">
@@ -569,7 +578,7 @@ export default function Dispatch() {
         </div>
       </div>
 
-      <div className="flex-1 flex gap-6 min-h-0 overflow-x-hidden overflow-y-visible">
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
         {/* Left Sidebar: AI Parking Lot */}
         <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
           <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
@@ -746,7 +755,7 @@ export default function Dispatch() {
           ) : (
             <div
               ref={dayScrollRef}
-              className="flex-1 overflow-auto relative"
+              className="flex-1 overflow-x-auto overflow-y-auto relative"
               style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
             >
               {/* Sticky header row (single, reliable) */}
@@ -844,7 +853,7 @@ export default function Dispatch() {
                               style={jobStyleForGrid(job, idx)}
                             >
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
                                 {job.scheduled_start && (
                                   <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
                                     {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
