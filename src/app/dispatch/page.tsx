@@ -20,6 +20,7 @@ type Job = {
   technician_id?: string;
   scheduled_start?: string;
   scheduled_end?: string;
+  estimated_minutes?: number;
   created_at?: string;
   customers?: {
     first_name?: string;
@@ -41,7 +42,27 @@ export default function Dispatch() {
   const [techTableAvailable, setTechTableAvailable] = useState(true);
   const [assignSelection, setAssignSelection] = useState<Record<string, string>>({});
   const [assignSaving, setAssignSaving] = useState<string | null>(null);
-  const [scheduleSelection, setScheduleSelection] = useState<Record<string, { start?: string; end?: string }>>({});
+  const [scheduleSelection, setScheduleSelection] = useState<Record<string, { date?: string; time?: string; duration?: number }>>({});
+
+  const getDefaultDuration = (job: Job) => {
+    const m = job.estimated_minutes;
+    if (!m || Number.isNaN(Number(m))) return 60;
+    // clamp to common buckets
+    if (m <= 30) return 30;
+    if (m <= 60) return 60;
+    if (m <= 90) return 90;
+    if (m <= 120) return 120;
+    if (m <= 180) return 180;
+    return 240;
+  };
+
+  const toIso = (date?: string, time?: string) => {
+    if (!date || !time) return null;
+    // datetime-local style string; parse as local time
+    const d = new Date(`${date}T${time}`);
+    if (Number.isNaN(d.getTime())) return null;
+    return d.toISOString();
+  };
 
   const loadJobs = () => {
     fetch("/api/jobs?view=unassigned")
@@ -57,9 +78,15 @@ export default function Dispatch() {
 
   const bookJob = async (jobId: string) => {
     const techId = assignSelection[jobId];
-    const start = scheduleSelection[jobId]?.start;
-    const end = scheduleSelection[jobId]?.end;
-    if (!techId || !start || !end) return;
+    const date = scheduleSelection[jobId]?.date;
+    const time = scheduleSelection[jobId]?.time;
+    const duration = scheduleSelection[jobId]?.duration;
+    const startIso = toIso(date, time);
+    if (!techId || !startIso || !duration) return;
+
+    const startDt = new Date(startIso);
+    const endDt = new Date(startDt.getTime() + duration * 60000);
+    const endIso = endDt.toISOString();
 
     setAssignSaving(jobId);
     try {
@@ -69,8 +96,8 @@ export default function Dispatch() {
         body: JSON.stringify({
           id: jobId,
           technician_id: techId,
-          scheduled_start: new Date(start).toISOString(),
-          scheduled_end: new Date(end).toISOString(),
+          scheduled_start: startIso,
+          scheduled_end: endIso,
           status: "Scheduled",
         }),
       });
@@ -183,34 +210,53 @@ export default function Dispatch() {
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
                       <input
-                        type="datetime-local"
-                        value={scheduleSelection[job.id]?.start || ""}
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
                         onChange={(e) => setScheduleSelection((prev) => ({
                           ...prev,
-                          [job.id]: { ...(prev[job.id] || {}), start: e.target.value },
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
                         }))}
                         className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">End</label>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
                       <input
-                        type="datetime-local"
-                        value={scheduleSelection[job.id]?.end || ""}
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
                         onChange={(e) => setScheduleSelection((prev) => ({
                           ...prev,
-                          [job.id]: { ...(prev[job.id] || {}), end: e.target.value },
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
                         }))}
                         className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
                       />
                     </div>
                   </div>
 
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
                   <button
                     onClick={() => bookJob(job.id)}
-                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.start || !scheduleSelection[job.id]?.end || assignSaving === job.id}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
                     className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
                   >
                     {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}

@@ -70,6 +70,7 @@ export async function POST(req: Request) {
       technician_id: body.technician_id,
       scheduled_start: body.scheduled_start,
       scheduled_end: body.scheduled_end,
+      estimated_minutes: body.estimated_minutes,
       ...(isUpdate ? (body.priority !== undefined ? { priority: body.priority } : {}) : { priority: body.priority || "normal" }),
     };
 

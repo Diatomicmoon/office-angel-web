@@ -31,6 +31,63 @@ function deriveActionItems(summary?: string, urgency?: string) {
   return 'Requires review';
 }
 
+function heuristicDurationMinutes(text: string) {
+  const s = (text || '').toLowerCase();
+  if (s.match(/(burning|smoke|sparking|arcing|fire|no power|power out|outage)/)) return 120;
+  if (s.match(/(panel upgrade|service upgrade|200a|100a|service change)/)) return 480;
+  if (s.match(/(ev charger|tesla|charger)/)) return 240;
+  if (s.match(/(recessed|can light|lighting install|fixtures)/)) return 180;
+  if (s.match(/(breaker tripping|tripping)/)) return 120;
+  if (s.match(/(outlet|switch|gfci)/)) return 60;
+  if (s.match(/(estimate|quote)/)) return 90;
+  return 90;
+}
+
+async function aiEstimateDurationMinutes(args: {
+  openaiApiKey?: string | null;
+  summary?: string | null;
+  jobType?: string | null;
+  jobDetails?: string | null;
+  urgencyFlag?: string | null;
+}) {
+  const text = `${args.jobType || ''}\n${args.jobDetails || ''}\n${args.summary || ''}`.trim();
+  const fallback = heuristicDurationMinutes(text);
+
+  if (!args.openaiApiKey) return { minutes: fallback, source: 'heuristic' as const };
+
+  try {
+    const openai = new OpenAI({ apiKey: args.openaiApiKey });
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an expert electrical dispatcher. Estimate job duration in minutes for scheduling. Return STRICT JSON only.'
+        },
+        {
+          role: 'user',
+          content: JSON.stringify({
+            job_type: args.jobType,
+            job_details: args.jobDetails,
+            summary: args.summary,
+            urgency: args.urgencyFlag,
+            instructions: 'Return: {"estimated_minutes": number, "min_minutes": number, "max_minutes": number, "confidence": "low"|"medium"|"high" }'
+          })
+        }
+      ],
+      max_tokens: 120,
+    });
+
+    const raw = completion.choices[0]?.message?.content || '';
+    const json = JSON.parse(raw);
+    const minutes = Math.max(15, Math.min(12 * 60, Number(json.estimated_minutes || fallback)));
+    return { minutes, source: 'ai' as const };
+  } catch (e) {
+    console.log('AI duration estimate failed (falling back):', e);
+    return { minutes: fallback, source: 'heuristic' as const };
+  }
+}
+
 function deriveJobTitle(args: {
   jobType?: string | null;
   jobDetails?: string | null;
@@ -317,6 +374,15 @@ export async function POST(req: Request) {
         const title = deriveJobTitle({ jobType: parsedJobType, jobDetails: parsedJobDetails, summary: finalSummary, urgencyFlag });
         const priority = urgencyFlag === 'high' ? 'high' : urgencyFlag === 'low' ? 'low' : 'normal';
 
+        const durationRes = await aiEstimateDurationMinutes({
+          openaiApiKey: process.env.OPENAI_API_KEY || null,
+          summary: finalSummary || null,
+          jobType: parsedJobType || null,
+          jobDetails: parsedJobDetails || null,
+          urgencyFlag: urgencyFlag || null,
+        });
+        const estimatedMinutes = durationRes.minutes;
+
         // Some Supabase projects may not have the dispatch columns migrated yet.
         // Try insert with priority; if the column doesn't exist, retry without it.
         let job: any = null;
@@ -333,6 +399,7 @@ export async function POST(req: Request) {
                 status: 'Lead',
                 address: parsedAddress || null,
                 priority,
+                estimated_minutes: estimatedMinutes,
               },
             ])
             .select('id')
@@ -342,7 +409,7 @@ export async function POST(req: Request) {
           jobErr = res.error;
         }
 
-        if (jobErr && String(jobErr.message || '').includes('priority')) {
+        if (jobErr && (String(jobErr.message || '').includes('priority') || String(jobErr.message || '').includes('estimated_minutes'))) {
           const res2 = await supabase
             .from('jobs')
             .insert([
