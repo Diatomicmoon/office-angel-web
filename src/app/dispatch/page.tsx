@@ -45,6 +45,10 @@ const GRID_TOTAL_PX = GRID_HOURS * GRID_HOUR_PX;
 // UI
 const GUTTER_W = 112; // px (w-28-ish)
 
+// Timezone handling
+// Force the timeline to a single business timezone so “now”, the red line, and job cards agree.
+const DISPLAY_TZ = "America/Chicago";
+
 function hourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
   const ampm = h24 >= 12 ? 'PM' : 'AM';
@@ -57,8 +61,30 @@ function halfHourLabel(h24: number) {
   return `${h}:30`;
 }
 
+function tzParts(d: Date, timeZone: string): { y: number; mo: number; day: number; h: number; mi: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return { y: get('year'), mo: get('month'), day: get('day'), h: get('hour'), mi: get('minute') };
+}
+
 function minutesSinceGridStart(d: Date) {
-  return (d.getHours() - GRID_START_HOUR) * 60 + d.getMinutes();
+  const { h, mi } = tzParts(d, DISPLAY_TZ);
+  return (h - GRID_START_HOUR) * 60 + mi;
+}
+
+function isSameTzDay(a: Date, b: Date, timeZone: string) {
+  const pa = tzParts(a, timeZone);
+  const pb = tzParts(b, timeZone);
+  return pa.y === pb.y && pa.mo === pb.mo && pa.day === pb.day;
 }
 
 function clamp(n: number, min: number, max: number) {
@@ -101,8 +127,9 @@ export default function Dispatch() {
     const el = dayScrollRef.current;
     if (!el) return;
     const n = new Date();
-    const minutes = (n.getHours() - GRID_START_HOUR) * 60 + n.getMinutes();
-    const y = clamp((minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_TOTAL_PX);
+    const minutes = minutesSinceGridStart(n);
+    // +GRID_HEADER_PX because the timeline body starts after the header row in the scroll container.
+    const y = clamp(GRID_HEADER_PX + (minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_HEADER_PX + GRID_TOTAL_PX);
     // Wait for layout; Safari can ignore immediate scrollTop on first paint.
     requestAnimationFrame(() => requestAnimationFrame(() => {
       el.scrollTo({ top: y, behavior: 'auto' });
@@ -113,9 +140,7 @@ export default function Dispatch() {
   const slots = useMemo(() => Array.from({ length: GRID_HOURS * (60 / GRID_SLOT_MINUTES) }, (_, i) => i), []);
 
   const timeLineTop = useMemo(() => {
-    const h = now.getHours();
-    const m = now.getMinutes();
-    const minutesSinceStart = (h - GRID_START_HOUR) * 60 + m;
+    const minutesSinceStart = minutesSinceGridStart(now);
     if (minutesSinceStart < 0 || minutesSinceStart > GRID_HOURS * 60) return null;
     return (minutesSinceStart / 60) * GRID_HOUR_PX;
   }, [now]);
@@ -624,18 +649,15 @@ export default function Dispatch() {
                   {techs.length === 0 ? (
                     <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
                   ) : techs.map((tech) => {
-                    // Only render jobs scheduled for TODAY on the timeline.
-                    const todayStart = new Date();
-                    todayStart.setHours(0, 0, 0, 0);
-                    const tomorrowStart = new Date(todayStart);
-                    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+                    // Only render jobs scheduled for TODAY in DISPLAY_TZ.
+                    const today = new Date();
 
                     const jobsForTech = assignedJobs.filter((j) => {
                       if (j.technician_id !== tech.id) return false;
                       if (!j.scheduled_start) return false;
                       const start = new Date(j.scheduled_start);
                       if (Number.isNaN(start.getTime())) return false;
-                      return start >= todayStart && start < tomorrowStart;
+                      return isSameTzDay(start, today, DISPLAY_TZ);
                     });
 
                     return (
@@ -660,7 +682,7 @@ export default function Dispatch() {
                                 <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
                                 {job.scheduled_start && (
                                   <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
-                                    {new Date(job.scheduled_start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
                                   </span>
                                 )}
                               </div>
