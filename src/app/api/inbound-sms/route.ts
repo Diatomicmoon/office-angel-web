@@ -36,6 +36,9 @@ function twiml(message?: string) {
 
 export async function POST(req: Request) {
   try {
+    const url = new URL(req.url);
+    const debug = url.searchParams.get('debug') === '1';
+
     const form = await req.formData();
     const from = String(form.get('From') || '');
     const to = String(form.get('To') || '');
@@ -70,6 +73,9 @@ export async function POST(req: Request) {
         headers: { 'Content-Type': 'text/xml' },
       });
     }
+
+    let debugErr: string | null = null;
+    let jobIdForMessage: string | null = null;
 
     // Upsert customer by phone
     let customerId: string | null = null;
@@ -130,11 +136,12 @@ export async function POST(req: Request) {
         } else {
           // If the table doesn't have notes/updated_at yet, fall back to creating a new job.
           console.error('[INBOUND SMS] Could not update existing lead job:', upd.error);
+          debugErr = debugErr || String(upd.error.message || upd.error);
         }
       }
     }
 
-    let jobIdForMessage: string | null = updatedExisting ? existingJobId : null;
+    jobIdForMessage = updatedExisting ? existingJobId : null;
 
     if (!updatedExisting) {
       // Create job (drops into AI Parking Lot because technician_id is null)
@@ -154,8 +161,11 @@ export async function POST(req: Request) {
       const ins = await supabase.from('jobs').insert([insertPayload]).select('id').single();
       if (ins.error && String(ins.error.message || '').includes('notes')) {
         delete insertPayload.notes;
-        await supabase.from('jobs').insert([insertPayload]);
+        const ins2 = await supabase.from('jobs').insert([insertPayload]).select('id').single();
+        if (ins2.error) debugErr = debugErr || String(ins2.error.message || ins2.error);
+        jobIdForMessage = (ins2.data as any)?.id || null;
       } else {
+        if (ins.error) debugErr = debugErr || String(ins.error.message || ins.error);
         jobIdForMessage = ((ins.data as any)?.id as string) || null;
       }
     }
@@ -163,7 +173,7 @@ export async function POST(req: Request) {
     // Best-effort: store the message in messages table (scalable history).
     // If the table doesn't exist yet, ignore errors.
     try {
-      await supabase.from('messages').insert([
+      const minsert = await supabase.from('messages').insert([
         {
           company_id: companyId,
           customer_id: customerId,
@@ -176,11 +186,12 @@ export async function POST(req: Request) {
           meta: { raw: { From: from, To: to } },
         } as any,
       ]);
+      if (minsert.error) debugErr = debugErr || String(minsert.error.message || minsert.error);
     } catch {}
 
-    const reply =
-      "Got it — we’re logging your request now. Reply with: Name, Address, Best time window, and what’s going on. Example: 'Jordan, 123 Main St, today 3-5pm, breaker keeps tripping.'" +
-      " If this is an emergency, call 911.";
+    const reply = debug
+      ? `DEBUG ok. companyId=${companyId} customerId=${customerId || 'null'} jobId=${jobIdForMessage || 'null'} updatedExisting=${updatedExisting} err=${debugErr || 'none'}`
+      : "Got it — we’re logging your request now. Reply with: Name, Address, Best time window, and what’s going on. Example: 'Jordan, 123 Main St, today 3-5pm, breaker keeps tripping.' If this is an emergency, call 911.";
 
     return new NextResponse(twiml(reply), { status: 200, headers: { 'Content-Type': 'text/xml' } });
   } catch (e) {
