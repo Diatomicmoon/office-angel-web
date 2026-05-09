@@ -92,9 +92,33 @@ export async function POST(req: Request) {
     const suggestedStart = suggestStartTime(urgencyFlag);
     const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
 
-    // Create job (drops into AI Parking Lot because technician_id is null)
-    await supabase.from('jobs').insert([
-      {
+    // De-dupe: if the customer is already mid-conversation, update the most recent Lead job instead of creating new jobs.
+    let updatedExisting = false;
+    if (customerId) {
+      const cutoff = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+      const { data: recent } = await supabase
+        .from('jobs')
+        .select('id, notes, status, created_at')
+        .eq('company_id', companyId)
+        .eq('customer_id', customerId)
+        .gte('created_at', cutoff)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      const r0 = recent?.[0];
+      if (r0?.id && String(r0.status || '').toLowerCase() === 'lead') {
+        const nextNotes = [r0.notes, `SMS from ${from}: ${body}`].filter(Boolean).join('\n\n');
+        await supabase.from('jobs').update({
+          notes: nextNotes,
+          updated_at: new Date().toISOString(),
+        } as any).eq('id', r0.id);
+        updatedExisting = true;
+      }
+    }
+
+    if (!updatedExisting) {
+      // Create job (drops into AI Parking Lot because technician_id is null)
+      const insertPayload: any = {
         company_id: companyId,
         customer_id: customerId,
         title,
@@ -105,11 +129,20 @@ export async function POST(req: Request) {
         scheduled_end: suggestedEnd.toISOString(),
         // best-effort: store the raw message for now
         notes: body || null,
-      } as any,
-    ]);
+      };
 
-    // No auto-reply for now (keeps it clean). You can enable later.
-    return new NextResponse(twiml(), { status: 200, headers: { 'Content-Type': 'text/xml' } });
+      const ins = await supabase.from('jobs').insert([insertPayload]);
+      if (ins.error && String(ins.error.message || '').includes('notes')) {
+        delete insertPayload.notes;
+        await supabase.from('jobs').insert([insertPayload]);
+      }
+    }
+
+    const reply =
+      "Got it — we’re logging your request now. Reply with: Name, Address, Best time window, and what’s going on. Example: 'Jordan, 123 Main St, today 3-5pm, breaker keeps tripping.'" +
+      " If this is an emergency, call 911.";
+
+    return new NextResponse(twiml(reply), { status: 200, headers: { 'Content-Type': 'text/xml' } });
   } catch (e) {
     console.error('[INBOUND SMS] error', e);
     return new NextResponse(twiml(), { status: 200, headers: { 'Content-Type': 'text/xml' } });
