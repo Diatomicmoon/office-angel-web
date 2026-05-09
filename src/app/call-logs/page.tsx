@@ -93,10 +93,24 @@ export default function CallLogs() {
   const selectedCall = useMemo(() => calls.find((c) => c.id === selectedId) || calls[0], [calls, selectedId]);
   const transcript = useMemo(() => normalizeTranscript(selectedCall?.transcript), [selectedCall]);
 
+  // Normalize structured outputs (Vapi sends UUID-keyed objects)
+  const normalizedStructured = useMemo(() => {
+    const raw = selectedCall?.meta?.structured;
+    if (!raw) return {};
+    const out: Record<string, any> = {};
+    Object.values(raw).forEach((item: any) => {
+      if (item?.name && item?.result !== undefined && item.result !== '') out[item.name] = item.result;
+    });
+    // Also include already-flat keys
+    Object.entries(raw).forEach(([k, v]: any) => {
+      if (typeof v !== 'object' && v) out[k] = v;
+    });
+    return out;
+  }, [selectedCall]);
+
   // Extract address from summary text as fallback
   const extractedAddress = useMemo(() => {
-    const structured = selectedCall?.meta?.structured;
-    if (structured?.address) return structured.address;
+    if (normalizedStructured?.address) return normalizedStructured.address;
     if (selectedCall?.customers?.address) return selectedCall.customers.address;
     // Parse from summary
     const s = selectedCall?.summary || '';
@@ -105,19 +119,17 @@ export default function CallLogs() {
   }, [selectedCall]);
 
   const extractedJobType = useMemo(() => {
-    const structured = selectedCall?.meta?.structured;
-    if (structured?.job_type) return structured.job_type;
+    if (normalizedStructured?.job_type) return normalizedStructured.job_type;
     if (selectedCall?.urgency_flag === 'high') return 'Emergency';
     return 'Standard';
-  }, [selectedCall]);
+  }, [selectedCall, normalizedStructured]);
 
   const callerName = useMemo(() => {
-    const structured = selectedCall?.meta?.structured;
-    if (structured?.caller_name) return structured.caller_name;
+    if (normalizedStructured?.caller_name) return normalizedStructured.caller_name;
     const c = selectedCall?.customers;
     if (c?.first_name && c.first_name !== 'New') return `${c.first_name} ${c.last_name || ''}`.trim();
     return null;
-  }, [selectedCall]);
+  }, [selectedCall, normalizedStructured]);
 
   return (
     <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)]">
