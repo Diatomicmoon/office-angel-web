@@ -61,6 +61,10 @@ function halfHourLabel(h24: number) {
   return `${h}:30`;
 }
 
+function fmtTime(d: Date, timeZone: string) {
+  return d.toLocaleTimeString([], { timeZone, hour: 'numeric', minute: '2-digit' });
+}
+
 function tzParts(d: Date, timeZone: string): { y: number; mo: number; day: number; h: number; mi: number } {
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone,
@@ -122,6 +126,11 @@ export default function Dispatch() {
   const [now, setNow] = useState<Date>(() => new Date());
   const dayScrollRef = useRef<HTMLDivElement | null>(null);
   const didAutoScrollRef = useRef(false);
+
+  const todayKey = useMemo(() => {
+    const p = tzParts(new Date(), DISPLAY_TZ);
+    return `${p.y}-${String(p.mo).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
+  }, []);
 
   const jumpToNow = () => {
     const el = dayScrollRef.current;
@@ -292,12 +301,16 @@ export default function Dispatch() {
   // Auto-scroll Day View to around "now" (so you don’t land at midnight).
   useLayoutEffect(() => {
     if (viewMode !== 'day') return;
+    const storageKey = `dispatch:autoScroll:${todayKey}`;
+    const already = typeof window !== 'undefined' ? window.localStorage.getItem(storageKey) : '1';
+    if (already === '1') return;
     if (didAutoScrollRef.current) return;
     didAutoScrollRef.current = true;
     // Try a few times in case Safari hasn't fully laid out yet.
     jumpToNow();
     setTimeout(jumpToNow, 50);
     setTimeout(jumpToNow, 250);
+    try { window.localStorage.setItem(storageKey, '1'); } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode]);
 
@@ -641,8 +654,14 @@ export default function Dispatch() {
                 {/* Columns */}
                 <div className="flex-1 flex min-w-max relative bg-gray-50/30">
                   {timeLineTop !== null && (
-                    <div className="absolute left-0 right-0 h-0.5 bg-red-500 z-10 flex items-center" style={{ top: `${timeLineTop}px` }}>
-                      <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
                     </div>
                   )}
 
