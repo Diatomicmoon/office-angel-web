@@ -35,6 +35,17 @@ type JobTicket = Job & {
 
 const center = { lat: 44.9778, lng: -93.2650 };
 
+function getLatLng(loc: any): { lat: number; lng: number } | null {
+  if (!loc) return null;
+  if (typeof loc === 'string') {
+    try { loc = JSON.parse(loc); } catch { return null; }
+  }
+  const lat = Number(loc.lat ?? loc.latitude);
+  const lng = Number(loc.lng ?? loc.lon ?? loc.longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+  return null;
+}
+
 export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
@@ -130,18 +141,24 @@ export default function Dispatch() {
   };
 
   useEffect(() => {
-    fetch("/api/technicians")
-      .then((r) => r.json())
-      .then((json) => {
-        setTechs(json.technicians || []);
-        setTechTableAvailable(json.tableAvailable !== false);
-      })
-      .catch(() => {
-        setTechs([]);
-        setTechTableAvailable(false);
-      });
+    const load = () => {
+      fetch("/api/technicians")
+        .then((r) => r.json())
+        .then((json) => {
+          setTechs(json.technicians || []);
+          setTechTableAvailable(json.tableAvailable !== false);
+        })
+        .catch(() => {
+          setTechs([]);
+          setTechTableAvailable(false);
+        });
 
-    loadJobs();
+      loadJobs();
+    };
+
+    load();
+    const t = setInterval(load, 15000);
+    return () => clearInterval(t);
   }, []);
 
   return (
@@ -379,7 +396,14 @@ export default function Dispatch() {
               ) : (
                 <APIProvider apiKey={apiKey}>
                   <div style={{ width: '100%', height: '100%' }}>
-                    <Map defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'} />
+                    <Map defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </Map>
                   </div>
                 </APIProvider>
               )}
