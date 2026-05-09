@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 
 type Technician = {
@@ -48,13 +48,13 @@ const GUTTER_W = 112; // px (w-28-ish)
 function hourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
   const ampm = h24 >= 12 ? 'PM' : 'AM';
-  return `${h}:00 ${ampm}`;
+  return `${h} ${ampm}`;
 }
 
 function halfHourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
-  const ampm = h24 >= 12 ? 'PM' : 'AM';
-  return `${h}:30 ${ampm}`;
+  // Keep this compact so it doesn't wrap in the gutter.
+  return `${h}:30`;
 }
 
 function minutesSinceGridStart(d: Date) {
@@ -95,6 +95,17 @@ export default function Dispatch() {
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
   const [now, setNow] = useState<Date>(() => new Date());
   const dayScrollRef = useRef<HTMLDivElement | null>(null);
+
+  const jumpToNow = () => {
+    const el = dayScrollRef.current;
+    if (!el) return;
+    const minutes = (new Date().getHours() - GRID_START_HOUR) * 60 + new Date().getMinutes();
+    const y = clamp((minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_TOTAL_PX);
+    // Wait for layout; Safari can ignore immediate scrollTop on first paint.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      el.scrollTo({ top: y, behavior: 'auto' });
+    }));
+  };
 
   const hours = useMemo(() => Array.from({ length: GRID_HOURS }, (_, i) => GRID_START_HOUR + i), []);
   const slots = useMemo(() => Array.from({ length: GRID_HOURS * (60 / GRID_SLOT_MINUTES) }, (_, i) => i), []);
@@ -252,14 +263,9 @@ export default function Dispatch() {
   }, []);
 
   // Auto-scroll Day View to around "now" (so you don’t land at midnight).
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (viewMode !== 'day') return;
-    const el = dayScrollRef.current;
-    if (!el) return;
-    const minutes = (now.getHours() - GRID_START_HOUR) * 60 + now.getMinutes();
-    const y = clamp((minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_TOTAL_PX);
-    el.scrollTop = y;
-    // only on mode switch
+    jumpToNow();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode]);
 
@@ -359,6 +365,12 @@ export default function Dispatch() {
           <h2 className="text-lg font-semibold text-gray-900">Today</h2>
           <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => jumpToNow()}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Now
           </button>
         </div>
         <div className="flex bg-gray-100 p-1 rounded-lg">
@@ -548,7 +560,7 @@ export default function Dispatch() {
                         className={`whitespace-nowrap leading-tight mt-1 ${
                           isHalf
                             ? 'text-[11px] text-gray-500 font-medium'
-                            : 'text-[12px] text-gray-800 font-bold'
+                            : 'text-[12px] text-gray-900 font-bold'
                         }`}
                       >
                         {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
