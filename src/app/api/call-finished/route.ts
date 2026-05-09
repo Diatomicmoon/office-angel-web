@@ -37,11 +37,19 @@ export async function POST(req: Request) {
     console.log('\n=============================================');
     console.log('🚨 [VAPI WEBHOOK] CALL FINISHED 🚨');
     console.log('=============================================');
+    console.log('RAW PAYLOAD KEYS:', JSON.stringify(Object.keys(payload), null, 2));
+    console.log('MESSAGE TYPE:', payload?.message?.type);
+    console.log('FULL PAYLOAD:', JSON.stringify(payload, null, 2));
     
     if (payload.message && payload.message.type === 'end-of-call-report') {
       const call = payload.message.call;
-      const summary = payload.message.summary;
-      const transcript = normalizeTranscript(payload.message.transcript);
+      // Handle both payload.message.summary and payload.message.artifact.summary
+      const summary = payload.message.summary || payload.message.artifact?.summary || payload.message.analysis?.summary;
+      const transcript = normalizeTranscript(
+        payload.message.transcript ||
+        payload.message.artifact?.transcript ||
+        payload.message.artifact?.transcriptObject
+      );
       const phoneNumber = call?.customer?.number || 'Unknown';
       const durationSeconds = call?.duration || 0;
       const providerCallId = call?.id || call?.callId || payload?.message?.callId;
