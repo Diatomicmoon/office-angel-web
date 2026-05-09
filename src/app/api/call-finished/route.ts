@@ -2,6 +2,36 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
+function cleanCallerName(input: unknown): string | null {
+  if (!input) return null;
+  let s = String(input).trim();
+  if (!s) return null;
+
+  s = s.replace(/\s+/g, ' ');
+  s = s.replace(/^(hi|hey|hello)[, ]+/i, '');
+  s = s.replace(/^(this is|my name is|name'?s?\s+is|i(?:'?m| am))\s+/i, '');
+  s = s.replace(/[.,:;!]+$/g, '');
+
+  // If it looks like an intro ("Sarah with Office Angel"), keep only the person name.
+  s = s.replace(/\s+(with|from|at)\b.*$/i, '');
+
+  const bad = new Set(['unknown', 'caller', 'new', 'office', 'angel']);
+  const tokens = s.split(' ').filter(Boolean);
+  const out: string[] = [];
+  for (const t of tokens) {
+    const low = t.toLowerCase();
+    if (['with', 'from', 'at'].includes(low)) break;
+    if (bad.has(low)) return null;
+    out.push(t);
+    if (out.length >= 3) break;
+  }
+
+  if (out.length === 0) return null;
+  return out
+    .map((w) => (w.length ? w[0].toUpperCase() + w.slice(1).toLowerCase() : w))
+    .join(' ');
+}
+
 function normalizeTranscript(t: any) {
   if (!t) return null;
   if (Array.isArray(t)) return t;
@@ -177,16 +207,20 @@ export async function POST(req: Request) {
       const addressMatch = transcriptTextAll.match(/(?:address is|at)\s+([\d][^.\n]+(?:Street|St|Drive|Dr|Ave|Avenue|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^.\n]*)/i);
       const parsedAddress = structuredOutputs?.address || (addressMatch ? addressMatch[1].trim() : null);
 
-      // Name extraction: structured output → transcript regex on USER text
+      // Name extraction:
+      // Prefer USER transcript (most reliable) → fall back to structured output only if it doesn't look like an agent intro.
       const rawStructuredName = typeof structuredOutputs?.caller_name === 'string' ? String(structuredOutputs.caller_name).trim() : '';
-      const structuredName = rawStructuredName && !rawStructuredName.match(/^(sarah|office angel|unknown|caller)$/i)
-        ? rawStructuredName
+      const structuredName = rawStructuredName
+        // If the structured value contains "with/from/at" it often came from the agent intro ("Sarah with Office Angel").
+        && !rawStructuredName.match(/\b(with|from|at)\b/i)
+        ? (cleanCallerName(rawStructuredName) || '')
         : '';
 
       const nameMatch = transcriptTextUser.match(
-        /(?:my name is|this is|name'?s?\s+is|i(?:'?m| am))\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i
+        /(?:my name is|this is|name'?s?\s+is|i(?:'?m| am))\s+([^\n.]{1,60})/i
       );
-      const parsedName = structuredName || (nameMatch ? nameMatch[1].trim() : null);
+      const userName = cleanCallerName(nameMatch ? nameMatch[1] : null);
+      const parsedName = userName || structuredName || null;
 
       const parsedJobType = structuredOutputs?.job_type || null;
       const parsedJobDetails = structuredOutputs?.job_details || null;
@@ -238,7 +272,7 @@ export async function POST(req: Request) {
 
           const savedLookup = incomingLog?.[0]?.meta?.lookup_name as string | null;
           if (savedLookup) {
-            resolvedName = savedLookup;
+            resolvedName = cleanCallerName(savedLookup) || savedLookup;
             console.log('📋 Name from incoming lookup record:', resolvedName);
             // Mark the incoming record as processed so it clears from co-pilot
             await supabase.from('call_logs').update({ call_status: 'processed' }).eq('id', incomingLog![0].id);
@@ -256,6 +290,7 @@ export async function POST(req: Request) {
             const raw = lookupData?.caller_name?.caller_name as string | null;
             if (raw) {
               resolvedName = raw.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+              resolvedName = cleanCallerName(resolvedName) || resolvedName;
               console.log('📋 Fresh Twilio Lookup name:', resolvedName);
             }
           } catch (e) {

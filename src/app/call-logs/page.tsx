@@ -43,6 +43,20 @@ function fmtDuration(sec?: number) {
   return `${m}m ${s}s`;
 }
 
+function cleanDisplayName(input: any): string {
+  if (!input) return "";
+  let s = String(input).trim();
+  if (!s) return "";
+  s = s.replace(/\s+/g, " ");
+  s = s.replace(/^(hi|hey|hello)[, ]+/i, "");
+  s = s.replace(/^(this is|my name is|name'?s?\s+is|i(?:'?m| am))\s+/i, "");
+  if (s.match(/office\s+angel/i)) return "";
+  // Strip common intro tails: "Sarah with X" → "Sarah"
+  s = s.replace(/\s+(with|from|at)\b.*$/i, "");
+  s = s.replace(/[.,:;!]+$/g, "");
+  return s;
+}
+
 function normalizeTranscript(t: any): TranscriptLine[] {
   if (!t) return [];
   if (Array.isArray(t)) return t;
@@ -184,7 +198,9 @@ export default function CallLogs() {
               const customerName = call.customers?.first_name && call.customers.first_name !== 'New'
                 ? `${call.customers.first_name} ${call.customers.last_name || ''}`.trim() : '';
               const fmtPhone = (p: string) => { const d = p.replace(/\D/g,''); if(d.length===11&&d[0]==='1') return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`; if(d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`; return p; };
-              const name = flatName || uuidName || customerName || (phone !== 'Unknown' ? fmtPhone(phone) : 'Unknown Caller');
+              const cleanedFlat = cleanDisplayName(flatName);
+              const cleanedUuid = cleanDisplayName(uuidName);
+              const name = cleanedFlat || cleanedUuid || customerName || (phone !== 'Unknown' ? fmtPhone(phone) : 'Unknown Caller');
               const urgency = (call.urgency_flag || "low").toString().toLowerCase();
               const isHigh = urgency === "high";
               return (
