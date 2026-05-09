@@ -172,7 +172,17 @@ export default function CallLogs() {
               <div className="p-8 text-center text-sm text-gray-500">No call logs yet.</div>
             ) : calls.map(call => {
               const phone = call.customers?.phone_number || "Unknown";
-              const name = (call.meta?.structured?.caller_name) || (call.customers?.first_name && call.customers.first_name !== 'New' ? `${call.customers.first_name} ${call.customers.last_name || ""}`.trim() : null) || "Unregistered Caller";
+              // Extract name: try flat structured key, then UUID-keyed objects, then customer table, then phone
+              const structuredRaw = call.meta?.structured || {};
+              let uuidName = '';
+              Object.values(structuredRaw).forEach((item: any) => {
+                if (item?.name === 'caller_name' && item?.result) uuidName = item.result;
+              });
+              const flatName = typeof structuredRaw.caller_name === 'string' && structuredRaw.caller_name ? structuredRaw.caller_name : '';
+              const customerName = call.customers?.first_name && call.customers.first_name !== 'New'
+                ? `${call.customers.first_name} ${call.customers.last_name || ''}`.trim() : '';
+              const fmtPhone = (p: string) => { const d = p.replace(/\D/g,''); if(d.length===11&&d[0]==='1') return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`; if(d.length===10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`; return p; };
+              const name = flatName || uuidName || customerName || (phone !== 'Unknown' ? fmtPhone(phone) : 'Unknown Caller');
               const urgency = (call.urgency_flag || "low").toString().toLowerCase();
               const isHigh = urgency === "high";
               return (
