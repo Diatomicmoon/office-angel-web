@@ -132,15 +132,32 @@ export async function POST(req: Request) {
     // This keeps the workflow dead-simple for customers.
     if (customerId && (isYes(bodyNorm) || isNo(bodyNorm))) {
       const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-      const { data: recentScheduled } = await supabase
-        .from('jobs')
-        .select('id, status, scheduled_start, scheduled_end')
-        .eq('company_id', companyId)
-        .eq('customer_id', customerId)
-        .gte('created_at', cutoff)
-        .order('updated_at', { ascending: false })
-        .order('created_at', { ascending: false })
-        .limit(5);
+      let recentScheduled: any[] | null = null;
+      {
+        const q0 = await supabase
+          .from('jobs')
+          .select('id, status, scheduled_start, scheduled_end, created_at, updated_at')
+          .eq('company_id', companyId)
+          .eq('customer_id', customerId)
+          .gte('created_at', cutoff)
+          .order('updated_at', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (q0.error && String(q0.error.message || '').includes('updated_at')) {
+          const q1 = await supabase
+            .from('jobs')
+            .select('id, status, scheduled_start, scheduled_end, created_at')
+            .eq('company_id', companyId)
+            .eq('customer_id', customerId)
+            .gte('created_at', cutoff)
+            .order('created_at', { ascending: false })
+            .limit(10);
+          recentScheduled = q1.data as any;
+        } else {
+          recentScheduled = q0.data as any;
+        }
+      }
 
       const target = (recentScheduled || []).find((j: any) => {
         const st = String(j.status || '').toLowerCase();

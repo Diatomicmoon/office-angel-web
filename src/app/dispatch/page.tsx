@@ -690,7 +690,7 @@ export default function Dispatch() {
         </div>
 
         {/* Right Side: Board or Map */}
-        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0">
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
           {viewMode === 'map' ? (
             <div className="flex-1 relative overflow-hidden bg-gray-100">
               <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
