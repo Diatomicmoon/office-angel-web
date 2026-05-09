@@ -15,23 +15,28 @@ export async function GET(req: Request) {
     const view = url.searchParams.get("view"); // 'unassigned' or 'assigned'
     // In a real app we'd filter by date range, but for beta we'll just grab recent
 
-    let q = supabase
+    const base = supabase
       .from("jobs")
       .select("*, customers(first_name, last_name, phone_number)")
       .eq("company_id", companyId)
       .order("created_at", { ascending: false });
 
-    if (view === "unassigned") {
-      q = q.is("technician_id", null);
-    } else if (view === "assigned") {
-      q = q.not("technician_id", "is", null);
+    // Prefer filtering by technician_id when the dispatch migration is present.
+    // If the column doesn't exist yet, gracefully fall back to returning all jobs.
+    let { data, error } = await (view === "unassigned"
+      ? base.is("technician_id", null)
+      : view === "assigned"
+        ? base.not("technician_id", "is", null)
+        : base);
+
+    if (error && String(error.message || '').includes('technician_id')) {
+      // Migration not applied yet.
+      const res2 = await base;
+      data = res2.data;
+      error = res2.error;
     }
 
-    const { data, error } = await q;
-
-    if (error) {
-      return NextResponse.json({ jobs: [], error: error.message }, { status: 400 });
-    }
+    if (error) return NextResponse.json({ jobs: [], error: error.message }, { status: 400 });
 
     return NextResponse.json({ jobs: data || [] });
   } catch (error: any) {
@@ -50,17 +55,22 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
+    // Important: on UPDATE, do not clobber existing fields with defaults.
+    // Only apply defaults on INSERT.
+    const isUpdate = Boolean(body.id);
+
     const payload: any = {
       company_id: companyId,
       customer_id: body.customer_id,
       title: body.title,
-      status: body.status || 'Lead',
+      ...(isUpdate ? {} : { status: body.status || "Lead" }),
+      ...(isUpdate ? (body.status !== undefined ? { status: body.status } : {}) : {}),
       address: body.address,
       quoted_amount: body.quoted_amount,
       technician_id: body.technician_id,
       scheduled_start: body.scheduled_start,
       scheduled_end: body.scheduled_end,
-      priority: body.priority || 'normal',
+      ...(isUpdate ? (body.priority !== undefined ? { priority: body.priority } : {}) : { priority: body.priority || "normal" }),
     };
 
     // Remove undefined

@@ -39,6 +39,47 @@ export default function Dispatch() {
   const [unassignedJobs, setUnassignedJobs] = useState<Job[]>([]);
   const [assignedJobs, setAssignedJobs] = useState<Job[]>([]);
   const [techTableAvailable, setTechTableAvailable] = useState(true);
+  const [assignSelection, setAssignSelection] = useState<Record<string, string>>({});
+  const [assignSaving, setAssignSaving] = useState<string | null>(null);
+  const [scheduleSelection, setScheduleSelection] = useState<Record<string, { start?: string; end?: string }>>({});
+
+  const loadJobs = () => {
+    fetch("/api/jobs?view=unassigned")
+      .then((r) => r.json())
+      .then((json) => setUnassignedJobs(json.jobs || []))
+      .catch(() => setUnassignedJobs([]));
+
+    fetch("/api/jobs?view=assigned")
+      .then((r) => r.json())
+      .then((json) => setAssignedJobs(json.jobs || []))
+      .catch(() => setAssignedJobs([]));
+  };
+
+  const bookJob = async (jobId: string) => {
+    const techId = assignSelection[jobId];
+    const start = scheduleSelection[jobId]?.start;
+    const end = scheduleSelection[jobId]?.end;
+    if (!techId || !start || !end) return;
+
+    setAssignSaving(jobId);
+    try {
+      await fetch("/api/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: jobId,
+          technician_id: techId,
+          scheduled_start: new Date(start).toISOString(),
+          scheduled_end: new Date(end).toISOString(),
+          status: "Scheduled",
+        }),
+      });
+      // refresh lists
+      loadJobs();
+    } finally {
+      setAssignSaving(null);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/technicians")
@@ -52,15 +93,7 @@ export default function Dispatch() {
         setTechTableAvailable(false);
       });
 
-    fetch("/api/jobs?view=unassigned")
-      .then((r) => r.json())
-      .then((json) => setUnassignedJobs(json.jobs || []))
-      .catch(() => setUnassignedJobs([]));
-
-    fetch("/api/jobs?view=assigned")
-      .then((r) => r.json())
-      .then((json) => setAssignedJobs(json.jobs || []))
-      .catch(() => setAssignedJobs([]));
+    loadJobs();
   }, []);
 
   return (
@@ -131,6 +164,58 @@ export default function Dispatch() {
                     <MapPin size={12} /> {job.address}
                   </div>
                 )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="datetime-local"
+                        value={scheduleSelection[job.id]?.start || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), start: e.target.value },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">End</label>
+                      <input
+                        type="datetime-local"
+                        value={scheduleSelection[job.id]?.end || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), end: e.target.value },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.start || !scheduleSelection[job.id]?.end || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -205,6 +290,11 @@ export default function Dispatch() {
                         <div key={job.id} className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10" style={{ top: `${50 + (idx * 150)}px`, height: '120px' }}>
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
+                            {job.scheduled_start && (
+                              <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                {new Date(job.scheduled_start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
                           <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>

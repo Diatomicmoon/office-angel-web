@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign } from 'lucide-react';
+import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase } from 'lucide-react';
 
 export default function Sidebar() {
   return (
@@ -34,6 +34,10 @@ export default function Sidebar() {
         </Link>
         <Link href="/projects" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
           <Archive size={20} />
+          <span>Customers</span>
+        </Link>
+        <Link href="/jobs" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+          <Briefcase size={20} />
           <span>Job Archive</span>
         </Link>
         <Link href="/dispatch" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
@@ -63,7 +67,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 border-t border-gray-800">
-        <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
           <Settings size={20} />
           <span>Settings</span>
         </Link>

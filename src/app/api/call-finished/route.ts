@@ -31,6 +31,25 @@ function deriveActionItems(summary?: string, urgency?: string) {
   return 'Requires review';
 }
 
+function deriveJobTitle(args: {
+  jobType?: string | null;
+  jobDetails?: string | null;
+  summary?: string | null;
+  urgencyFlag?: string | null;
+}) {
+  const jobType = (args.jobType || '').trim();
+  const jobDetails = (args.jobDetails || '').trim();
+  const summary = (args.summary || '').trim();
+
+  const clean = (s: string) => s.replace(/\s+/g, ' ').replace(/[\s,.;:]+$/g, '').trim();
+
+  if (jobType && jobType.toLowerCase() !== 'electrical') return clean(jobType).slice(0, 80);
+  if (jobDetails) return clean(jobDetails).slice(0, 80);
+  if (summary) return clean(summary.split(/[\n.]/)[0]).slice(0, 80);
+  if (args.urgencyFlag === 'high') return 'Emergency Service Call';
+  return 'Service Call';
+}
+
 export async function POST(req: Request) {
   try {
     const payload = await req.json();
@@ -260,22 +279,109 @@ export async function POST(req: Request) {
         },
       };
 
-      let { error: logErr } = await supabase
-        .from('call_logs')
-        .insert([baseRow]);
+      let callLogId: string | null = null;
+      let logErr: any = null;
+      {
+        const res = await supabase
+          .from('call_logs')
+          .insert([baseRow])
+          .select('id')
+          .single();
+        logErr = res.error;
+        callLogId = res.data?.id || null;
+      }
 
       // If the DB migration hasn't been applied yet, retry without the new optional columns.
       if (logErr && (String(logErr.message || '').includes('recording_url') || String(logErr.message || '').includes('meta'))) {
         const fallbackRow = { ...baseRow };
         delete fallbackRow.recording_url;
         delete fallbackRow.meta;
-        ({ error: logErr } = await supabase.from('call_logs').insert([fallbackRow]));
+
+        const res2 = await supabase
+          .from('call_logs')
+          .insert([fallbackRow])
+          .select('id')
+          .single();
+        logErr = res2.error;
+        callLogId = res2.data?.id || callLogId;
       }
 
       if (logErr) {
         console.error("Error saving call to DB:", logErr);
       } else {
         console.log("✅ Call saved to Supabase successfully!");
+      }
+
+      // 4. Create a Job for EVERY call (unassigned → shows up in Dispatch "AI Parking Lot")
+      try {
+        const title = deriveJobTitle({ jobType: parsedJobType, jobDetails: parsedJobDetails, summary: finalSummary, urgencyFlag });
+        const priority = urgencyFlag === 'high' ? 'high' : urgencyFlag === 'low' ? 'low' : 'normal';
+
+        // Some Supabase projects may not have the dispatch columns migrated yet.
+        // Try insert with priority; if the column doesn't exist, retry without it.
+        let job: any = null;
+        let jobErr: any = null;
+
+        {
+          const res = await supabase
+            .from('jobs')
+            .insert([
+              {
+                company_id: companyId,
+                customer_id: customerId,
+                title,
+                status: 'Lead',
+                address: parsedAddress || null,
+                priority,
+              },
+            ])
+            .select('id')
+            .single();
+
+          job = res.data;
+          jobErr = res.error;
+        }
+
+        if (jobErr && String(jobErr.message || '').includes('priority')) {
+          const res2 = await supabase
+            .from('jobs')
+            .insert([
+              {
+                company_id: companyId,
+                customer_id: customerId,
+                title,
+                status: 'Lead',
+                address: parsedAddress || null,
+              },
+            ])
+            .select('id')
+            .single();
+          job = res2.data;
+          jobErr = res2.error;
+        }
+
+        if (jobErr) {
+          console.error('Error creating job:', jobErr);
+        } else {
+          console.log('🧾 Job created:', job?.id);
+          // Best-effort: link the job back to the call log via meta. (Safe to fail.)
+          if (callLogId) {
+            await supabase
+              .from('call_logs')
+              .update({
+                meta: {
+                  ...(baseRow.meta || {}),
+                  structured: {
+                    ...((baseRow.meta || {}).structured || {}),
+                    job_id: job?.id,
+                  },
+                },
+              })
+              .eq('id', callLogId);
+          }
+        }
+      } catch (e) {
+        console.error('Job creation/linking failed (non-fatal):', e);
       }
 
     } else {
