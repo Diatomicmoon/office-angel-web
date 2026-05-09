@@ -395,9 +395,9 @@ export default function Dispatch() {
         </div>
       </div>
 
-      <div className="flex-1 flex gap-6 overflow-hidden">
+      <div className="flex-1 flex gap-6 min-h-0 overflow-x-hidden overflow-y-visible">
         {/* Left Sidebar: AI Parking Lot */}
-        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0">
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
           <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
             <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
@@ -496,7 +496,7 @@ export default function Dispatch() {
         </div>
 
         {/* Right Side: Board or Map */}
-        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col relative">
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0">
           {viewMode === 'map' ? (
             <div className="flex-1 relative overflow-hidden bg-gray-100">
               <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
