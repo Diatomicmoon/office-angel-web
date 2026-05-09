@@ -15,6 +15,15 @@ type Lead = {
   time_ago: string;
 };
 
+function formatPhone(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 11 && digits[0] === "1")
+    return `(${digits.slice(1,4)}) ${digits.slice(4,7)}-${digits.slice(7)}`;
+  if (digits.length === 10)
+    return `(${digits.slice(0,3)}) ${digits.slice(3,6)}-${digits.slice(6)}`;
+  return phone;
+}
+
 function timeAgo(iso?: string) {
   if (!iso) return "";
   const diff = Date.now() - new Date(iso).getTime();
@@ -59,31 +68,56 @@ export default function CRM() {
         const mapped: Lead[] = (json.calls || []).map((c: any) => {
           const structured = c.meta?.structured || {};
           const normalized: Record<string, any> = {};
+
+          // First pass: extract UUID-keyed objects like {name: "caller_name", result: "..."}
           Object.values(structured).forEach((item: any) => {
             if (item?.name && item?.result !== undefined && item.result !== "")
               normalized[item.name] = item.result;
           });
-          Object.entries(structured).forEach(([k, v]: any) => {
-            if (typeof v !== "object" && v) normalized[k] = v;
+          // Second pass: flat string values (demo data format)
+          Object.entries(structured).forEach(([, v]: any) => {
+            if (typeof v !== "object" && v) {
+              // already merged via keys above — skip
+            }
+          });
+          // Direct flat keys take precedence only if non-null
+          const flatKeys = ["caller_name", "address", "job_type", "job_details", "urgency"];
+          flatKeys.forEach((k) => {
+            if (structured[k] !== null && structured[k] !== undefined && structured[k] !== "")
+              normalized[k] = structured[k];
           });
 
+          // Caller name: structured → customer table → phone number
+          const phone = c.customers?.phone_number || "";
           const callerName =
             normalized.caller_name ||
             (c.customers?.first_name && c.customers.first_name !== "New"
               ? `${c.customers.first_name} ${c.customers.last_name || ""}`.trim()
-              : "Unregistered Caller");
+              : phone ? formatPhone(phone) : "Unknown Caller");
+
           const address =
-            normalized.address || c.customers?.address || "Unknown location";
-          const jobType =
-            normalized.job_type ||
-            (c.urgency_flag === "high" ? "Emergency" : "Service Call");
+            normalized.address || c.customers?.address || "Address unknown";
+
+          // Job type: use structured value; if generic "electrical" pull first sentence of job_details
+          let jobType = normalized.job_type || "";
+          if (!jobType || jobType.toLowerCase() === "electrical") {
+            const details = normalized.job_details || "";
+            if (details) {
+              // Shorten: take up to 40 chars, stop at comma or period
+              jobType = details.replace(/^The caller (is |wants |requested? |need[s]? )*/i, "")
+                .split(/[,.]/)[0].slice(0, 50).trim();
+            } else {
+              jobType = c.urgency_flag === "high" ? "Emergency" : "Service Call";
+            }
+          }
+
           const urgency = c.urgency_flag || "low";
           const status = urgency === "medium" ? "estimating" : "captured";
 
           return {
             id: c.id,
             caller_name: callerName,
-            phone: c.customers?.phone_number || "",
+            phone,
             address,
             job_type: jobType,
             urgency,
