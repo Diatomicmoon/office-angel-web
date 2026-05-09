@@ -66,9 +66,24 @@ export async function POST(req: Request) {
       const durationSeconds = call?.duration || 0;
       const providerCallId = call?.id || call?.callId || payload?.message?.callId;
       const recordingUrl = call?.recordingUrl || payload?.message?.recordingUrl || payload?.message?.artifact?.recordingUrl;
-      // Structured outputs — merge all sources
-      const structuredOutputs = structuredFromArtifact || null;
-      console.log('📊 Structured outputs:', JSON.stringify(structuredOutputs));
+      // Normalize structured outputs — Vapi sends them keyed by UUID {id: {name, result}}
+      // Convert to simple {field_name: value} map
+      const rawStructured = structuredFromArtifact || null;
+      const structuredOutputs: Record<string, any> = {};
+      if (rawStructured) {
+        Object.values(rawStructured).forEach((item: any) => {
+          if (item?.name && item?.result !== undefined) {
+            structuredOutputs[item.name] = item.result;
+          } else if (typeof item === 'string' || typeof item === 'number') {
+            // already flat
+          }
+        });
+        // Also copy any already-flat keys
+        Object.entries(rawStructured).forEach(([k, v]: any) => {
+          if (typeof v !== 'object' || v === null) structuredOutputs[k] = v;
+        });
+      }
+      console.log('📊 Normalized structured outputs:', JSON.stringify(structuredOutputs));
 
       // Parse address + caller name from transcript text as ultimate fallback
       const transcriptText = Array.isArray(transcript)
