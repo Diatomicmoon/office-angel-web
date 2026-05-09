@@ -103,6 +103,36 @@ export async function POST(req: Request) {
         .single();
       
       if (error) throw error;
+
+      // Best-effort: update technician live status when a job is booked/assigned.
+      // This keeps the demo map/dispatch headers feeling alive even before GPS is wired.
+      try {
+        const techId = body.technician_id;
+        if (techId) {
+          const startIso = (body.scheduled_start || data.scheduled_start) as string | undefined;
+          const endIso = (body.scheduled_end || data.scheduled_end) as string | undefined;
+          const now = Date.now();
+          const startMs = startIso ? new Date(startIso).getTime() : NaN;
+          const endMs = endIso ? new Date(endIso).getTime() : NaN;
+          let status = 'en_route';
+          if (Number.isFinite(startMs) && Number.isFinite(endMs)) {
+            if (now >= startMs && now <= endMs) status = 'on_site';
+            else if (now < startMs) status = 'en_route';
+            else status = 'available';
+          }
+
+          await supabase
+            .from('technicians')
+            .update({
+              status,
+              current_job_title: data.title || body.title || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', techId)
+            .eq('company_id', companyId);
+        }
+      } catch {}
+
       return NextResponse.json({ job: data });
     } else {
       // Insert
@@ -113,6 +143,23 @@ export async function POST(req: Request) {
         .single();
 
       if (error) throw error;
+
+      // Best-effort: set technician status when inserting a booked job.
+      try {
+        const techId = body.technician_id;
+        if (techId) {
+          await supabase
+            .from('technicians')
+            .update({
+              status: 'en_route',
+              current_job_title: data.title || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', techId)
+            .eq('company_id', companyId);
+        }
+      } catch {}
+
       return NextResponse.json({ job: data });
     }
   } catch (error: any) {
