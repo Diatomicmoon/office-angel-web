@@ -117,6 +117,25 @@ function getLatLng(loc: any): { lat: number; lng: number } | null {
   return null;
 }
 
+function fmtPhone(p?: string) {
+  if (!p) return '';
+  const d = String(p).replace(/\D/g, '');
+  if (d.length === 11 && d[0] === '1') return `(${d.slice(1, 4)}) ${d.slice(4, 7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+  return p;
+}
+
+function customerLabel(job: Job) {
+  const c = job.customers;
+  const first = (c?.first_name || '').trim();
+  const last = (c?.last_name || '').trim();
+  const full = `${first} ${last}`.trim();
+  if (full && first.toLowerCase() !== 'new') return full;
+  const phone = fmtPhone(c?.phone_number);
+  if (phone) return phone;
+  return 'Unknown customer';
+}
+
 function toDateInputValue(d: Date) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -562,13 +581,23 @@ export default function Dispatch() {
             {unassignedJobs.length === 0 ? (
               <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
             ) : unassignedJobs.map(job => (
-              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm cursor-grab hover:shadow-md transition-all">
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
                 <div className="flex justify-between items-start mb-2">
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
                     {job.priority || 'Normal'}
                   </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
                 </div>
                 <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
                 {job.address && (
                   <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
                     <MapPin size={12} /> {job.address}
@@ -822,10 +851,11 @@ export default function Dispatch() {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
-                              <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
-                            </div>
-                          ))}
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
                         </div>
                       </div>
                     );
