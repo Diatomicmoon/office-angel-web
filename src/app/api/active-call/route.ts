@@ -15,8 +15,10 @@ export async function GET() {
   }
   if (!companyId) return NextResponse.json({ active: null });
 
-  // Look for a call_log with status 'incoming' in the last 5 minutes
-  const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  // Look for a call_log with status 'incoming' very recently.
+  // This is a lightweight “ringing right now” indicator, not a historical state.
+  // Keep the window tight so stale rows don’t look like phantom calls.
+  const cutoff = new Date(Date.now() - 60 * 1000).toISOString();
   const { data } = await sb()
     .from("call_logs")
     .select("id, meta, customers(id, first_name, last_name, phone_number, address, call_logs(id, summary, created_at))")
