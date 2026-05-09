@@ -1,66 +1,68 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Mic, PhoneCall, User, MapPin, Zap, CheckCircle2, AlertCircle, Save, X, Activity } from "lucide-react";
-import { NotWired } from "@/components/NotWired";
+import { Mic, PhoneCall, User, MapPin, Zap, CheckCircle2, AlertCircle, Phone, ChevronRight, Clock } from "lucide-react";
+import Link from "next/link";
+
+type ActiveCall = {
+  call_id: string;
+  caller_name: string | null;
+  phone: string | null;
+  address: string | null;
+  customer: {
+    id?: string;
+    first_name?: string;
+    last_name?: string;
+    phone_number?: string;
+    address?: string;
+    call_logs?: { id: string; summary: string; created_at: string }[];
+  } | null;
+};
+
+function formatPhone(phone?: string | null) {
+  const d = (phone || "").replace(/\D/g, "");
+  if (d.length === 11 && d[0] === "1") return `(${d.slice(1,4)}) ${d.slice(4,7)}-${d.slice(7)}`;
+  if (d.length === 10) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`;
+  return phone || "—";
+}
+
+function timeAgo(iso?: string) {
+  if (!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.round(diff / 86400000);
+  if (days < 1) return "Today";
+  if (days === 1) return "Yesterday";
+  return `${days}d ago`;
+}
 
 export default function CoPilot() {
-  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-  if (!isDemoMode) {
-    return (
-      <NotWired
-        title="Co-Pilot"
-        subtitle="Co-Pilot is still demo UI right now. Next step is wiring Twilio/Vapi live transcription into Supabase + auto-fill job ticket."
-      />
-    );
-  }
+  const [active, setActive] = useState<ActiveCall | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const [isListening, setIsListening] = useState(true);
-  const [transcript, setTranscript] = useState([
-    { speaker: "Dispatcher (Sarah)", text: "Thanks for calling Hardhat Electric, this is Sarah." }
-  ]);
-  const [extractedData, setExtractedData] = useState({
-    name: "Typing...",
-    phone: "+1 (612) 555-8992",
-    address: "Waiting for address...",
-    issue: "Listening...",
-    urgency: "Normal"
-  });
-
-  // Fake the live transcription typing effect for the demo
   useEffect(() => {
-    if (!isListening) return;
+    const poll = async () => {
+      try {
+        const r = await fetch("/api/active-call");
+        const json = await r.json();
+        setActive(json.active);
+      } catch { /* silent */ }
+      setLoading(false);
+    };
+    poll();
+    const interval = setInterval(poll, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
-    const sequence = [
-      { delay: 2000, speaker: "Caller", text: "Hey Sarah, I've got a major issue. My main breaker keeps tripping and I smell something burning near the panel." },
-      { delay: 2500, data: { issue: "Panel arcing / burning smell", urgency: "High - Fire Risk" } },
-      { delay: 4000, speaker: "Dispatcher (Sarah)", text: "Oh wow, okay. Please don't touch the panel. I'm going to get someone out there right away. What's the address?" },
-      { delay: 6000, speaker: "Caller", text: "It's 8824 Lake Street, over in Wayzata." },
-      { delay: 6500, data: { name: "Unknown Caller", address: "8824 Lake St, Wayzata, MN" } },
-      { delay: 8000, speaker: "Dispatcher (Sarah)", text: "Got it, 8824 Lake Street. I have Mike in Truck 1 about 15 minutes away from you. I'm dispatching him now." },
-      { delay: 10000, speaker: "Caller", text: "Thank you so much." },
-      { delay: 11000, action: () => setIsListening(false) }
-    ];
+  const callerName =
+    active?.caller_name ||
+    (active?.customer?.first_name && active.customer.first_name !== "New"
+      ? `${active.customer.first_name} ${active.customer.last_name || ""}`.trim()
+      : null) ||
+    formatPhone(active?.phone) ||
+    "Unknown Caller";
 
-    const timeouts: NodeJS.Timeout[] = [];
-    
-    sequence.forEach(({ delay, speaker, text, data, action }) => {
-      const timeout = setTimeout(() => {
-        if (speaker && text) {
-          setTranscript(prev => [...prev, { speaker, text }]);
-        }
-        if (data) {
-          setExtractedData(prev => ({ ...prev, ...data }));
-        }
-        if (action) {
-          action();
-        }
-      }, delay);
-      timeouts.push(timeout);
-    });
-
-    return () => timeouts.forEach(clearTimeout);
-  }, [isListening]);
+  const priorCalls = active?.customer?.call_logs || [];
+  const customerId = active?.customer?.id;
 
   return (
     <div className="max-w-7xl mx-auto p-8 h-[calc(100vh-2rem)] flex flex-col">
@@ -69,194 +71,156 @@ export default function CoPilot() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
             Dispatcher Co-Pilot
-            {isListening ? (
+            {active ? (
               <span className="flex items-center gap-1.5 text-xs font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full animate-pulse border border-red-200">
-                <Mic size={14} className="animate-bounce" /> LIVE LISTENING
+                <Mic size={14} /> LIVE CALL
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 text-xs font-bold text-gray-600 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
-                <PhoneCall size={14} /> CALL ENDED
+              <span className="flex items-center gap-1.5 text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+                <PhoneCall size={14} /> STANDING BY
               </span>
             )}
           </h1>
-          <p className="text-gray-500 mt-2">AI is silently transcribing and filling out the job ticket for you.</p>
-        </div>
-        <div className="flex gap-3 text-sm">
-          <div className="bg-gray-900 text-white px-4 py-2 rounded-lg flex items-center gap-2 font-mono">
-            <Activity size={16} className={isListening ? "text-green-400" : "text-gray-500"} />
-            00:0{transcript.length * 4}
-          </div>
+          <p className="text-gray-500 mt-2">
+            {active ? "Active call in progress — caller ID and history pulled automatically." : "Waiting for next inbound call. Sarah is live on your number."}
+          </p>
         </div>
       </div>
 
-      {/* Main Split Layout */}
-      <div className="flex-1 flex gap-8 overflow-hidden">
-        
-        {/* Left: Live Transcript Box */}
-        <div className="w-1/2 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col">
-          <div className="p-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center rounded-t-xl">
-            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Mic size={18} className="text-blue-600" />
-              Live Transcript
-            </h2>
-          </div>
-          
-          <div className="flex-1 p-6 overflow-y-auto space-y-6 bg-gray-50/50">
-            {transcript.map((line, idx) => (
-              <div key={idx} className={`flex gap-4 ${line.speaker === 'Caller' ? '' : 'flex-row-reverse'}`}>
-                <div className="flex-shrink-0 mt-1">
-                  <div className={`h-8 w-8 rounded-full flex items-center justify-center ${
-                    line.speaker === 'Caller' ? 'bg-gray-200' : 'bg-blue-600'
-                  }`}>
-                    {line.speaker === 'Caller' ? <User size={16} className="text-gray-600"/> : <PhoneCall size={16} className="text-white"/>}
-                  </div>
+      {loading ? (
+        <div className="flex-1 flex items-center justify-center text-gray-400">Checking for active calls...</div>
+      ) : active ? (
+        /* ── ACTIVE CALL VIEW ── */
+        <div className="flex-1 flex gap-8 overflow-hidden">
+
+          {/* Left: Caller ID Card */}
+          <div className="w-1/2 flex flex-col gap-6">
+
+            {/* Caller Identity */}
+            <div className="bg-white rounded-xl border-2 border-blue-300 shadow-lg p-6">
+              <div className="flex items-center gap-2 text-blue-600 font-bold text-sm mb-4 uppercase tracking-wider">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-ping" />
+                Incoming Caller Identified
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-2xl font-bold shrink-0">
+                  {callerName[0]?.toUpperCase() || "?"}
                 </div>
-                <div className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
-                  line.speaker === 'Caller' 
-                    ? 'bg-white border border-gray-200 rounded-tl-none' 
-                    : 'bg-blue-600 text-white rounded-tr-none'
-                }`}>
-                  <p className="text-xs opacity-70 mb-1 font-medium">{line.speaker}</p>
-                  <p className="text-sm leading-relaxed">{line.text}</p>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">{callerName}</h2>
+                  <a href={`tel:${active.phone}`} className="flex items-center gap-1.5 text-blue-600 hover:underline text-sm mt-1">
+                    <Phone size={14} /> {formatPhone(active.phone)}
+                  </a>
                 </div>
               </div>
-            ))}
-            
-            {/* Typing Indicator */}
-            {isListening && (
-              <div className="flex gap-4">
-                <div className="flex-shrink-0 mt-1">
-                  <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                    <User size={16} className="text-gray-600"/>
-                  </div>
+              {(active.address || active.customer?.address) && (
+                <div className="mt-4 flex items-start gap-2 bg-gray-50 rounded-lg p-3 text-sm text-gray-700">
+                  <MapPin size={15} className="text-gray-400 mt-0.5 shrink-0" />
+                  <span>{active.address || active.customer?.address}</span>
                 </div>
-                <div className="bg-white border border-gray-200 p-4 rounded-2xl rounded-tl-none shadow-sm flex items-center gap-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+              )}
+              {customerId && (
+                <Link
+                  href={`/projects/customer-profile?id=${customerId}`}
+                  className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 py-2.5 rounded-lg transition-colors w-full"
+                >
+                  View Full Customer Profile <ChevronRight size={14} />
+                </Link>
+              )}
+            </div>
+
+            {/* Repeat caller badge */}
+            {priorCalls.length > 0 && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+                <p className="font-semibold text-yellow-800 mb-3 flex items-center gap-2">
+                  🔁 Repeat Caller — {priorCalls.length} previous call{priorCalls.length > 1 ? "s" : ""}
+                </p>
+                <div className="space-y-2">
+                  {priorCalls.slice(0, 3).map((c) => (
+                    <div key={c.id} className="text-sm text-yellow-900 bg-white rounded-lg border border-yellow-100 p-3">
+                      <div className="flex justify-between text-xs text-yellow-600 mb-1">
+                        <Clock size={11} className="inline mr-1" />{timeAgo(c.created_at)}
+                      </div>
+                      <p className="text-xs leading-snug">{c.summary?.slice(0, 120)}{(c.summary?.length || 0) > 120 ? "…" : ""}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Right: AI Auto-Filling Ticket */}
-        <div className="w-1/2 flex flex-col gap-6">
-          
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 flex flex-col overflow-hidden relative">
-            
-            {/* Scanning Overlay (Looks cool for demo) */}
-            {isListening && (
-              <div className="absolute top-0 left-0 right-0 h-1 bg-blue-500/20 z-10 animate-[scan_2s_ease-in-out_infinite]"></div>
-            )}
-
+          {/* Right: Live job ticket */}
+          <div className="w-1/2 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col overflow-hidden">
             <div className="p-4 border-b border-gray-200 bg-gray-50 rounded-t-xl">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <Zap size={18} className="text-yellow-500" />
                 Auto-Filling Job Ticket
               </h2>
             </div>
-            
-            <div className="p-8 space-y-8 flex-1 overflow-y-auto">
-              
-              {/* Customer Info */}
-              <div>
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Customer Details</h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Caller ID / Phone</label>
-                    <div className="bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-lg text-sm text-gray-900 font-medium">
-                      {extractedData.phone}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Extracted Name</label>
-                    <div className={`border px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                      extractedData.name === 'Typing...' ? 'bg-blue-50 border-blue-200 text-blue-700 animate-pulse' : 'bg-gray-50 border-gray-200 text-gray-900'
-                    }`}>
-                      {extractedData.name}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div>
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Location</h3>
+            <div className="p-6 space-y-6 flex-1">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Service Address</label>
-                  <div className={`border px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                    extractedData.address.includes('Waiting') ? 'bg-blue-50 border-blue-200 text-blue-700 animate-pulse' : 'bg-green-50 border-green-200 text-green-800'
-                  }`}>
-                    <MapPin size={16} className={extractedData.address.includes('Waiting') ? 'opacity-50' : ''} />
-                    {extractedData.address}
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Caller ID</label>
+                  <div className="bg-green-50 border border-green-200 px-4 py-2.5 rounded-lg text-sm font-medium text-green-900">
+                    {callerName}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Phone</label>
+                  <div className="bg-gray-50 border border-gray-200 px-4 py-2.5 rounded-lg text-sm font-medium text-gray-900">
+                    {formatPhone(active.phone)}
                   </div>
                 </div>
               </div>
-
-              {/* Issue & Tags */}
               <div>
-                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">Job Scope</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">Reported Issue</label>
-                    <div className={`border px-4 py-3 rounded-lg text-sm font-medium transition-colors min-h-[80px] ${
-                      extractedData.issue === 'Listening...' ? 'bg-blue-50 border-blue-200 text-blue-700 animate-pulse' : 'bg-gray-50 border-gray-200 text-gray-900'
-                    }`}>
-                      {extractedData.issue}
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-2">AI Urgency Analysis</label>
-                    {extractedData.urgency === 'Normal' ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full">
-                        Analyzing...
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1.5 text-sm font-bold text-red-700 bg-red-100 border border-red-200 px-4 py-2 rounded-lg shadow-sm">
-                        <AlertCircle size={18} /> {extractedData.urgency}
-                      </span>
-                    )}
-                  </div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Service Address</label>
+                <div className={`border px-4 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 ${active.address || active.customer?.address ? "bg-green-50 border-green-200 text-green-900" : "bg-blue-50 border-blue-200 text-blue-600 animate-pulse"}`}>
+                  <MapPin size={15} />
+                  {active.address || active.customer?.address || "Sarah is asking for address..."}
                 </div>
               </div>
-
+              <div>
+                <label className="block text-xs font-medium text-gray-500 mb-1">Issue / Job Scope</label>
+                <div className="bg-blue-50 border border-blue-200 px-4 py-3 rounded-lg text-sm text-blue-700 animate-pulse min-h-16 flex items-center">
+                  Sarah is transcribing in real-time...
+                </div>
+              </div>
+              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-500 text-center">
+                Full transcript &amp; AI summary will save automatically when the call ends.
+              </div>
             </div>
-            
-            {/* Action Footer */}
-            <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3 rounded-b-xl">
-              <button className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm">
-                Cancel
-              </button>
-              <button 
-                disabled={isListening}
-                className={`px-5 py-2.5 text-sm font-medium rounded-lg shadow-sm flex items-center gap-2 transition-colors ${
-                  isListening 
-                    ? 'bg-blue-300 text-white cursor-not-allowed' 
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
+            <div className="p-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+              <Link
+                href="/call-logs"
+                className="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
               >
-                <Save size={16} />
-                {isListening ? 'Waiting for call to end...' : 'Save & Dispatch'}
-              </button>
+                <CheckCircle2 size={16} /> View Call Log After
+              </Link>
             </div>
-            
           </div>
         </div>
-
-      </div>
-      
-      {/* Global Style for the cool scanning laser effect */}
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes scan {
-          0% { top: 0; opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { top: 100%; opacity: 0; }
-        }
-      `}} />
+      ) : (
+        /* ── STANDBY VIEW ── */
+        <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center">
+          <div className="h-24 w-24 rounded-full bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+            <PhoneCall size={40} className="text-gray-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-700">Standing By</h2>
+            <p className="text-gray-400 mt-1 max-w-sm">
+              When a call comes in to <span className="font-mono font-semibold text-gray-600">(612) 324-5110</span>, Sarah answers automatically and this screen will update with the caller's identity and history.
+            </p>
+          </div>
+          <div className="flex gap-4">
+            <Link href="/call-logs" className="text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2">
+              <Phone size={15} /> Recent Calls
+            </Link>
+            <Link href="/crm" className="text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 px-5 py-2.5 rounded-lg transition-colors flex items-center gap-2">
+              <User size={15} /> CRM
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

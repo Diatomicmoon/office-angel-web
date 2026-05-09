@@ -1,0 +1,59 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const sb = () =>
+  createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+export async function GET() {
+  let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+  if (!companyId) {
+    const { data: c0 } = await sb().from("companies").select("id").order("created_at", { ascending: true }).limit(1);
+    companyId = c0?.[0]?.id;
+  }
+  if (!companyId) return NextResponse.json({ active: null });
+
+  // Look for a call_log with status 'incoming' in the last 5 minutes
+  const cutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const { data } = await sb()
+    .from("call_logs")
+    .select("id, meta, customers(id, first_name, last_name, phone_number, address, call_logs(id, summary, created_at))")
+    .eq("company_id", companyId)
+    .eq("call_status", "incoming")
+    .gte("created_at", cutoff)
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const call = data?.[0];
+  if (!call) return NextResponse.json({ active: null });
+
+  const cust = Array.isArray(call.customers) ? call.customers[0] : call.customers;
+
+  return NextResponse.json({
+    active: {
+      call_id: call.id,
+      caller_name: call.meta?.lookup_name || null,
+      phone: call.meta?.phone || null,
+      address: cust?.address || null,
+      customer: cust || null,
+    },
+  });
+}
+
+// Called by twilio-voice to register/clear active call
+export async function POST(req: Request) {
+  const body = await req.json();
+  const { action, call_id } = body;
+
+  if (action === "clear" && call_id) {
+    await sb()
+      .from("call_logs")
+      .update({ call_status: "abandoned" })
+      .eq("id", call_id)
+      .eq("call_status", "incoming");
+  }
+
+  return NextResponse.json({ ok: true });
+}

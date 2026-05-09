@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SidebarClientWrapper from "@/components/SidebarClientWrapper";
+import IncomingCallBanner from "@/components/IncomingCallBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
           <main className="flex-1 min-w-0">
             {children}
           </main>
+          <IncomingCallBanner />
         </div>
       </body>
     </html>
