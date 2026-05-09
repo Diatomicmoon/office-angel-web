@@ -43,6 +43,15 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
+    // If the messages table exists, prefer it over stuffing lead text into jobs.notes.
+    let messagesTableOk = false;
+    try {
+      const probe = await supabase.from('messages').select('id').limit(1);
+      messagesTableOk = !probe.error;
+    } catch {
+      messagesTableOk = false;
+    }
+
     // Resolve company.
     // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
     // - In auth tenant mode, require payload.company_id (webhook integration will supply it).
@@ -104,7 +113,7 @@ export async function POST(req: Request) {
       estimated_minutes: estimatedMinutes,
       scheduled_start: suggestedStart.toISOString(),
       scheduled_end: suggestedEnd.toISOString(),
-      notes: message || null,
+      ...(messagesTableOk ? {} : { notes: message || null }),
     };
 
     let jobId: string | null = null;

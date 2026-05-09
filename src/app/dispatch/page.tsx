@@ -468,7 +468,7 @@ export default function Dispatch() {
                       )}
                     </div>
 
-                    {ticket.notes ? (
+                    {ticket.notes && ticketMessages.length === 0 ? (
                       <div className="mt-3">
                         <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
                         <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>

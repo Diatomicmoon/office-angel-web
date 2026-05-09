@@ -77,6 +77,16 @@ export async function POST(req: Request) {
     let debugErr: string | null = null;
     let jobIdForMessage: string | null = null;
 
+    // If the messages table exists, prefer it over stuffing SMS into jobs.notes.
+    // (jobs.notes remains as a fallback for older DBs.)
+    let messagesTableOk = false;
+    try {
+      const probe = await supabase.from('messages').select('id').limit(1);
+      messagesTableOk = !probe.error;
+    } catch {
+      messagesTableOk = false;
+    }
+
     // Upsert customer by phone
     let customerId: string | null = null;
     if (from) {
@@ -122,14 +132,15 @@ export async function POST(req: Request) {
       const r0 = recent?.[0];
       if (r0?.id && String(r0.status || '').toLowerCase() === 'lead') {
         existingJobId = r0.id;
-        const nextNotes = [r0.notes, `SMS from ${from}: ${body}`].filter(Boolean).join('\n\n');
-        const upd = await supabase
-          .from('jobs')
-          .update({
-            notes: nextNotes,
-            updated_at: new Date().toISOString(),
-          } as any)
-          .eq('id', r0.id);
+        const updatePayload: any = {
+          updated_at: new Date().toISOString(),
+        };
+        if (!messagesTableOk) {
+          const nextNotes = [r0.notes, `SMS from ${from}: ${body}`].filter(Boolean).join('\n\n');
+          updatePayload.notes = nextNotes;
+        }
+
+        const upd = await supabase.from('jobs').update(updatePayload).eq('id', r0.id);
 
         if (!upd.error) {
           updatedExisting = true;
@@ -154,8 +165,7 @@ export async function POST(req: Request) {
         estimated_minutes: estimatedMinutes,
         scheduled_start: suggestedStart.toISOString(),
         scheduled_end: suggestedEnd.toISOString(),
-        // best-effort: store the raw message for now
-        notes: body || null,
+        ...(messagesTableOk ? {} : { notes: body || null }),
       };
 
       const ins = await supabase.from('jobs').insert([insertPayload]).select('id').single();
