@@ -29,6 +29,10 @@ type Job = {
   }
 };
 
+type JobTicket = Job & {
+  quoted_amount?: any;
+};
+
 const center = { lat: 44.9778, lng: -93.2650 };
 
 export default function Dispatch() {
@@ -43,6 +47,23 @@ export default function Dispatch() {
   const [assignSelection, setAssignSelection] = useState<Record<string, string>>({});
   const [assignSaving, setAssignSaving] = useState<string | null>(null);
   const [scheduleSelection, setScheduleSelection] = useState<Record<string, { date?: string; time?: string; duration?: number }>>({});
+  const [ticketOpen, setTicketOpen] = useState(false);
+  const [ticketLoading, setTicketLoading] = useState(false);
+  const [ticket, setTicket] = useState<JobTicket | null>(null);
+
+  const openTicket = async (jobId: string) => {
+    setTicketOpen(true);
+    setTicketLoading(true);
+    try {
+      const res = await fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`);
+      const json = await res.json();
+      setTicket(json.job || null);
+    } catch {
+      setTicket(null);
+    } finally {
+      setTicketLoading(false);
+    }
+  };
 
   const getDefaultDuration = (job: Job) => {
     const m = job.estimated_minutes;
@@ -125,6 +146,66 @@ export default function Dispatch() {
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-6 p-8 h-[calc(100vh-2rem)] flex flex-col">
+      {/* Job Ticket Slide-over */}
+      {ticketOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setTicketOpen(false)} />
+          <div className="relative z-10 w-full max-w-lg bg-white shadow-2xl flex flex-col h-full overflow-hidden">
+            <div className="p-6 border-b border-gray-200 bg-gray-50 flex items-start justify-between">
+              <div>
+                <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">Job Ticket</p>
+                <h2 className="text-xl font-bold text-gray-900 mt-1">
+                  {ticketLoading ? 'Loading…' : (ticket?.title || 'Untitled Job')}
+                </h2>
+                {ticket?.customers?.phone_number && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {ticket.customers.first_name ? `${ticket.customers.first_name} ${ticket.customers.last_name || ''}`.trim() : 'Customer'} • {ticket.customers.phone_number}
+                  </p>
+                )}
+              </div>
+              <button onClick={() => setTicketOpen(false)} className="text-sm font-semibold text-gray-600 hover:text-gray-900">
+                Close
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {ticketLoading ? (
+                <div className="text-sm text-gray-500">Fetching job details…</div>
+              ) : !ticket ? (
+                <div className="text-sm text-gray-500">Could not load job.</div>
+              ) : (
+                <>
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Status</span>
+                      <span className="text-xs font-bold px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">{ticket.status || 'Lead'}</span>
+                    </div>
+                    {ticket.address && (
+                      <p className="text-sm text-gray-800 mt-3 flex items-start gap-2">
+                        <MapPin size={16} className="text-gray-400 mt-0.5" />
+                        <span>{ticket.address}</span>
+                      </p>
+                    )}
+                    {ticket.scheduled_start && (
+                      <p className="text-sm text-gray-700 mt-2">
+                        Scheduled: {new Date(ticket.scheduled_start).toLocaleString()}
+                      </p>
+                    )}
+                    {ticket.estimated_minutes ? (
+                      <p className="text-xs text-gray-500 mt-2">AI duration guess: ~{ticket.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex justify-between items-end">
         <div>
@@ -291,11 +372,17 @@ export default function Dispatch() {
                   </div>
                 )}
               </div>
-              <APIProvider apiKey={apiKey}>
-                <div style={{ width: '100%', height: '100%' }}>
-                  <Map defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'} />
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
                 </div>
-              </APIProvider>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <Map defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'} />
+                  </div>
+                </APIProvider>
+              )}
             </div>
           ) : (
             <div className="flex-1 flex overflow-x-auto relative">
@@ -333,7 +420,12 @@ export default function Dispatch() {
                       ))}
                       {assignedJobs.filter(j => j.technician_id === tech.id).map((job, idx) => (
                         // Render assigned jobs (mock position for beta)
-                        <div key={job.id} className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10" style={{ top: `${50 + (idx * 150)}px`, height: '120px' }}>
+                        <div
+                          key={job.id}
+                          onClick={() => openTicket(job.id)}
+                          className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                          style={{ top: `${50 + (idx * 150)}px`, height: '120px' }}
+                        >
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
                             {job.scheduled_start && (

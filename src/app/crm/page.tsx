@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 type Lead = {
   id: string;
   customer_id: string;
+  job_id?: string;
+  scheduled_start?: string | null;
   caller_name: string;
   phone: string;
   address: string;
@@ -20,6 +22,12 @@ type Lead = {
   status: string;
   time_ago: string;
   created_at: string;
+};
+
+type JobLite = {
+  id: string;
+  status?: string;
+  scheduled_start?: string | null;
 };
 
 function formatPhone(phone: string) {
@@ -267,9 +275,13 @@ export default function CRM() {
           const urgency = c.urgency_flag || "low";
           const status = urgency === "medium" ? "estimating" : "captured";
 
+          const jobId = norm.job_id || null;
+
           return {
             id: c.id,
             customer_id: c.customer_id || "",
+            job_id: jobId || undefined,
+            scheduled_start: null,
             caller_name: callerName,
             phone,
             address,
@@ -285,8 +297,38 @@ export default function CRM() {
             created_at: c.created_at,
           };
         });
-        setLeads(mapped);
-        setLoading(false);
+
+        // Pull linked jobs so we can show real Scheduled status/time.
+        const jobIds = Array.from(new Set(mapped.map((l) => l.job_id).filter(Boolean) as string[]));
+        if (jobIds.length === 0) {
+          setLeads(mapped);
+          setLoading(false);
+          return;
+        }
+
+        fetch(`/api/jobs?ids=${encodeURIComponent(jobIds.join(','))}`)
+          .then((r) => r.json())
+          .then((j) => {
+            const jobs: JobLite[] = (j.jobs || []) as JobLite[];
+            const jobMap = new Map(jobs.map((x) => [x.id, x]));
+            const merged = mapped.map((l) => {
+              const job = l.job_id ? jobMap.get(l.job_id) : null;
+              const scheduledStart = (job as any)?.scheduled_start || null;
+              const jobStatus = String((job as any)?.status || '').toLowerCase();
+              const isScheduled = Boolean(scheduledStart) || jobStatus === 'scheduled';
+              return {
+                ...l,
+                scheduled_start: scheduledStart,
+                status: isScheduled ? 'scheduled' : l.status,
+              };
+            });
+            setLeads(merged);
+            setLoading(false);
+          })
+          .catch(() => {
+            setLeads(mapped);
+            setLoading(false);
+          });
       })
       .catch(() => setLoading(false));
   }, []);
@@ -306,6 +348,11 @@ export default function CRM() {
       </div>
       <h4 className="font-semibold text-gray-900 mt-2 group-hover:text-blue-700 transition-colors">{lead.job_type}</h4>
       <p className="text-sm text-gray-500 mt-0.5">{lead.caller_name}</p>
+      {lead.scheduled_start && (
+        <p className="text-xs font-semibold text-green-700 mt-1">
+          Scheduled: {fmtDate(lead.scheduled_start)}
+        </p>
+      )}
       {lead.summary && (
         <p className="text-xs text-gray-400 mt-2 leading-snug" style={{display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden"}}>
           {lead.summary}
