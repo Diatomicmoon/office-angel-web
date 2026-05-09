@@ -21,6 +21,7 @@ type Job = {
   scheduled_start?: string;
   scheduled_end?: string;
   estimated_minutes?: number;
+  notes?: string;
   created_at?: string;
   customers?: {
     first_name?: string;
@@ -31,6 +32,16 @@ type Job = {
 
 type JobTicket = Job & {
   quoted_amount?: any;
+};
+
+type Msg = {
+  id: string;
+  channel?: string;
+  direction?: string;
+  from_value?: string | null;
+  to_value?: string | null;
+  body?: string | null;
+  created_at?: string;
 };
 
 const center = { lat: 44.9778, lng: -93.2650 };
@@ -134,6 +145,8 @@ export default function Dispatch() {
   const [ticketOpen, setTicketOpen] = useState(false);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [ticket, setTicket] = useState<JobTicket | null>(null);
+  const [ticketMessages, setTicketMessages] = useState<Msg[]>([]);
+  const [ticketMessagesLoading, setTicketMessagesLoading] = useState(false);
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
   const [now, setNow] = useState<Date>(() => new Date());
@@ -192,14 +205,28 @@ export default function Dispatch() {
   const openTicket = async (jobId: string) => {
     setTicketOpen(true);
     setTicketLoading(true);
+    setTicketMessagesLoading(true);
     try {
-      const res = await fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`);
-      const json = await res.json();
+      const [resJob, resMsg] = await Promise.all([
+        fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`),
+        fetch(`/api/messages?job_id=${encodeURIComponent(jobId)}&limit=50`),
+      ]);
+
+      const json = await resJob.json();
       setTicket(json.job || null);
+
+      if (resMsg.ok) {
+        const mj = await resMsg.json();
+        setTicketMessages(mj.messages || []);
+      } else {
+        setTicketMessages([]);
+      }
     } catch {
       setTicket(null);
+      setTicketMessages([]);
     } finally {
       setTicketLoading(false);
+      setTicketMessagesLoading(false);
     }
   };
 
@@ -428,6 +455,41 @@ export default function Dispatch() {
                     {ticket.estimated_minutes ? (
                       <p className="text-xs text-gray-500 mt-2">AI duration guess: ~{ticket.estimated_minutes} min</p>
                     ) : null}
+                  </div>
+
+                  {/* Messages / Notes */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="text-xs text-gray-400">

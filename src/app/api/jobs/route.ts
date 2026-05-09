@@ -1,6 +1,33 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { resolveCompanyIdOrThrow } from "@/lib/tenant";
+import twilio from "twilio";
+
+const DISPLAY_TZ = "America/Chicago";
+
+function fmtTimeRange(startIso?: string | null, endIso?: string | null) {
+  if (!startIso) return null;
+  const start = new Date(startIso);
+  if (Number.isNaN(start.getTime())) return null;
+  const startStr = start.toLocaleString([], {
+    timeZone: DISPLAY_TZ,
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  if (!endIso) return startStr;
+  const end = new Date(endIso);
+  if (Number.isNaN(end.getTime())) return startStr;
+  const endStr = end.toLocaleTimeString([], {
+    timeZone: DISPLAY_TZ,
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  return `${startStr}–${endStr}`;
+}
 
 export async function GET(req: Request) {
   try {
@@ -93,6 +120,14 @@ export async function POST(req: Request) {
     for (const k of Object.keys(payload)) if (payload[k] === undefined) delete payload[k];
 
     if (body.id) {
+      // Fetch "before" so we can detect first-time booking (for SMS confirmations).
+      const { data: before } = await supabase
+        .from("jobs")
+        .select("id, technician_id, customer_id, scheduled_start, scheduled_end, status")
+        .eq("id", body.id)
+        .eq("company_id", companyId)
+        .maybeSingle();
+
       // Update
       const { data, error } = await supabase
         .from("jobs")
@@ -130,6 +165,66 @@ export async function POST(req: Request) {
             })
             .eq('id', techId)
             .eq('company_id', companyId);
+        }
+      } catch {}
+
+      // Best-effort: send customer SMS confirmation when a job is booked for the first time.
+      try {
+        const wasUnassigned = !before?.technician_id;
+        const nowAssigned = Boolean(data?.technician_id);
+        const nowScheduled = String(data?.status || "").toLowerCase() === "scheduled";
+
+        if (wasUnassigned && nowAssigned && nowScheduled && data?.customer_id) {
+          const { data: company } = await supabase
+            .from("companies")
+            .select("id, name, phone_number, sms_booking_confirmation_enabled, twilio_subaccount_sid, twilio_messaging_service_sid")
+            .eq("id", companyId)
+            .maybeSingle();
+
+          if (company?.sms_booking_confirmation_enabled !== false && company?.phone_number) {
+            const { data: cust } = await supabase
+              .from("customers")
+              .select("id, first_name, phone_number")
+              .eq("id", data.customer_id)
+              .eq("company_id", companyId)
+              .maybeSingle();
+
+            const toPhone = cust?.phone_number;
+            if (toPhone && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+              const when = fmtTimeRange(data.scheduled_start, data.scheduled_end) || "your scheduled time";
+              const who = cust?.first_name && cust.first_name !== "New" ? cust.first_name : "there";
+              const fromPhone = company.phone_number;
+              const bodyText = `Hi ${who} — you're scheduled for ${when}. Reply YES to confirm or text back a better time window.`;
+
+              const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+              const acct = company.twilio_subaccount_sid || process.env.TWILIO_ACCOUNT_SID;
+
+              const msg = await client.api.accounts(acct).messages.create({
+                to: toPhone,
+                ...(company.twilio_messaging_service_sid
+                  ? { messagingServiceSid: company.twilio_messaging_service_sid }
+                  : { from: fromPhone }),
+                body: bodyText,
+              });
+
+              // Best-effort: log outbound message
+              try {
+                await supabase.from("messages").insert([
+                  {
+                    company_id: companyId,
+                    customer_id: data.customer_id,
+                    job_id: data.id,
+                    channel: "sms",
+                    direction: "outbound",
+                    from_value: fromPhone,
+                    to_value: toPhone,
+                    body: bodyText,
+                    meta: { twilio: { sid: msg.sid } },
+                  } as any,
+                ]);
+              } catch {}
+            }
+          }
         }
       } catch {}
 

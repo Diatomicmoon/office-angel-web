@@ -101,6 +101,7 @@ export async function POST(req: Request) {
 
     // De-dupe: if the customer is already mid-conversation, update the most recent Lead job instead of creating new jobs.
     let updatedExisting = false;
+    let existingJobId: string | null = null;
     if (customerId) {
       const cutoff = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
       const { data: recent } = await supabase
@@ -114,6 +115,7 @@ export async function POST(req: Request) {
 
       const r0 = recent?.[0];
       if (r0?.id && String(r0.status || '').toLowerCase() === 'lead') {
+        existingJobId = r0.id;
         const nextNotes = [r0.notes, `SMS from ${from}: ${body}`].filter(Boolean).join('\n\n');
         const upd = await supabase
           .from('jobs')
@@ -132,6 +134,8 @@ export async function POST(req: Request) {
       }
     }
 
+    let jobIdForMessage: string | null = updatedExisting ? existingJobId : null;
+
     if (!updatedExisting) {
       // Create job (drops into AI Parking Lot because technician_id is null)
       const insertPayload: any = {
@@ -147,12 +151,32 @@ export async function POST(req: Request) {
         notes: body || null,
       };
 
-      const ins = await supabase.from('jobs').insert([insertPayload]);
+      const ins = await supabase.from('jobs').insert([insertPayload]).select('id').single();
       if (ins.error && String(ins.error.message || '').includes('notes')) {
         delete insertPayload.notes;
         await supabase.from('jobs').insert([insertPayload]);
+      } else {
+        jobIdForMessage = ((ins.data as any)?.id as string) || null;
       }
     }
+
+    // Best-effort: store the message in messages table (scalable history).
+    // If the table doesn't exist yet, ignore errors.
+    try {
+      await supabase.from('messages').insert([
+        {
+          company_id: companyId,
+          customer_id: customerId,
+          job_id: jobIdForMessage,
+          channel: 'sms',
+          direction: 'inbound',
+          from_value: from || null,
+          to_value: to || null,
+          body: body || null,
+          meta: { raw: { From: from, To: to } },
+        } as any,
+      ]);
+    } catch {}
 
     const reply =
       "Got it — we’re logging your request now. Reply with: Name, Address, Best time window, and what’s going on. Example: 'Jordan, 123 Main St, today 3-5pm, breaker keeps tripping.'" +

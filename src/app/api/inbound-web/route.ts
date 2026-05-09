@@ -32,6 +32,7 @@ function suggestStartTime(urgencyFlag: string) {
 export async function POST(req: Request) {
   try {
     const payload = await req.json();
+    const companyIdIn = String(payload?.company_id || '').trim();
     const name = String(payload?.name || '').trim();
     const phone = String(payload?.phone || '').trim();
     const message = String(payload?.message || '').trim();
@@ -43,8 +44,18 @@ export async function POST(req: Request) {
     );
 
     // Resolve company.
-    // In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
-    let companyId: string | null = process.env.OFFICE_ANGEL_COMPANY_ID || null;
+    // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
+    // - In auth tenant mode, require payload.company_id (webhook integration will supply it).
+    const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
+    let companyId: string | null = null;
+
+    if (tenantMode === 'auth') {
+      companyId = companyIdIn || null;
+      if (!companyId) return NextResponse.json({ ok: false, error: 'Missing company_id' }, { status: 400 });
+    } else {
+      companyId = process.env.OFFICE_ANGEL_COMPANY_ID || null;
+    }
+
     if (!companyId) {
       const { data: c0 } = await supabase.from('companies').select('id').order('created_at', { ascending: true }).limit(1);
       companyId = c0?.[0]?.id || null;
@@ -83,20 +94,45 @@ export async function POST(req: Request) {
     const suggestedStart = suggestStartTime(urgencyFlag);
     const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
 
-    await supabase.from('jobs').insert([
-      {
-        company_id: companyId,
-        customer_id: customerId,
-        title,
-        status: 'Lead',
-        address: address || null,
-        priority: urgencyFlag === 'high' ? 'high' : urgencyFlag === 'low' ? 'low' : 'normal',
-        estimated_minutes: estimatedMinutes,
-        scheduled_start: suggestedStart.toISOString(),
-        scheduled_end: suggestedEnd.toISOString(),
-        notes: message || null,
-      } as any,
-    ]);
+    const insertPayload: any = {
+      company_id: companyId,
+      customer_id: customerId,
+      title,
+      status: 'Lead',
+      address: address || null,
+      priority: urgencyFlag === 'high' ? 'high' : urgencyFlag === 'low' ? 'low' : 'normal',
+      estimated_minutes: estimatedMinutes,
+      scheduled_start: suggestedStart.toISOString(),
+      scheduled_end: suggestedEnd.toISOString(),
+      notes: message || null,
+    };
+
+    let jobId: string | null = null;
+    const ins = await supabase.from('jobs').insert([insertPayload]).select('id').single();
+    if (ins.error && String(ins.error.message || '').includes('notes')) {
+      delete insertPayload.notes;
+      const ins2 = await supabase.from('jobs').insert([insertPayload]).select('id').single();
+      jobId = (ins2.data as any)?.id || null;
+    } else {
+      jobId = (ins.data as any)?.id || null;
+    }
+
+    // Best-effort: store in messages table.
+    try {
+      await supabase.from('messages').insert([
+        {
+          company_id: companyId,
+          customer_id: customerId,
+          job_id: jobId,
+          channel: 'web',
+          direction: 'inbound',
+          from_value: phone || name || null,
+          to_value: null,
+          body: [name ? `Name: ${name}` : null, phone ? `Phone: ${phone}` : null, address ? `Address: ${address}` : null, message ? `Message: ${message}` : null].filter(Boolean).join('\n'),
+          meta: { raw: payload },
+        } as any,
+      ]);
+    } catch {}
 
     return NextResponse.json({ ok: true });
   } catch (e) {

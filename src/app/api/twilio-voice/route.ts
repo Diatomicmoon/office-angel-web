@@ -35,8 +35,19 @@ export async function POST(req: Request) {
 
     console.log(`[TWILIO VOICE] Incoming call from ${callerPhone} to ${twilioNumber}`);
 
-    // Get company settings
-    let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+    // Resolve company.
+    // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID.
+    // - In auth tenant mode, map by inbound "To" number.
+    const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
+    let companyId: string | undefined = undefined;
+
+    if (tenantMode !== 'auth') {
+      companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+    } else if (twilioNumber) {
+      const { data: cMatch } = await sb().from('companies').select('id').eq('phone_number', twilioNumber).limit(1);
+      companyId = cMatch?.[0]?.id;
+    }
+
     if (!companyId) {
       const { data: c0 } = await sb().from('companies').select('id').order('created_at', { ascending: true }).limit(1);
       companyId = c0?.[0]?.id;
