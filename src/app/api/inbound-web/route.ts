@@ -1,6 +1,22 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+function corsHeaders(origin?: string | null) {
+  // For now: permissive so the widget is easy to drop into any site.
+  // When multi-tenant is live, lock this down per-company if needed.
+  const o = origin || '*';
+  return {
+    'Access-Control-Allow-Origin': o,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Office-Angel-Secret',
+  };
+}
+
+export async function OPTIONS(req: Request) {
+  const origin = req.headers.get('origin');
+  return new NextResponse(null, { status: 204, headers: corsHeaders(origin) });
+}
+
 function deriveUrgency(text?: string) {
   const s = (text || '').toLowerCase();
   if (s.match(/(emergency|sparking|spark|fire|smoke|smoking|burning smell|burning|burn|arcing|arc|shock|electrocution|power out|no power|flood)/)) return 'high';
@@ -31,8 +47,10 @@ function suggestStartTime(urgencyFlag: string) {
 
 export async function POST(req: Request) {
   try {
+    const origin = req.headers.get('origin');
     const payload = await req.json();
     const companyIdIn = String(payload?.company_id || '').trim();
+    const secretIn = String(payload?.secret || '').trim();
     const name = String(payload?.name || '').trim();
     const phone = String(payload?.phone || '').trim();
     const message = String(payload?.message || '').trim();
@@ -70,6 +88,17 @@ export async function POST(req: Request) {
       companyId = c0?.[0]?.id || null;
     }
     if (!companyId) return NextResponse.json({ ok: false, error: 'No company configured' }, { status: 500 });
+
+    // In auth tenant mode, require a webhook secret (prevents random internet spam).
+    if (tenantMode === 'auth') {
+      const headerSecret = String(req.headers.get('x-office-angel-secret') || '').trim();
+      const provided = headerSecret || secretIn;
+      const { data: company } = await supabase.from('companies').select('id, webhook_secret').eq('id', companyId).maybeSingle();
+      const expected = String((company as any)?.webhook_secret || '').trim();
+      if (!expected || provided !== expected) {
+        return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401, headers: corsHeaders(origin) });
+      }
+    }
 
     // Upsert customer by phone if provided
     let customerId: string | null = null;
@@ -143,9 +172,10 @@ export async function POST(req: Request) {
       ]);
     } catch {}
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true }, { headers: corsHeaders(origin) });
   } catch (e) {
     console.error('[INBOUND WEB] error', e);
-    return NextResponse.json({ ok: false, error: 'Failed' }, { status: 500 });
+    const origin = req.headers.get('origin');
+    return NextResponse.json({ ok: false, error: 'Failed' }, { status: 500, headers: corsHeaders(origin) });
   }
 }

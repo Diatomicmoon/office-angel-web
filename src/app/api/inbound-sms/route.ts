@@ -34,6 +34,18 @@ function twiml(message?: string) {
   return `<?xml version="1.0" encoding="UTF-8"?><Response>${body}</Response>`;
 }
 
+function normalizeBody(s: string) {
+  return (s || '').trim().replace(/\s+/g, ' ');
+}
+
+function isYes(s: string) {
+  return /^(yes|yep|yeah|yup|confirm|confirmed|ok|okay)\b/i.test(s);
+}
+
+function isNo(s: string) {
+  return /^(no|nope|nah|can't|cant|cannot|reschedule|change)\b/i.test(s);
+}
+
 export async function POST(req: Request) {
   try {
     const url = new URL(req.url);
@@ -43,6 +55,7 @@ export async function POST(req: Request) {
     const from = String(form.get('From') || '');
     const to = String(form.get('To') || '');
     const body = String(form.get('Body') || '');
+    const bodyNorm = normalizeBody(body);
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -114,6 +127,87 @@ export async function POST(req: Request) {
     const title = urgencyFlag === 'high' ? 'Emergency Text Message' : 'Inbound Text Message';
     const suggestedStart = suggestStartTime(urgencyFlag);
     const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
+
+    // 0) Handle confirmation replies (YES/NO) for the most recent scheduled job.
+    // This keeps the workflow dead-simple for customers.
+    if (customerId && (isYes(bodyNorm) || isNo(bodyNorm))) {
+      const cutoff = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+      const { data: recentScheduled } = await supabase
+        .from('jobs')
+        .select('id, status, scheduled_start, scheduled_end')
+        .eq('company_id', companyId)
+        .eq('customer_id', customerId)
+        .gte('created_at', cutoff)
+        .order('updated_at', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      const target = (recentScheduled || []).find((j: any) => {
+        const st = String(j.status || '').toLowerCase();
+        return st === 'scheduled' || st === 'confirmed' || st.includes('reschedule');
+      }) as any;
+
+      if (target?.id) {
+        if (isYes(bodyNorm)) {
+          await supabase.from('jobs').update({
+            confirmation_status: 'confirmed',
+            confirmed_at: new Date().toISOString(),
+            status: 'Confirmed',
+            updated_at: new Date().toISOString(),
+          } as any).eq('id', target.id);
+
+          try {
+            await supabase.from('messages').insert([
+              {
+                company_id: companyId,
+                customer_id: customerId,
+                job_id: target.id,
+                channel: 'sms',
+                direction: 'inbound',
+                from_value: from || null,
+                to_value: to || null,
+                body: bodyNorm,
+                meta: { kind: 'confirm_yes' },
+              } as any,
+            ]);
+          } catch {}
+
+          return new NextResponse(
+            twiml('Perfect — you’re confirmed. See you then.'),
+            { status: 200, headers: { 'Content-Type': 'text/xml' } }
+          );
+        }
+
+        await supabase.from('jobs').update({
+          confirmation_status: 'reschedule_requested',
+          reschedule_requested_at: new Date().toISOString(),
+          status: 'Reschedule Requested',
+          updated_at: new Date().toISOString(),
+        } as any).eq('id', target.id);
+
+        try {
+          await supabase.from('messages').insert([
+            {
+              company_id: companyId,
+              customer_id: customerId,
+              job_id: target.id,
+              channel: 'sms',
+              direction: 'inbound',
+              from_value: from || null,
+              to_value: to || null,
+              body: bodyNorm,
+              meta: { kind: 'confirm_no' },
+            } as any,
+          ]);
+        } catch {}
+
+        return new NextResponse(
+          twiml("No problem — reply with a new time window that works (example: 'tomorrow 9-11am')."),
+          { status: 200, headers: { 'Content-Type': 'text/xml' } }
+        );
+      }
+      // If we can't find a target job, fall through to normal job creation.
+    }
 
     // De-dupe: if the customer is already mid-conversation, update the most recent Lead job instead of creating new jobs.
     let updatedExisting = false;

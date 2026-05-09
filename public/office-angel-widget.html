@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Office Angel Widget (Demo)</title>
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
+      label { display:block; font-size: 12px; font-weight: 700; color: #444; margin-top: 10px; }
+      input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+      button { margin-top: 12px; padding: 10px 14px; border: 0; border-radius: 12px; font-weight: 800; background: #2563eb; color: white; cursor:pointer; }
+      .card { max-width: 520px; border: 1px solid #eee; border-radius: 16px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); }
+      .muted { color:#666; font-size: 12px; margin-top: 6px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h2 style="margin:0;">Request Scheduling</h2>
+      <div class="muted">Demo form → sends to /api/inbound-web and drops into AI Parking Lot</div>
+
+      <label>Name</label>
+      <input id="name" placeholder="Jordan" />
+
+      <label>Phone</label>
+      <input id="phone" placeholder="+16125550123" />
+
+      <label>Address</label>
+      <input id="address" placeholder="123 Main St" />
+
+      <label>What’s going on?</label>
+      <textarea id="message" rows="4" placeholder="Breaker keeps tripping. Best time tomorrow 9–11am."></textarea>
+
+      <button id="send">Send</button>
+      <div id="out" class="muted"></div>
+    </div>
+
+    <script>
+      // NOTE: For true multi-tenant, pass company_id + X-Office-Angel-Secret.
+      document.getElementById('send').addEventListener('click', async () => {
+        const payload = {
+          name: document.getElementById('name').value,
+          phone: document.getElementById('phone').value,
+          address: document.getElementById('address').value,
+          message: document.getElementById('message').value,
+        };
+
+        const r = await fetch('https://www.office-angel.com/api/inbound-web', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const out = document.getElementById('out');
+        out.textContent = r.ok ? 'Sent ✅ Check Dispatch → AI Parking Lot.' : 'Failed ❌';
+      });
+    </script>
+  </body>
+</html>
+

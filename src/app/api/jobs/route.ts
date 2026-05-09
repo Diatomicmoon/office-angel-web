@@ -224,7 +224,7 @@ export async function POST(req: Request) {
               const when = fmtTimeRange(data.scheduled_start, data.scheduled_end) || "your scheduled time";
               const who = cust?.first_name && cust.first_name !== "New" ? cust.first_name : "there";
               const fromPhone = company.phone_number;
-              const bodyText = `Hi ${who} — you're scheduled for ${when}. Reply YES to confirm or text back a better time window.`;
+              const bodyText = `Hi ${who} — you're scheduled for ${when}. Reply YES to confirm or NO to reschedule.`;
 
               const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
               const acct = company.twilio_subaccount_sid || process.env.TWILIO_ACCOUNT_SID;
