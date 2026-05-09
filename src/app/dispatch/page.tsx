@@ -117,7 +117,7 @@ export default function Dispatch() {
     const m = now.getMinutes();
     const minutesSinceStart = (h - GRID_START_HOUR) * 60 + m;
     if (minutesSinceStart < 0 || minutesSinceStart > GRID_HOURS * 60) return null;
-    return GRID_HEADER_PX + (minutesSinceStart / 60) * GRID_HOUR_PX;
+    return (minutesSinceStart / 60) * GRID_HOUR_PX;
   }, [now]);
 
   const jobStyleForGrid = (job: Job, idx: number) => {
@@ -139,7 +139,7 @@ export default function Dispatch() {
     const mins = minutesSinceGridStart(start);
     const topPx = clamp((mins / 60) * GRID_HOUR_PX, 0, GRID_HOURS * GRID_HOUR_PX - 20);
     const heightPx = clamp((durationMinutes / 60) * GRID_HOUR_PX - 8, 52, GRID_HOURS * GRID_HOUR_PX);
-    return { top: `${topPx + 8}px`, height: `${heightPx}px` } as any;
+    return { top: `${topPx}px`, height: `${heightPx}px` } as any;
   };
 
   const openTicket = async (jobId: string) => {
@@ -562,86 +562,117 @@ export default function Dispatch() {
           ) : (
             <div
               ref={dayScrollRef}
-              className="flex-1 flex overflow-auto relative"
+              className="flex-1 overflow-auto relative"
               style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
             >
-              <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20" style={{ width: GUTTER_W }}>
-                <div className="h-20 border-b border-gray-200 bg-gray-50"></div>
-                {slots.map((i) => {
-                  const h24 = GRID_START_HOUR + Math.floor(i / 2);
-                  const isHalf = i % 2 === 1;
-                  return (
-                    <div
-                      key={i}
-                      className="border-b border-gray-200 pr-3 flex items-start justify-end"
-                      style={{ height: GRID_SLOT_PX }}
-                    >
-                      <span
-                        className={`whitespace-nowrap leading-tight mt-1 ${
-                          isHalf
-                            ? 'text-[11px] text-gray-500 font-medium'
-                            : 'text-[12px] text-gray-900 font-bold'
-                        }`}
-                      >
-                        {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="flex-1 flex min-w-max relative bg-gray-50/30">
-                {timeLineTop !== null && (
-                  <div className="absolute left-0 right-0 h-0.5 bg-red-500 z-10 flex items-center" style={{ top: `${timeLineTop}px` }}>
-                    <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
-                  </div>
-                )}
-                {techs.length === 0 ? (
-                  <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
-                ) : techs.map(tech => (
-                  <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
-                    <div className="h-20 border-b border-gray-200 bg-white p-3 sticky top-0 z-30 flex flex-col justify-center">
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
                           <User size={18} className="text-blue-600" />
                           <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
                         </div>
-                        <div>
-                          <h4 className="font-bold text-gray-900 leading-tight">{tech.name}</h4>
-                          <p className="text-xs text-gray-500 capitalize">{tech.status}</p>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
                         </div>
                       </div>
                     </div>
-                    <div className="relative" style={{ height: GRID_TOTAL_PX }}>
-                      {[...Array(GRID_HOURS * 2)].map((_, i) => (
-                        <div
-                          key={i}
-                          className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
-                          style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
-                        />
-                      ))}
-                      {assignedJobs.filter(j => j.technician_id === tech.id).map((job, idx) => (
-                        // Render assigned jobs (mock position for beta)
-                        <div
-                          key={job.id}
-                          onClick={() => openTicket(job.id)}
-                          className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
-                          style={jobStyleForGrid(job, idx)}
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const h24 = GRID_START_HOUR + Math.floor(i / 2);
+                    const isHalf = i % 2 === 1;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
                         >
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
-                            {job.scheduled_start && (
-                              <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
-                                {new Date(job.scheduled_start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
-                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
-                        </div>
-                      ))}
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 h-0.5 bg-red-500 z-10 flex items-center" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
                     </div>
-                  </div>
-                ))}
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for TODAY on the timeline.
+                    const todayStart = new Date();
+                    todayStart.setHours(0, 0, 0, 0);
+                    const tomorrowStart = new Date(todayStart);
+                    tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return start >= todayStart && start < tomorrowStart;
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: GRID_TOTAL_PX }}>
+                          {[...Array(GRID_HOURS * 2)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                              <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
