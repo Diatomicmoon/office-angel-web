@@ -46,18 +46,45 @@ export async function POST(req: Request) {
       const call = payload.message.call;
       // Handle both payload.message.summary and payload.message.artifact.summary
       const summary = payload.message.summary || payload.message.artifact?.summary || payload.message.analysis?.summary;
-      const transcript = normalizeTranscript(
-        payload.message.transcript ||
-        payload.message.artifact?.transcript ||
-        payload.message.artifact?.transcriptObject
-      );
+
+      // Transcript: try direct field first, then parse from artifact.messages
+      let rawTranscript = payload.message.transcript || payload.message.artifact?.transcript;
+      if (!rawTranscript && payload.message.artifact?.messages) {
+        // Convert artifact.messages [{role, message}] to our format [{speaker, text}]
+        rawTranscript = payload.message.artifact.messages
+          .filter((m: any) => m.role === 'bot' || m.role === 'user')
+          .map((m: any) => ({ speaker: m.role === 'bot' ? 'AI' : 'User', text: m.message || '' }));
+      }
+      const transcript = normalizeTranscript(rawTranscript);
+
+      // Structured outputs — try all known Vapi payload locations
+      const structuredFromArtifact = payload.message.artifact?.structuredOutputs || 
+        payload.message.artifact?.structuredOutput ||
+        payload.message.analysis?.structuredData ||
+        null;
       const phoneNumber = call?.customer?.number || 'Unknown';
       const durationSeconds = call?.duration || 0;
       const providerCallId = call?.id || call?.callId || payload?.message?.callId;
       const recordingUrl = call?.recordingUrl || payload?.message?.recordingUrl || payload?.message?.artifact?.recordingUrl;
-      // Structured outputs from Vapi analysis plan
-      const structuredOutputs = payload?.message?.analysis?.structuredData || payload?.message?.artifact?.structuredData || null;
+      // Structured outputs — merge all sources
+      const structuredOutputs = structuredFromArtifact || null;
       console.log('📊 Structured outputs:', JSON.stringify(structuredOutputs));
+
+      // Parse address + caller name from transcript text as ultimate fallback
+      const transcriptText = Array.isArray(transcript)
+        ? transcript.map((t: any) => `${t.speaker || t.role}: ${t.text || t.message || ''}`).join('\n')
+        : String(transcript || '');
+      
+      // Simple extraction from transcript if structured outputs missing
+      const addressMatch = transcriptText.match(/(?:address is|at)\s+([\d][^.\n]+(?:Street|St|Drive|Dr|Ave|Avenue|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^.\n]*)/i);
+      const parsedAddress = structuredOutputs?.address || (addressMatch ? addressMatch[1].trim() : null);
+
+      const nameMatch = transcriptText.match(/(?:my name is|name'?s?\s+is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+      const parsedName = structuredOutputs?.caller_name || (nameMatch ? nameMatch[1].trim() : null);
+
+      const parsedJobType = structuredOutputs?.job_type || null;
+      const parsedJobDetails = structuredOutputs?.job_details || null;
+      console.log('📍 Parsed address:', parsedAddress, '| 👤 Name:', parsedName);
       
       console.log(`📞 Caller ID: ${phoneNumber}`);
       console.log(`⏱️ Duration: ${durationSeconds} seconds`);
@@ -98,12 +125,12 @@ export async function POST(req: Request) {
         if (existingCustomer) {
           customerId = existingCustomer.id;
         } else {
-          // Extract caller name from structured outputs if available
-          const callerName = structuredOutputs?.caller_name || '';
+          // Extract caller name from structured outputs or transcript parse
+          const callerName = parsedName || '';
           const nameParts = callerName.trim().split(' ');
           const firstName = nameParts[0] || 'New';
           const lastName = nameParts.slice(1).join(' ') || 'Caller';
-          const address = structuredOutputs?.address || null;
+          const address = parsedAddress || null;
 
           const { data: newCustomer, error: cErr } = await supabase
             .from('customers')
@@ -123,12 +150,11 @@ export async function POST(req: Request) {
         }
 
         // Update existing customer with name/address if we now have it from structured outputs
-        if (existingCustomer && structuredOutputs?.caller_name) {
-          const nameParts = structuredOutputs.caller_name.trim().split(' ');
+        if (existingCustomer && (parsedName || parsedAddress)) {
+          const nameParts = (parsedName || '').trim().split(' ');
           await supabase.from('customers').update({
-            first_name: nameParts[0] || existingCustomer.first_name,
-            last_name: nameParts.slice(1).join(' ') || existingCustomer.last_name,
-            ...(structuredOutputs.address ? { address: structuredOutputs.address } : {}),
+            ...(parsedName ? { first_name: nameParts[0], last_name: nameParts.slice(1).join(' ') || '' } : {}),
+            ...(parsedAddress ? { address: parsedAddress } : {}),
           }).eq('id', existingCustomer.id);
           customerId = existingCustomer.id;
         }
@@ -175,7 +201,7 @@ export async function POST(req: Request) {
         meta: {
           provider: 'vapi',
           provider_call_id: providerCallId,
-          structured: structuredOutputs,
+          structured: { ...(structuredOutputs || {}), address: parsedAddress, caller_name: parsedName, job_type: parsedJobType, job_details: parsedJobDetails },
         },
       };
 
