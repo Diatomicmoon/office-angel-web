@@ -44,10 +44,13 @@ export async function GET(req: Request) {
     const idsParam = url.searchParams.get("ids"); // comma-separated
     // In a real app we'd filter by date range, but for beta we'll just grab recent
 
-    const base = supabase
+    // Prefer most-recent activity ordering when available.
+    // If updated_at doesn't exist yet in this Supabase project, fall back to created_at.
+    let base = supabase
       .from("jobs")
       .select("*, customers(first_name, last_name, phone_number)")
       .eq("company_id", companyId)
+      .order("updated_at", { ascending: false })
       .order("created_at", { ascending: false });
 
     if (id) {
@@ -64,12 +67,39 @@ export async function GET(req: Request) {
     }
 
     // Prefer filtering by technician_id when the dispatch migration is present.
-    // If the column doesn't exist yet, gracefully fall back to returning all jobs.
-    let { data, error } = await (view === "unassigned"
+    // If updated_at ordering isn't migrated yet, gracefully fall back.
+    let data: any = null;
+    let error: any = null;
+
+    const run = async (q: any) => {
+      const res = await q;
+      data = res.data;
+      error = res.error;
+    };
+
+    const q0 = (view === "unassigned"
       ? base.is("technician_id", null)
       : view === "assigned"
         ? base.not("technician_id", "is", null)
         : base);
+
+    await run(q0);
+
+    if (error && String(error.message || '').includes('updated_at')) {
+      // updated_at column not migrated yet.
+      const base2 = supabase
+        .from("jobs")
+        .select("*, customers(first_name, last_name, phone_number)")
+        .eq("company_id", companyId)
+        .order("created_at", { ascending: false });
+
+      const q1 = (view === "unassigned"
+        ? base2.is("technician_id", null)
+        : view === "assigned"
+          ? base2.not("technician_id", "is", null)
+          : base2);
+      await run(q1);
+    }
 
     if (error && String(error.message || '').includes('technician_id')) {
       // Migration not applied yet.
