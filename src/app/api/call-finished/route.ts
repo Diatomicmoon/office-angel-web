@@ -98,15 +98,39 @@ export async function POST(req: Request) {
         if (existingCustomer) {
           customerId = existingCustomer.id;
         } else {
+          // Extract caller name from structured outputs if available
+          const callerName = structuredOutputs?.caller_name || '';
+          const nameParts = callerName.trim().split(' ');
+          const firstName = nameParts[0] || 'New';
+          const lastName = nameParts.slice(1).join(' ') || 'Caller';
+          const address = structuredOutputs?.address || null;
+
           const { data: newCustomer, error: cErr } = await supabase
             .from('customers')
-            .insert([{ company_id: companyId, phone_number: phoneNumber, first_name: 'New', last_name: 'Caller' }])
+            .insert([{ 
+              company_id: companyId, 
+              phone_number: phoneNumber, 
+              first_name: firstName, 
+              last_name: lastName,
+              address: address,
+            }])
             .select()
             .single();
           
           if (!cErr && newCustomer) {
             customerId = newCustomer.id;
           }
+        }
+
+        // Update existing customer with name/address if we now have it from structured outputs
+        if (existingCustomer && structuredOutputs?.caller_name) {
+          const nameParts = structuredOutputs.caller_name.trim().split(' ');
+          await supabase.from('customers').update({
+            first_name: nameParts[0] || existingCustomer.first_name,
+            last_name: nameParts.slice(1).join(' ') || existingCustomer.last_name,
+            ...(structuredOutputs.address ? { address: structuredOutputs.address } : {}),
+          }).eq('id', existingCustomer.id);
+          customerId = existingCustomer.id;
         }
       }
 

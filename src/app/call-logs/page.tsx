@@ -93,6 +93,32 @@ export default function CallLogs() {
   const selectedCall = useMemo(() => calls.find((c) => c.id === selectedId) || calls[0], [calls, selectedId]);
   const transcript = useMemo(() => normalizeTranscript(selectedCall?.transcript), [selectedCall]);
 
+  // Extract address from summary text as fallback
+  const extractedAddress = useMemo(() => {
+    const structured = selectedCall?.meta?.structured;
+    if (structured?.address) return structured.address;
+    if (selectedCall?.customers?.address) return selectedCall.customers.address;
+    // Parse from summary
+    const s = selectedCall?.summary || '';
+    const match = s.match(/(?:at|located at|address[:\s]+)([\d]+[^,.]+(?:Drive|Dr|Street|St|Ave|Avenue|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^,.]*(?:,\s*[^,.]+)?)/i);
+    return match ? match[1].trim() : null;
+  }, [selectedCall]);
+
+  const extractedJobType = useMemo(() => {
+    const structured = selectedCall?.meta?.structured;
+    if (structured?.job_type) return structured.job_type;
+    if (selectedCall?.urgency_flag === 'high') return 'Emergency';
+    return 'Standard';
+  }, [selectedCall]);
+
+  const callerName = useMemo(() => {
+    const structured = selectedCall?.meta?.structured;
+    if (structured?.caller_name) return structured.caller_name;
+    const c = selectedCall?.customers;
+    if (c?.first_name && c.first_name !== 'New') return `${c.first_name} ${c.last_name || ''}`.trim();
+    return null;
+  }, [selectedCall]);
+
   return (
     <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)]">
       {/* Header */}
@@ -134,7 +160,7 @@ export default function CallLogs() {
               <div className="p-8 text-center text-sm text-gray-500">No call logs yet.</div>
             ) : calls.map(call => {
               const phone = call.customers?.phone_number || "Unknown";
-              const name = call.customers?.first_name ? `${call.customers.first_name} ${call.customers.last_name || ""}`.trim() : "Unregistered Caller";
+              const name = (call.meta?.structured?.caller_name) || (call.customers?.first_name && call.customers.first_name !== 'New' ? `${call.customers.first_name} ${call.customers.last_name || ""}`.trim() : null) || "Unregistered Caller";
               const urgency = (call.urgency_flag || "low").toString().toLowerCase();
               const isHigh = urgency === "high";
               return (
@@ -173,7 +199,7 @@ export default function CallLogs() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{selectedCall?.customers?.phone_number || "Unknown"}</h2>
                 <p className="text-gray-500 mt-1">
-                  {(selectedCall?.customers?.first_name ? `${selectedCall.customers.first_name} ${selectedCall.customers.last_name || ""}`.trim() : "Unregistered Caller")}
+                  {callerName || 'Unregistered Caller'}
                   {selectedCall?.created_at ? ` • ${timeAgo(selectedCall.created_at)}` : ""}
                 </p>
               </div>
@@ -219,7 +245,7 @@ export default function CallLogs() {
                     <div>
                       <p className="text-xs text-gray-500 font-medium">Address</p>
                       <p className="text-sm text-gray-900 font-semibold">
-                        {selectedCall?.meta?.structured?.address || selectedCall?.customers?.address || "(Not captured yet)"}
+                        {extractedAddress || "(Not captured yet)"}
                       </p>
                     </div>
                   </div>
@@ -228,7 +254,7 @@ export default function CallLogs() {
                     <div>
                       <p className="text-xs text-gray-500 font-medium">Job Type</p>
                       <p className="text-sm text-gray-900 font-semibold">
-                        {selectedCall?.meta?.structured?.job_type || (selectedCall?.urgency_flag === "high" ? "Emergency" : "Standard")}
+                        {extractedJobType}
                       </p>
                     </div>
                   </div>
