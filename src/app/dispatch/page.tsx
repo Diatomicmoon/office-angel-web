@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 
 type Technician = {
@@ -34,23 +34,27 @@ type JobTicket = Job & {
 };
 
 const center = { lat: 44.9778, lng: -93.2650 };
-const GRID_START_HOUR = 8; // 8am
-const GRID_HOURS = 8; // 8am–3pm demo window
+const GRID_START_HOUR = 0; // 12am
+const GRID_HOURS = 24; // full day
 const GRID_HEADER_PX = 80; // h-20
 const GRID_HOUR_PX = 128; // h-32
 const GRID_SLOT_MINUTES = 30;
 const GRID_SLOT_PX = GRID_HOUR_PX / 2;
+const GRID_TOTAL_PX = GRID_HOURS * GRID_HOUR_PX;
+
+// UI
+const GUTTER_W = 112; // px (w-28-ish)
 
 function hourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
   const ampm = h24 >= 12 ? 'PM' : 'AM';
-  return `${h} ${ampm}`;
+  return `${h}:00 ${ampm}`;
 }
 
 function halfHourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
-  // Keep this compact so it doesn't wrap in the gutter.
-  return `${h}:30`;
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  return `${h}:30 ${ampm}`;
 }
 
 function minutesSinceGridStart(d: Date) {
@@ -90,6 +94,7 @@ export default function Dispatch() {
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
   const [now, setNow] = useState<Date>(() => new Date());
+  const dayScrollRef = useRef<HTMLDivElement | null>(null);
 
   const hours = useMemo(() => Array.from({ length: GRID_HOURS }, (_, i) => GRID_START_HOUR + i), []);
   const slots = useMemo(() => Array.from({ length: GRID_HOURS * (60 / GRID_SLOT_MINUTES) }, (_, i) => i), []);
@@ -245,6 +250,18 @@ export default function Dispatch() {
     const t = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(t);
   }, []);
+
+  // Auto-scroll Day View to around "now" (so you don’t land at midnight).
+  useEffect(() => {
+    if (viewMode !== 'day') return;
+    const el = dayScrollRef.current;
+    if (!el) return;
+    const minutes = (now.getHours() - GRID_START_HOUR) * 60 + now.getMinutes();
+    const y = clamp((minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_TOTAL_PX);
+    el.scrollTop = y;
+    // only on mode switch
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode]);
 
   return (
     <div className="max-w-[1600px] mx-auto space-y-6 p-8 h-[calc(100vh-2rem)] flex flex-col">
@@ -515,8 +532,8 @@ export default function Dispatch() {
               )}
             </div>
           ) : (
-            <div className="flex-1 flex overflow-x-auto relative">
-              <div className="w-24 border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20">
+            <div ref={dayScrollRef} className="flex-1 flex overflow-auto relative">
+              <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20" style={{ width: GUTTER_W }}>
                 <div className="h-20 border-b border-gray-200 bg-gray-50"></div>
                 {slots.map((i) => {
                   const h24 = GRID_START_HOUR + Math.floor(i / 2);
@@ -530,8 +547,8 @@ export default function Dispatch() {
                       <span
                         className={`whitespace-nowrap leading-tight mt-1 ${
                           isHalf
-                            ? 'text-[10px] text-gray-300'
-                            : 'text-[11px] text-gray-700 font-semibold'
+                            ? 'text-[11px] text-gray-500 font-medium'
+                            : 'text-[12px] text-gray-800 font-bold'
                         }`}
                       >
                         {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
@@ -550,7 +567,7 @@ export default function Dispatch() {
                   <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
                 ) : techs.map(tech => (
                   <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
-                    <div className="h-20 border-b border-gray-200 bg-white p-3 sticky top-0 z-10 flex flex-col justify-center">
+                    <div className="h-20 border-b border-gray-200 bg-white p-3 sticky top-0 z-30 flex flex-col justify-center">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative">
                           <User size={18} className="text-blue-600" />
@@ -562,7 +579,7 @@ export default function Dispatch() {
                         </div>
                       </div>
                     </div>
-                    <div className="relative h-[1024px]">
+                    <div className="relative" style={{ height: GRID_TOTAL_PX }}>
                       {[...Array(GRID_HOURS * 2)].map((_, i) => (
                         <div
                           key={i}
