@@ -106,6 +106,19 @@ function getLatLng(loc: any): { lat: number; lng: number } | null {
   return null;
 }
 
+function toDateInputValue(d: Date) {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function toTimeInputValue(d: Date) {
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  return `${h}:${m}`;
+}
+
 export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
@@ -231,7 +244,49 @@ export default function Dispatch() {
   const loadJobs = () => {
     fetch("/api/jobs?view=unassigned")
       .then((r) => r.json())
-      .then((json) => setUnassignedJobs(json.jobs || []))
+      .then((json) => {
+        const jobs = (json.jobs || []) as Job[];
+        setUnassignedJobs(jobs);
+
+        // Pre-fill scheduling controls from suggested schedule on the job.
+        setScheduleSelection((prev) => {
+          const next = { ...prev };
+          for (const j of jobs) {
+            if (!j.id) continue;
+            if (next[j.id]?.date || next[j.id]?.time) continue;
+            if (!j.scheduled_start) continue;
+            const start = new Date(j.scheduled_start);
+            if (Number.isNaN(start.getTime())) continue;
+
+            let duration = j.estimated_minutes ? getDefaultDuration(j) : 60;
+            if (j.scheduled_end) {
+              const end = new Date(j.scheduled_end);
+              const diff = (end.getTime() - start.getTime()) / 60000;
+              if (Number.isFinite(diff) && diff > 0) duration = Math.round(diff);
+            }
+
+            next[j.id] = {
+              date: toDateInputValue(start),
+              time: toTimeInputValue(start),
+              duration,
+            };
+          }
+          return next;
+        });
+
+        // If a company only has one tech (or one available), preselect it for true 1-click booking.
+        setAssignSelection((prev) => {
+          const next = { ...prev };
+          const preferred = techs.find((t) => String(t.status || '').toLowerCase() === 'available') || techs[0];
+          if (!preferred) return next;
+          for (const j of jobs) {
+            if (!j.id) continue;
+            if (next[j.id]) continue;
+            next[j.id] = preferred.id;
+          }
+          return next;
+        });
+      })
       .catch(() => setUnassignedJobs([]));
 
     fetch("/api/jobs?view=assigned")

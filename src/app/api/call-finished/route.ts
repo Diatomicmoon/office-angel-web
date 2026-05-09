@@ -73,6 +73,18 @@ function heuristicDurationMinutes(text: string) {
   return 90;
 }
 
+function roundUpToNextSlot(d: Date, slotMinutes = 30) {
+  const ms = d.getTime();
+  const slotMs = slotMinutes * 60 * 1000;
+  return new Date(Math.ceil(ms / slotMs) * slotMs);
+}
+
+function suggestStartTime({ urgencyFlag }: { urgencyFlag: string | null }) {
+  // Simple + safe: buffer by urgency, then snap to next 30-min boundary.
+  const bufferMin = urgencyFlag === 'high' ? 0 : urgencyFlag === 'medium' ? 60 : 180;
+  return roundUpToNextSlot(new Date(Date.now() + bufferMin * 60000), 30);
+}
+
 async function aiEstimateDurationMinutes(args: {
   openaiApiKey?: string | null;
   summary?: string | null;
@@ -439,6 +451,10 @@ export async function POST(req: Request) {
         });
         const estimatedMinutes = durationRes.minutes;
 
+        // Suggested schedule (pre-fills Dispatch so dispatcher can 1-click book).
+        const suggestedStart = suggestStartTime({ urgencyFlag });
+        const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
+
         // Some Supabase projects may not have the dispatch columns migrated yet.
         // Try insert with priority; if the column doesn't exist, retry without it.
         let job: any = null;
@@ -456,6 +472,8 @@ export async function POST(req: Request) {
                 address: parsedAddress || null,
                 priority,
                 estimated_minutes: estimatedMinutes,
+                scheduled_start: suggestedStart.toISOString(),
+                scheduled_end: suggestedEnd.toISOString(),
               },
             ])
             .select('id')
@@ -465,7 +483,7 @@ export async function POST(req: Request) {
           jobErr = res.error;
         }
 
-        if (jobErr && (String(jobErr.message || '').includes('priority') || String(jobErr.message || '').includes('estimated_minutes'))) {
+        if (jobErr && (String(jobErr.message || '').includes('priority') || String(jobErr.message || '').includes('estimated_minutes') || String(jobErr.message || '').includes('scheduled_start') || String(jobErr.message || '').includes('scheduled_end'))) {
           const res2 = await supabase
             .from('jobs')
             .insert([
