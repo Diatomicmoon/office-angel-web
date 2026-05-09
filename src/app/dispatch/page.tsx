@@ -180,6 +180,7 @@ export default function Dispatch() {
   const [now, setNow] = useState<Date>(() => new Date());
   const dayScrollRef = useRef<HTMLDivElement | null>(null);
   const didAutoScrollRef = useRef(false);
+  const dragRef = useRef<{ active: boolean; x: number; y: number; left: number; top: number }>({ active: false, x: 0, y: 0, left: 0, top: 0 });
 
   const todayKey = useMemo(() => {
     const p = tzParts(new Date(), DISPLAY_TZ);
@@ -755,8 +756,34 @@ export default function Dispatch() {
           ) : (
             <div
               ref={dayScrollRef}
-              className="flex-1 overflow-x-auto overflow-y-auto relative"
-              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
             >
               {/* Sticky header row (single, reliable) */}
               <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">

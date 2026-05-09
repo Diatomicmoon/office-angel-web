@@ -149,12 +149,20 @@ export async function POST(req: Request) {
 
       if (target?.id) {
         if (isYes(bodyNorm)) {
-          await supabase.from('jobs').update({
+          const upd1 = await supabase.from('jobs').update({
             confirmation_status: 'confirmed',
             confirmed_at: new Date().toISOString(),
             status: 'Confirmed',
             updated_at: new Date().toISOString(),
           } as any).eq('id', target.id);
+
+          // If confirmation columns aren't migrated yet, still flip status.
+          if (upd1.error && String(upd1.error.message || '').match(/confirmation_status|confirmed_at/)) {
+            await supabase.from('jobs').update({
+              status: 'Confirmed',
+              updated_at: new Date().toISOString(),
+            } as any).eq('id', target.id);
+          }
 
           try {
             await supabase.from('messages').insert([
@@ -178,12 +186,19 @@ export async function POST(req: Request) {
           );
         }
 
-        await supabase.from('jobs').update({
+        const upd2 = await supabase.from('jobs').update({
           confirmation_status: 'reschedule_requested',
           reschedule_requested_at: new Date().toISOString(),
           status: 'Reschedule Requested',
           updated_at: new Date().toISOString(),
         } as any).eq('id', target.id);
+
+        if (upd2.error && String(upd2.error.message || '').match(/confirmation_status|reschedule_requested_at/)) {
+          await supabase.from('jobs').update({
+            status: 'Reschedule Requested',
+            updated_at: new Date().toISOString(),
+          } as any).eq('id', target.id);
+        }
 
         try {
           await supabase.from('messages').insert([
