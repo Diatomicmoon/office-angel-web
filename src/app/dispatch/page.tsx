@@ -53,6 +53,14 @@ function halfHourLabel(h24: number) {
   return `${h}:30 ${ampm}`;
 }
 
+function minutesSinceGridStart(d: Date) {
+  return (d.getHours() - GRID_START_HOUR) * 60 + d.getMinutes();
+}
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
 function getLatLng(loc: any): { lat: number; lng: number } | null {
   if (!loc) return null;
   if (typeof loc === 'string') {
@@ -93,6 +101,28 @@ export default function Dispatch() {
     if (minutesSinceStart < 0 || minutesSinceStart > GRID_HOURS * 60) return null;
     return GRID_HEADER_PX + (minutesSinceStart / 60) * GRID_HOUR_PX;
   }, [now]);
+
+  const jobStyleForGrid = (job: Job, idx: number) => {
+    // Fallback stack layout if no schedule
+    if (!job.scheduled_start) return { top: `${50 + idx * 150}px`, height: '120px' } as any;
+
+    const start = new Date(job.scheduled_start);
+    if (Number.isNaN(start.getTime())) return { top: `${50 + idx * 150}px`, height: '120px' } as any;
+
+    let durationMinutes = 60;
+    if (job.scheduled_end) {
+      const end = new Date(job.scheduled_end);
+      const diff = (end.getTime() - start.getTime()) / 60000;
+      if (Number.isFinite(diff) && diff > 0) durationMinutes = diff;
+    } else if (job.estimated_minutes) {
+      durationMinutes = job.estimated_minutes;
+    }
+
+    const mins = minutesSinceGridStart(start);
+    const topPx = clamp((mins / 60) * GRID_HOUR_PX, 0, GRID_HOURS * GRID_HOUR_PX - 20);
+    const heightPx = clamp((durationMinutes / 60) * GRID_HOUR_PX - 8, 52, GRID_HOURS * GRID_HOUR_PX);
+    return { top: `${topPx + 8}px`, height: `${heightPx}px` } as any;
+  };
 
   const openTicket = async (jobId: string) => {
     setTicketOpen(true);
@@ -536,7 +566,7 @@ export default function Dispatch() {
                           key={job.id}
                           onClick={() => openTicket(job.id)}
                           className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
-                          style={{ top: `${50 + (idx * 150)}px`, height: '120px' }}
+                          style={jobStyleForGrid(job, idx)}
                         >
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded uppercase">{job.status || 'Scheduled'}</span>
