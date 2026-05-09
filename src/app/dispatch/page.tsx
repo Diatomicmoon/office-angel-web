@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
 
 type Technician = {
@@ -34,6 +34,16 @@ type JobTicket = Job & {
 };
 
 const center = { lat: 44.9778, lng: -93.2650 };
+const GRID_START_HOUR = 8; // 8am
+const GRID_HOURS = 8; // 8am–3pm demo window
+const GRID_HEADER_PX = 80; // h-20
+const GRID_HOUR_PX = 128; // h-32
+
+function hourLabel(h24: number) {
+  const h = ((h24 + 11) % 12) + 1;
+  const ampm = h24 >= 12 ? 'PM' : 'AM';
+  return `${h} ${ampm}`;
+}
 
 function getLatLng(loc: any): { lat: number; lng: number } | null {
   if (!loc) return null;
@@ -63,6 +73,17 @@ export default function Dispatch() {
   const [ticket, setTicket] = useState<JobTicket | null>(null);
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
+  const [now, setNow] = useState<Date>(() => new Date());
+
+  const hours = useMemo(() => Array.from({ length: GRID_HOURS }, (_, i) => GRID_START_HOUR + i), []);
+
+  const timeLineTop = useMemo(() => {
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const minutesSinceStart = (h - GRID_START_HOUR) * 60 + m;
+    if (minutesSinceStart < 0 || minutesSinceStart > GRID_HOURS * 60) return null;
+    return GRID_HEADER_PX + (minutesSinceStart / 60) * GRID_HOUR_PX;
+  }, [now]);
 
   const openTicket = async (jobId: string) => {
     setTicketOpen(true);
@@ -178,6 +199,11 @@ export default function Dispatch() {
 
     load();
     const t = setInterval(load, 15000);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(t);
   }, []);
 
@@ -453,16 +479,18 @@ export default function Dispatch() {
             <div className="flex-1 flex overflow-x-auto relative">
               <div className="w-20 border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-20">
                 <div className="h-20 border-b border-gray-200 bg-gray-50"></div>
-                {["8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM", "3 PM"].map((time) => (
-                  <div key={time} className="h-32 border-b border-gray-200 text-right pr-3 pt-2 relative">
-                    <span className="text-xs font-medium text-gray-500 absolute -top-2.5 right-3 bg-gray-50 px-1">{time}</span>
+                {hours.map((h) => (
+                  <div key={h} className="h-32 border-b border-gray-200 text-right pr-3 pt-2 relative">
+                    <span className="text-xs font-medium text-gray-500 absolute -top-2.5 right-3 bg-gray-50 px-1">{hourLabel(h)}</span>
                   </div>
                 ))}
               </div>
               <div className="flex-1 flex min-w-max relative bg-gray-50/30">
-                <div className="absolute left-0 right-0 top-[280px] h-0.5 bg-red-500 z-10 flex items-center">
-                  <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
-                </div>
+                {timeLineTop !== null && (
+                  <div className="absolute left-0 right-0 h-0.5 bg-red-500 z-10 flex items-center" style={{ top: `${timeLineTop}px` }}>
+                    <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                  </div>
+                )}
                 {techs.length === 0 ? (
                   <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
                 ) : techs.map(tech => (
@@ -480,8 +508,8 @@ export default function Dispatch() {
                       </div>
                     </div>
                     <div className="relative h-[1024px]">
-                      {[...Array(8)].map((_, i) => (
-                        <div key={i} className="h-32 border-b border-gray-100 w-full absolute" style={{ top: `${i * 128}px` }}></div>
+                      {[...Array(GRID_HOURS)].map((_, i) => (
+                        <div key={i} className="h-32 border-b border-gray-100 w-full absolute" style={{ top: `${i * GRID_HOUR_PX}px` }}></div>
                       ))}
                       {assignedJobs.filter(j => j.technician_id === tech.id).map((job, idx) => (
                         // Render assigned jobs (mock position for beta)
