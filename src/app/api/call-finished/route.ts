@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
 
 function normalizeTranscript(t: any) {
   if (!t) return null;
@@ -15,10 +16,10 @@ function normalizeTranscript(t: any) {
   return t;
 }
 
-function deriveUrgency(summary?: string) {
-  const s = (summary || '').toLowerCase();
-  if (s.match(/(emergency|sparking|fire|smoke|burning smell|burning|arcing|arc|shock|electrocution|power out|no power|flood|gas)/)) return 'high';
-  if (s.match(/(breaker tripping|tripping|flicker|flickering|panel upgrade|estimate|quote|outlet)/)) return 'medium';
+function deriveUrgency(text?: string) {
+  const s = (text || '').toLowerCase();
+  if (s.match(/(emergency|sparking|spark|fire|smoke|smoking|burning smell|burning|burn|arcing|arc|shock|electrocution|power out|no power|flood|gas|smell|smell of|outlet burning|burning outlet)/)) return 'high';
+  if (s.match(/(breaker tripping|tripping|trip|flicker|flickering|panel upgrade|estimate|quote|outlet|power loss|power outage)/)) return 'medium';
   return 'low';
 }
 
@@ -106,9 +107,32 @@ export async function POST(req: Request) {
         }
       }
 
-      // 2. Heuristic urgency + action items (LLM later)
-      const urgencyFlag = deriveUrgency(summary);
-      const actionItems = deriveActionItems(summary, urgencyFlag);
+      // 2. Auto-generate summary from transcript if Vapi didn't send one
+      let finalSummary = summary;
+      if (!finalSummary && transcript) {
+        try {
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+          const transcriptText = Array.isArray(transcript)
+            ? transcript.map((t: any) => `${t.speaker || t.role}: ${t.text || t.message}`).join('\n')
+            : String(transcript);
+          const completion = await openai.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages: [{
+              role: 'user',
+              content: `You are an AI dispatcher assistant. Summarize this call transcript in 2-3 sentences. Include: caller name, address, job type, issue description, and urgency level.\n\nTranscript:\n${transcriptText}`
+            }],
+            max_tokens: 200,
+          });
+          finalSummary = completion.choices[0]?.message?.content || null;
+        } catch (e) {
+          console.error('OpenAI summary error:', e);
+        }
+      }
+
+      // 3. Heuristic urgency + action items
+      const urgencyText = (finalSummary || '') + ' ' + (Array.isArray(transcript) ? transcript.map((t: any) => t.text || t.message || '').join(' ') : String(transcript || ''));
+      const urgencyFlag = deriveUrgency(urgencyText);
+      const actionItems = deriveActionItems(finalSummary, urgencyFlag);
 
       // 3. Save the call log to Supabase
       const baseRow: any = {
@@ -117,7 +141,7 @@ export async function POST(req: Request) {
         call_status: 'completed',
         duration_seconds: durationSeconds,
         transcript: transcript,
-        summary: summary,
+        summary: finalSummary,
         urgency_flag: urgencyFlag,
         action_items: actionItems,
         recording_url: recordingUrl,
