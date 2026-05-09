@@ -130,22 +130,48 @@ export async function POST(req: Request) {
       // 1. Find or create the customer based on phone number
       let customerId = null;
       if (phoneNumber !== 'Unknown') {
+        // Twilio Lookup: get carrier-registered name if AI didn't capture it
+        let lookupName: string | null = parsedName || null;
+        if (!lookupName) {
+          try {
+            const lookupRes = await fetch(
+              `https://lookups.twilio.com/v2/PhoneNumbers/${encodeURIComponent(phoneNumber)}?Fields=caller_name`,
+              { headers: { 'Authorization': 'Basic ' + Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64') } }
+            );
+            const lookupData = await lookupRes.json();
+            const raw = lookupData?.caller_name?.caller_name as string | null;
+            if (raw) {
+              // Carrier returns ALL CAPS — convert to Title Case
+              lookupName = raw.toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase());
+              console.log('📋 Twilio Lookup name:', lookupName);
+            }
+          } catch (e) {
+            console.log('Twilio Lookup failed (non-fatal):', e);
+          }
+        }
+
         const { data: existingCustomer } = await supabase
           .from('customers')
-          .select('id')
+          .select('id, first_name')
           .eq('company_id', companyId)
           .eq('phone_number', phoneNumber)
           .single();
 
         if (existingCustomer) {
           customerId = existingCustomer.id;
+          // Update name/address if we have better data now
+          const isUnnamed = !existingCustomer.first_name || existingCustomer.first_name === 'New';
+          if ((lookupName && isUnnamed) || parsedAddress) {
+            const nameParts = (lookupName || '').trim().split(' ');
+            await supabase.from('customers').update({
+              ...(lookupName && isUnnamed ? { first_name: nameParts[0], last_name: nameParts.slice(1).join(' ') || '' } : {}),
+              ...(parsedAddress ? { address: parsedAddress } : {}),
+            }).eq('id', existingCustomer.id);
+          }
         } else {
-          // Extract caller name from structured outputs or transcript parse
-          const callerName = parsedName || '';
-          const nameParts = callerName.trim().split(' ');
+          const nameParts = (lookupName || '').trim().split(' ');
           const firstName = nameParts[0] || 'New';
           const lastName = nameParts.slice(1).join(' ') || 'Caller';
-          const address = parsedAddress || null;
 
           const { data: newCustomer, error: cErr } = await supabase
             .from('customers')
@@ -154,24 +180,12 @@ export async function POST(req: Request) {
               phone_number: phoneNumber, 
               first_name: firstName, 
               last_name: lastName,
-              address: address,
+              address: parsedAddress || null,
             }])
             .select()
             .single();
           
-          if (!cErr && newCustomer) {
-            customerId = newCustomer.id;
-          }
-        }
-
-        // Update existing customer with name/address if we now have it from structured outputs
-        if (existingCustomer && (parsedName || parsedAddress)) {
-          const nameParts = (parsedName || '').trim().split(' ');
-          await supabase.from('customers').update({
-            ...(parsedName ? { first_name: nameParts[0], last_name: nameParts.slice(1).join(' ') || '' } : {}),
-            ...(parsedAddress ? { address: parsedAddress } : {}),
-          }).eq('id', existingCustomer.id);
-          customerId = existingCustomer.id;
+          if (!cErr && newCustomer) customerId = newCustomer.id;
         }
       }
 
