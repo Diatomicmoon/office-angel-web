@@ -61,6 +61,8 @@ export default function Dispatch() {
   const [ticketOpen, setTicketOpen] = useState(false);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [ticket, setTicket] = useState<JobTicket | null>(null);
+  const [geoBusy, setGeoBusy] = useState(false);
+  const [geoMsg, setGeoMsg] = useState<string | null>(null);
 
   const openTicket = async (jobId: string) => {
     setTicketOpen(true);
@@ -73,6 +75,24 @@ export default function Dispatch() {
       setTicket(null);
     } finally {
       setTicketLoading(false);
+    }
+  };
+
+  const geocodeDemo = async () => {
+    setGeoBusy(true);
+    setGeoMsg(null);
+    try {
+      const res = await fetch('/api/technicians/geocode', { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok || json?.ok === false) {
+        setGeoMsg(json?.error || 'Geocode failed');
+      } else {
+        setGeoMsg(`Geocoded ${json.updated}/${json.attempted} tech addresses`);
+      }
+    } catch {
+      setGeoMsg('Geocode failed');
+    } finally {
+      setGeoBusy(false);
     }
   };
 
@@ -388,6 +408,27 @@ export default function Dispatch() {
                     ))}
                   </div>
                 )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
               </div>
               {!apiKey ? (
                 <div className="flex items-center justify-center h-full text-sm text-gray-500">
