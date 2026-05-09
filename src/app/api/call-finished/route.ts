@@ -161,20 +161,32 @@ export async function POST(req: Request) {
       }
       console.log('📊 Normalized structured outputs:', JSON.stringify(structuredOutputs));
 
-      // Parse address + caller name from transcript text as ultimate fallback
-      const transcriptText = Array.isArray(transcript)
+      // Parse address + caller name from transcript text as ultimate fallback.
+      // IMPORTANT: only use the USER side for name extraction so we don't accidentally capture the AI's name.
+      const transcriptTextAll = Array.isArray(transcript)
         ? transcript.map((t: any) => `${t.speaker || t.role}: ${t.text || t.message || ''}`).join('\n')
         : String(transcript || '');
-      
+
+      const transcriptTextUser = Array.isArray(transcript)
+        ? transcript
+            .filter((t: any) => String(t.speaker || t.role || '').toLowerCase() === 'user')
+            .map((t: any) => String(t.text || t.message || '')).join('\n')
+        : transcriptTextAll;
+
       // Simple extraction from transcript if structured outputs missing
-      const addressMatch = transcriptText.match(/(?:address is|at)\s+([\d][^.\n]+(?:Street|St|Drive|Dr|Ave|Avenue|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^.\n]*)/i);
+      const addressMatch = transcriptTextAll.match(/(?:address is|at)\s+([\d][^.\n]+(?:Street|St|Drive|Dr|Ave|Avenue|Blvd|Road|Rd|Lane|Ln|Way|Court|Ct|Place|Pl)[^.\n]*)/i);
       const parsedAddress = structuredOutputs?.address || (addressMatch ? addressMatch[1].trim() : null);
 
-      // Name extraction: structured output → transcript regex (case-insensitive)
-      const nameMatch = transcriptText.match(
-        /(?:my name is|i(?:'?m| am)|this is|name'?s?\s+is|speaking with|calling as)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i
+      // Name extraction: structured output → transcript regex on USER text
+      const rawStructuredName = typeof structuredOutputs?.caller_name === 'string' ? String(structuredOutputs.caller_name).trim() : '';
+      const structuredName = rawStructuredName && !rawStructuredName.match(/^(sarah|office angel|unknown|caller)$/i)
+        ? rawStructuredName
+        : '';
+
+      const nameMatch = transcriptTextUser.match(
+        /(?:my name is|this is|name'?s?\s+is|i(?:'?m| am))\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i
       );
-      const parsedName = structuredOutputs?.caller_name || (nameMatch ? nameMatch[1].trim() : null);
+      const parsedName = structuredName || (nameMatch ? nameMatch[1].trim() : null);
 
       const parsedJobType = structuredOutputs?.job_type || null;
       const parsedJobDetails = structuredOutputs?.job_details || null;
@@ -332,7 +344,16 @@ export async function POST(req: Request) {
         meta: {
           provider: 'vapi',
           provider_call_id: providerCallId,
-          structured: { ...(structuredOutputs || {}), address: parsedAddress, caller_name: resolvedName, job_type: parsedJobType, job_details: parsedJobDetails },
+          structured: {
+            ...(structuredOutputs || {}),
+            address: parsedAddress,
+            // Prefer the name the caller said (parsedName); fall back to lookup name only when missing.
+            caller_name: parsedName || resolvedName,
+            caller_name_source: parsedName ? 'caller' : (resolvedName ? 'lookup' : null),
+            lookup_name: resolvedName || null,
+            job_type: parsedJobType,
+            job_details: parsedJobDetails,
+          },
         },
       };
 
