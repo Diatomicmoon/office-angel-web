@@ -16,16 +16,44 @@ async function getCompanyId() {
   return companyId;
 }
 
-async function geocode(address: string, apiKey: string) {
+async function geocodeOnce(address: string, apiKey: string) {
   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${encodeURIComponent(apiKey)}`;
   const res = await fetch(url);
   const json: any = await res.json().catch(() => null);
+  const status = json?.status;
+  const error_message = json?.error_message;
   const loc = json?.results?.[0]?.geometry?.location;
-  if (!loc) return null;
+  if (!loc) return { ok: false as const, status, error_message };
   const lat = Number(loc.lat);
   const lng = Number(loc.lng);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  return { lat, lng };
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { ok: false as const, status, error_message };
+  return { ok: true as const, lat, lng, status, error_message };
+}
+
+async function geocode(address: string, apiKey: string) {
+  const a = String(address || '').trim();
+  if (!a) return { ok: false as const, status: 'EMPTY', error_message: 'Empty address' };
+
+  // Attempt 1: raw address
+  const r1 = await geocodeOnce(a, apiKey);
+  if (r1.ok) return r1;
+
+  // Attempt 2: if no state present, try adding MN (demo is Twin Cities)
+  const hasState = /\b(MN|Minnesota)\b/i.test(a);
+  const r2 = !hasState ? await geocodeOnce(`${a}, MN`, apiKey) : r1;
+  if ((r2 as any).ok) return r2 as any;
+
+  // Attempt 3: handle "Shop - City" style labels
+  if (a.includes('-')) {
+    const tail = a.split('-').slice(1).join('-').trim();
+    if (tail) {
+      const r3 = await geocodeOnce(`${tail}, MN`, apiKey);
+      if (r3.ok) return r3;
+      return { ok: false as const, status: r3.status || r2.status || r1.status, error_message: r3.error_message || r2.error_message || r1.error_message };
+    }
+  }
+
+  return { ok: false as const, status: (r2 as any)?.status || r1.status, error_message: (r2 as any)?.error_message || r1.error_message };
 }
 
 // Quick demo helper: turn last_location_address into last_location lat/lng.
@@ -64,15 +92,15 @@ export async function POST() {
 
     for (const t of targets) {
       const loc = await geocode(String(t.last_location_address), apiKey);
-      if (!loc) {
-        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: false });
+      if (!loc.ok) {
+        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: false, status: loc.status, error: loc.error_message || null });
         continue;
       }
 
       const { error: uErr } = await sb()
         .from("technicians")
         .update({
-          last_location: { ...loc, source: "geocode", accuracy: null },
+          last_location: { lat: loc.lat, lng: loc.lng, source: "geocode", accuracy: null },
           updated_at: new Date().toISOString(),
         })
         .eq("id", t.id)
@@ -82,7 +110,7 @@ export async function POST() {
         results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: false, error: uErr.message });
       } else {
         updated++;
-        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: true, ...loc });
+        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: true, lat: loc.lat, lng: loc.lng });
       }
     }
 
@@ -91,4 +119,3 @@ export async function POST() {
     return NextResponse.json({ ok: false, error: e?.message || String(e) }, { status: 500 });
   }
 }
-
