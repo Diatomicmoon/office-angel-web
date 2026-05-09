@@ -108,11 +108,20 @@ export async function POST(req: Request) {
       const r0 = recent?.[0];
       if (r0?.id && String(r0.status || '').toLowerCase() === 'lead') {
         const nextNotes = [r0.notes, `SMS from ${from}: ${body}`].filter(Boolean).join('\n\n');
-        await supabase.from('jobs').update({
-          notes: nextNotes,
-          updated_at: new Date().toISOString(),
-        } as any).eq('id', r0.id);
-        updatedExisting = true;
+        const upd = await supabase
+          .from('jobs')
+          .update({
+            notes: nextNotes,
+            updated_at: new Date().toISOString(),
+          } as any)
+          .eq('id', r0.id);
+
+        if (!upd.error) {
+          updatedExisting = true;
+        } else {
+          // If the table doesn't have notes/updated_at yet, fall back to creating a new job.
+          console.error('[INBOUND SMS] Could not update existing lead job:', upd.error);
+        }
       }
     }
 
@@ -148,4 +157,3 @@ export async function POST(req: Request) {
     return new NextResponse(twiml(), { status: 200, headers: { 'Content-Type': 'text/xml' } });
   }
 }
-
