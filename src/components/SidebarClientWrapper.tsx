@@ -5,8 +5,9 @@ import Sidebar from "./Sidebar";
 
 export default function SidebarClientWrapper() {
   const pathname = usePathname();
-  const isLoginPage = pathname === "/login" || pathname === "/";
+  const publicRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret"];
+  const isPublicPage = publicRoutes.includes(pathname);
 
-  if (isLoginPage) return null;
+  if (isPublicPage) return null;
   return <Sidebar />;
 }
