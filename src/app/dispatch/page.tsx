@@ -505,6 +505,37 @@ export default function Dispatch() {
     }
   };
 
+  const bookJobWithSuggestion = async (jobId: string, sug: Suggestion) => {
+    const startIso = toIso(sug.date, sug.time);
+    if (!startIso || !sug.techId || !sug.duration) return;
+
+    const startDt = new Date(startIso);
+    const endDt = new Date(startDt.getTime() + sug.duration * 60000);
+    const endIso = endDt.toISOString();
+
+    // Optimistically reflect in the UI controls
+    setAssignSelection((prev) => ({ ...prev, [jobId]: sug.techId }));
+    setScheduleSelection((prev) => ({ ...prev, [jobId]: { date: sug.date, time: sug.time, duration: sug.duration } }));
+
+    setAssignSaving(jobId);
+    try {
+      await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: jobId,
+          technician_id: sug.techId,
+          scheduled_start: startIso,
+          scheduled_end: endIso,
+          status: 'Scheduled',
+        }),
+      });
+      loadJobs();
+    } finally {
+      setAssignSaving(null);
+    }
+  };
+
   useEffect(() => {
     const load = () => {
       fetch("/api/technicians")
@@ -792,7 +823,7 @@ export default function Dispatch() {
                       }}
                       className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
                     >
-                      AI Recommend Times
+                      AI Recommend Times (click to book)
                     </button>
                     {aiSuggestions[job.id]?.length ? (
                       <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
@@ -804,13 +835,7 @@ export default function Dispatch() {
                       {aiSuggestions[job.id].map((sug, idx) => (
                         <button
                           key={idx}
-                          onClick={() => {
-                            setAssignSelection((prev) => ({ ...prev, [job.id]: sug.techId }));
-                            setScheduleSelection((prev) => ({
-                              ...prev,
-                              [job.id]: { date: sug.date, time: sug.time, duration: sug.duration },
-                            }));
-                          }}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
                           className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
                         >
                           <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
