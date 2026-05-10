@@ -1,20 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { Bot, Check, X, ArrowRight, Zap } from "lucide-react";
+import { Bot, Check, X, ArrowRight, Zap, Phone } from "lucide-react";
 
 const plans = [
   {
     name: "Starter",
-    price: "$197",
-    period: "/mo",
-    description: "Perfect for solo operators and small crews ready to stop missing calls.",
-    setup: "$99 one-time setup",
+    tagline: "For solo operators and small crews.",
+    description: "Everything you need to stop missing calls and start booking more jobs automatically.",
     badge: null,
     color: "border-gray-200",
     buttonStyle: "bg-gray-900 text-white hover:bg-black",
     features: [
-      { text: "AI Voice Dispatcher (up to 100 calls/mo)", included: true },
+      { text: "AI Voice Dispatcher (overflow & after-hours)", included: true },
       { text: "24/7 After-Hours & Weekend Coverage", included: true },
       { text: "Lead Triage & Qualification", included: true },
       { text: "Auto-Schedule to Google / Apple Calendar", included: true },
@@ -33,15 +31,13 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$347",
-    period: "/mo",
-    description: "The full back-office suite. Built for growing crews who need everything automated.",
-    setup: "Free setup included",
+    tagline: "For growing crews who need the full suite.",
+    description: "The complete AI back-office. Dispatch, Co-Pilot, CRM, field tracking, and more — all automated.",
     badge: "Most Popular",
     color: "border-blue-500 ring-2 ring-blue-500",
     buttonStyle: "bg-blue-600 text-white hover:bg-blue-700",
     features: [
-      { text: "AI Voice Dispatcher (up to 300 calls/mo)", included: true },
+      { text: "AI Voice Dispatcher (overflow & after-hours)", included: true },
       { text: "24/7 After-Hours & Weekend Coverage", included: true },
       { text: "Lead Triage & Qualification", included: true },
       { text: "Auto-Schedule to Google / Apple Calendar", included: true },
@@ -60,10 +56,8 @@ const plans = [
   },
   {
     name: "Elite",
-    price: "$547",
-    period: "/mo",
-    description: "Unlimited everything. For high-volume operations running a full back-office on autopilot.",
-    setup: "Free same-day setup",
+    tagline: "For high-volume operations running at full scale.",
+    description: "Unlimited calls, every feature unlocked, and a dedicated onboarding specialist to get you live fast.",
     badge: null,
     color: "border-gray-200",
     buttonStyle: "bg-gray-900 text-white hover:bg-black",
@@ -88,10 +82,10 @@ const plans = [
 ];
 
 const competitors = [
-  { name: "GoodCall", price: "$59/mo", note: "Basic voice only" },
-  { name: "NextPhone", price: "$199/mo", note: "Generic AI" },
-  { name: "Smith.ai", price: "$350+/mo", note: "Human hybrid" },
-  { name: "Office Angel", price: "$197–$547/mo", note: "Purpose-built for trades", highlight: true },
+  { name: "GoodCall", note: "Basic voice only. No scheduling, no CRM, no dashboard." },
+  { name: "NextPhone", note: "Generic AI. Not built for trades. No job flow." },
+  { name: "Smith.ai", note: "Human hybrid. Slower, expensive, not automated." },
+  { name: "Office Angel", note: "Purpose-built for trades. Full AI back-office suite.", highlight: true },
 ];
 
 export default function PricingPage() {
@@ -119,13 +113,13 @@ export default function PricingPage() {
         {/* Header */}
         <section className="max-w-4xl mx-auto px-8 pt-20 pb-12 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium mb-6">
-            <Zap size={16} /> Simple, transparent pricing
+            <Zap size={16} /> Plans & Packages
           </div>
           <h1 className="text-5xl font-extrabold tracking-tight mb-4">
-            One recovered call pays for months.
+            Priced for your operation.<br />Not a one-size-fits-all.
           </h1>
-          <p className="text-xl text-gray-500">
-            No contracts. Cancel anytime. Live in under 1 business day.
+          <p className="text-xl text-gray-500 max-w-2xl mx-auto">
+            Every contractor is different. Book a free demo and we'll put together the right package for your crew size, call volume, and budget. No contracts. Cancel anytime.
           </p>
         </section>
 
@@ -134,20 +128,20 @@ export default function PricingPage() {
           <div className="bg-gray-900 text-white rounded-2xl p-8 grid md:grid-cols-3 gap-6 text-center">
             <div>
               <p className="text-4xl font-extrabold text-blue-400">$1,500</p>
-              <p className="text-gray-400 mt-1 text-sm">Average missed call value for a contractor</p>
+              <p className="text-gray-400 mt-1 text-sm">Average value of a missed contractor service call</p>
             </div>
             <div>
               <p className="text-4xl font-extrabold text-blue-400">4–8</p>
               <p className="text-gray-400 mt-1 text-sm">Extra booked jobs per month after activating Office Angel</p>
             </div>
             <div>
-              <p className="text-4xl font-extrabold text-blue-400">1 call</p>
-              <p className="text-gray-400 mt-1 text-sm">Covers 7+ months of Starter. The math is obvious.</p>
+              <p className="text-4xl font-extrabold text-blue-400">Day 1</p>
+              <p className="text-gray-400 mt-1 text-sm">Most customers recover the cost on their very first recovered call</p>
             </div>
           </div>
         </section>
 
-        {/* Pricing Cards */}
+        {/* Plan Cards */}
         <section className="max-w-6xl mx-auto px-8 pb-20">
           <div className="grid md:grid-cols-3 gap-8 items-start">
             {plans.map((plan) => (
@@ -161,17 +155,19 @@ export default function PricingPage() {
                   </div>
                 )}
                 <h2 className="text-2xl font-bold mb-1">{plan.name}</h2>
-                <div className="flex items-end gap-1 mb-2">
-                  <span className="text-5xl font-extrabold">{plan.price}</span>
-                  <span className="text-gray-500 mb-1">{plan.period}</span>
+                <p className="text-blue-600 text-sm font-semibold mb-3">{plan.tagline}</p>
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">{plan.description}</p>
+
+                <div className="bg-gray-50 rounded-xl p-4 mb-6 text-center border border-gray-100">
+                  <p className="text-sm text-gray-500 mb-1">Custom pricing based on your operation</p>
+                  <p className="text-lg font-bold text-gray-900">Book a demo to get your quote</p>
                 </div>
-                <p className="text-gray-500 text-sm mb-2">{plan.description}</p>
-                <p className="text-xs text-gray-400 mb-6">{plan.setup}</p>
+
                 <Link
                   href="/#demo"
                   className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-colors mb-8 ${plan.buttonStyle}`}
                 >
-                  Get Started <ArrowRight size={16} />
+                  <Phone size={16} /> Talk to Sales
                 </Link>
                 <ul className="space-y-3">
                   {plan.features.map((f, i) => (
@@ -188,32 +184,31 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
+          <p className="text-center text-gray-400 text-sm mt-8">No contracts · Cancel anytime · Live in under 1 business day</p>
         </section>
 
         {/* Competitor Comparison */}
         <section className="bg-white border-t border-gray-200 py-20 px-8">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-12">How we compare</h2>
+            <h2 className="text-3xl font-bold text-center mb-4">Why Office Angel wins.</h2>
+            <p className="text-center text-gray-500 mb-12">The competition sells one piece. We built the whole back office.</p>
             <div className="overflow-hidden rounded-2xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="text-left px-6 py-4 font-semibold text-gray-700">Provider</th>
-                    <th className="text-left px-6 py-4 font-semibold text-gray-700">Price</th>
-                    <th className="text-left px-6 py-4 font-semibold text-gray-700">What you get</th>
+                    <th className="text-left px-6 py-4 font-semibold text-gray-700">What you actually get</th>
                   </tr>
                 </thead>
                 <tbody>
                   {competitors.map((c, i) => (
-                    <tr
-                      key={i}
-                      className={`border-b border-gray-100 last:border-0 ${c.highlight ? "bg-blue-50" : ""}`}
-                    >
-                      <td className={`px-6 py-4 font-bold ${c.highlight ? "text-blue-700" : "text-gray-700"}`}>
-                        {c.name} {c.highlight && <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Best Value</span>}
+                    <tr key={i} className={`border-b border-gray-100 last:border-0 ${c.highlight ? "bg-blue-50" : ""}`}>
+                      <td className={`px-6 py-4 font-bold whitespace-nowrap ${c.highlight ? "text-blue-700" : "text-gray-700"}`}>
+                        {c.name} {c.highlight && (
+                          <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Best Value</span>
+                        )}
                       </td>
-                      <td className="px-6 py-4 text-gray-700">{c.price}</td>
-                      <td className="px-6 py-4 text-gray-500">{c.note}</td>
+                      <td className={`px-6 py-4 ${c.highlight ? "text-blue-800 font-medium" : "text-gray-500"}`}>{c.note}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -229,24 +224,24 @@ export default function PricingPage() {
             <div className="space-y-6">
               {[
                 {
+                  q: "Why don't you show pricing on the page?",
+                  a: "Because a 2-man electrical crew and a 30-truck HVAC company shouldn't pay the same price. We build a custom package based on your call volume, crew size, and which features actually matter to your operation.",
+                },
+                {
                   q: "Is there a contract?",
-                  a: "No contracts, ever. Cancel anytime from your dashboard with one click.",
+                  a: "No contracts, ever. Cancel anytime with one click.",
                 },
                 {
                   q: "How fast can I get set up?",
-                  a: "Most customers are live within 1 business day. Our team handles the entire setup — you just plug in your phone number and we take it from there.",
+                  a: "Most customers are live within 1 business day. We handle the entire setup — you just plug in your phone number.",
                 },
                 {
                   q: "Does it work with my existing phone number?",
                   a: "Yes. We forward overflow calls to Office Angel — your number stays exactly the same.",
                 },
                 {
-                  q: "What if I go over my call limit?",
-                  a: "We'll notify you before you hit the cap. You can upgrade anytime or we'll handle overflow gracefully.",
-                },
-                {
                   q: "Does it work with Google and Apple Calendar?",
-                  a: "Yes, both. Jobs are pushed directly to whichever calendar your crew already uses.",
+                  a: "Yes, both. Jobs are pushed directly to whichever calendar your crew already uses on their phones.",
                 },
               ].map((item, i) => (
                 <div key={i} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
@@ -261,8 +256,8 @@ export default function PricingPage() {
         {/* CTA */}
         <section className="bg-gray-900 text-white py-20 px-8 text-center">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-4xl font-bold mb-4">Ready to stop losing jobs to voicemail?</h2>
-            <p className="text-gray-400 text-lg mb-8">Book a free 15-min demo. No slides. Just the real product.</p>
+            <h2 className="text-4xl font-bold mb-4">Let's build your package.</h2>
+            <p className="text-gray-400 text-lg mb-8">15 minutes. No slides. We'll show you the product and put together a quote on the spot.</p>
             <Link
               href="/#demo"
               className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors"
