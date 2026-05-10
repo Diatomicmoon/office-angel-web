@@ -182,6 +182,18 @@ export default function Dispatch() {
   const didAutoScrollRef = useRef(false);
   const dragRef = useRef<{ active: boolean; x: number; y: number; left: number; top: number }>({ active: false, x: 0, y: 0, left: 0, top: 0 });
 
+  const panLeft = () => {
+    const el = dayScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -320, top: 0, behavior: 'smooth' });
+  };
+
+  const panRight = () => {
+    const el = dayScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: 320, top: 0, behavior: 'smooth' });
+  };
+
   const todayKey = useMemo(() => {
     const p = tzParts(new Date(), DISPLAY_TZ);
     return `${p.y}-${String(p.mo).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
@@ -572,6 +584,13 @@ export default function Dispatch() {
           >
             Now
           </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
         </div>
         <div className="flex bg-gray-100 p-1 rounded-lg">
           <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
@@ -584,7 +603,25 @@ export default function Dispatch() {
         <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
           <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
-            <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
           </div>
           <div className="p-4 flex-1 overflow-y-auto space-y-4">
             <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
