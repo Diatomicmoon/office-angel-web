@@ -119,7 +119,7 @@ export default function PricingPage() {
             Priced for your operation.<br />Not a one-size-fits-all.
           </h1>
           <p className="text-xl text-gray-500 max-w-2xl mx-auto">
-            Every contractor is different. Book a free demo and we'll put together the right package for your crew size, call volume, and budget. No contracts. Cancel anytime.
+            Every contractor is different. Book a free demo and we'll put together the right package for your crew size, call volume, and budget. Subscription plans are month-to-month. Custom enterprise builds are scoped and contracted individually.
           </p>
         </section>
 
@@ -184,7 +184,7 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
-          <p className="text-center text-gray-400 text-sm mt-8">No contracts · Cancel anytime · Live in under 1 business day</p>
+          <p className="text-center text-gray-400 text-sm mt-8">Subscriptions are month-to-month · Custom builds contracted individually · Live in under 1 business day</p>
         </section>
 
         {/* Competitor Comparison */}
@@ -228,8 +228,8 @@ export default function PricingPage() {
                   a: "Because a 2-man electrical crew and a 30-truck HVAC company shouldn't pay the same price. We build a custom package based on your call volume, crew size, and which features actually matter to your operation.",
                 },
                 {
-                  q: "Is there a contract?",
-                  a: "No contracts, ever. Cancel anytime with one click.",
+                  q: "Is there a long-term commitment?",
+                  a: "Subscription plans are month-to-month with no long-term commitment — cancel anytime. Custom enterprise software builds are scoped and contracted individually to protect both parties and ensure you get exactly what was promised.",
                 },
                 {
                   q: "How fast can I get set up?",
