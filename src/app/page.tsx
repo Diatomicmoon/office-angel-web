@@ -27,16 +27,12 @@ export default function LandingPage() {
           <Bot className="text-blue-600" size={28} />
           <span className="text-xl font-bold tracking-tight">Office Angel</span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-            Features
-          </Link>
-          <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
-            Login
-          </Link>
-          <Link href="#demo" className="text-sm font-medium bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black transition-colors">
-            Book Demo
-          </Link>
+        <div className="flex items-center gap-6">
+          <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</Link>
+          <Link href="/pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</Link>
+          <Link href="/about" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">About</Link>
+          <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Login</Link>
+          <Link href="#demo" className="text-sm font-medium bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black transition-colors">Book Demo</Link>
         </div>
       </nav>
 
@@ -228,7 +224,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="bg-white py-8 border-t border-gray-200 text-center text-sm text-gray-500">
-        <p>© 2026 Ghost Office LLC. All rights reserved.</p>
+        <p>© 2026 Hard Hat Holdings LLC. All rights reserved.</p>
       </footer>
     </div>
   );

@@ -1,194 +1,281 @@
 "use client";
 
-import { BarChart3, TrendingUp, TrendingDown, Search, Filter, ShieldCheck, FileText, ArrowRight, Activity, ArrowDownRight, ArrowUpRight } from "lucide-react";
-import { useState } from "react";
+import Link from "next/link";
+import { Bot, Check, X, ArrowRight, Zap } from "lucide-react";
+
+const plans = [
+  {
+    name: "Starter",
+    price: "$197",
+    period: "/mo",
+    description: "Perfect for solo operators and small crews ready to stop missing calls.",
+    setup: "$99 one-time setup",
+    badge: null,
+    color: "border-gray-200",
+    buttonStyle: "bg-gray-900 text-white hover:bg-black",
+    features: [
+      { text: "AI Voice Dispatcher (up to 100 calls/mo)", included: true },
+      { text: "24/7 After-Hours & Weekend Coverage", included: true },
+      { text: "Lead Triage & Qualification", included: true },
+      { text: "Auto-Schedule to Google / Apple Calendar", included: true },
+      { text: "Job Summary Email to Owner", included: true },
+      { text: "Call Logs & Transcripts", included: true },
+      { text: "Smart Scheduling Inbox", included: true },
+      { text: "SMS Alerts to Field Crew", included: false },
+      { text: "AI Co-Pilot (Live Call Listener)", included: false },
+      { text: "Custom Brand Call Script", included: false },
+      { text: "Emergency Routing to Cell", included: false },
+      { text: "Bilingual Support (EN + ES)", included: false },
+      { text: "Live Field Tracking", included: false },
+      { text: "CRM & Customer Profiles", included: false },
+      { text: "Financial Dashboard", included: false },
+    ],
+  },
+  {
+    name: "Pro",
+    price: "$347",
+    period: "/mo",
+    description: "The full back-office suite. Built for growing crews who need everything automated.",
+    setup: "Free setup included",
+    badge: "Most Popular",
+    color: "border-blue-500 ring-2 ring-blue-500",
+    buttonStyle: "bg-blue-600 text-white hover:bg-blue-700",
+    features: [
+      { text: "AI Voice Dispatcher (up to 300 calls/mo)", included: true },
+      { text: "24/7 After-Hours & Weekend Coverage", included: true },
+      { text: "Lead Triage & Qualification", included: true },
+      { text: "Auto-Schedule to Google / Apple Calendar", included: true },
+      { text: "Job Summary Email to Owner", included: true },
+      { text: "Call Logs & Transcripts", included: true },
+      { text: "Smart Scheduling Inbox", included: true },
+      { text: "SMS Alerts to Field Crew", included: true },
+      { text: "AI Co-Pilot (Live Call Listener)", included: true },
+      { text: "Custom Brand Call Script", included: true },
+      { text: "Emergency Routing to Cell", included: true },
+      { text: "Bilingual Support (EN + ES)", included: true },
+      { text: "Live Field Tracking", included: true },
+      { text: "CRM & Customer Profiles", included: true },
+      { text: "Financial Dashboard", included: false },
+    ],
+  },
+  {
+    name: "Elite",
+    price: "$547",
+    period: "/mo",
+    description: "Unlimited everything. For high-volume operations running a full back-office on autopilot.",
+    setup: "Free same-day setup",
+    badge: null,
+    color: "border-gray-200",
+    buttonStyle: "bg-gray-900 text-white hover:bg-black",
+    features: [
+      { text: "Unlimited AI Voice Dispatcher calls", included: true },
+      { text: "24/7 After-Hours & Weekend Coverage", included: true },
+      { text: "Lead Triage & Qualification", included: true },
+      { text: "Auto-Schedule to Google / Apple Calendar", included: true },
+      { text: "Job Summary Email to Owner", included: true },
+      { text: "Call Logs & Transcripts", included: true },
+      { text: "Smart Scheduling Inbox", included: true },
+      { text: "SMS Alerts to Field Crew", included: true },
+      { text: "AI Co-Pilot (Live Call Listener)", included: true },
+      { text: "Custom Brand Call Script", included: true },
+      { text: "Emergency Routing to Cell", included: true },
+      { text: "Bilingual Support (EN + ES)", included: true },
+      { text: "Live Field Tracking", included: true },
+      { text: "CRM & Customer Profiles", included: true },
+      { text: "Financial Dashboard", included: true },
+    ],
+  },
+];
+
+const competitors = [
+  { name: "GoodCall", price: "$59/mo", note: "Basic voice only" },
+  { name: "NextPhone", price: "$199/mo", note: "Generic AI" },
+  { name: "Smith.ai", price: "$350+/mo", note: "Human hybrid" },
+  { name: "Office Angel", price: "$197–$547/mo", note: "Purpose-built for trades", highlight: true },
+];
 
 export default function PricingPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const materialData = [
-    {
-      id: 1,
-      name: "12/2 NM-B Romex (250ft)",
-      avgPrice: "$134.50",
-      trend: "up",
-      trendAmount: "+$4.20",
-      suppliers: [
-        { name: "Viking Electric", price: "$132.00", lastSeen: "Today" },
-        { name: "Home Depot Pro", price: "$134.50", lastSeen: "2 days ago" },
-        { name: "CED", price: "$137.00", lastSeen: "Last week" }
-      ]
-    },
-    {
-      id: 2,
-      name: "Square D 200A 40-Space Panel (HOM)",
-      avgPrice: "$189.00",
-      trend: "stable",
-      trendAmount: "$0.00",
-      suppliers: [
-        { name: "Home Depot Pro", price: "$189.00", lastSeen: "Today" },
-        { name: "Menards", price: "$192.50", lastSeen: "3 days ago" },
-        { name: "Viking Electric", price: "$188.50", lastSeen: "Last week" }
-      ]
-    },
-    {
-      id: 3,
-      name: "3/4\" EMT Conduit (10ft)",
-      avgPrice: "$7.45",
-      trend: "down",
-      trendAmount: "-$0.85",
-      suppliers: [
-        { name: "CED", price: "$6.90", lastSeen: "Yesterday" },
-        { name: "Home Depot Pro", price: "$7.85", lastSeen: "4 days ago" },
-        { name: "Viking Electric", price: "$7.60", lastSeen: "1 week ago" }
-      ]
-    },
-    {
-      id: 4,
-      name: "20A Single Pole Breaker HOM",
-      avgPrice: "$6.50",
-      trend: "up",
-      trendAmount: "+$0.25",
-      suppliers: [
-        { name: "Home Depot Pro", price: "$6.50", lastSeen: "Today" },
-        { name: "Viking Electric", price: "$6.75", lastSeen: "2 weeks ago" }
-      ]
-    }
-  ];
-
-  const filteredMaterials = materialData.filter(m => m.name.toLowerCase().includes(searchQuery.toLowerCase()));
-
   return (
-    <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
-      
-      {/* Header */}
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Material Cost Engine</h1>
-          <p className="text-gray-500 mt-2">Live wholesale price tracking powered by your ingested supply house receipts.</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
+      {/* Nav */}
+      <nav className="w-full bg-white border-b border-gray-200 py-4 px-8 flex justify-between items-center z-10 relative">
+        <Link href="/" className="flex items-center gap-2">
+          <Bot className="text-blue-600" size={28} />
+          <span className="text-xl font-bold tracking-tight">Office Angel</span>
+        </Link>
+        <div className="flex items-center gap-6">
+          <Link href="/#features" className="text-sm font-medium text-gray-600 hover:text-gray-900">Features</Link>
+          <Link href="/pricing" className="text-sm font-medium text-gray-900 font-bold">Pricing</Link>
+          <Link href="/about" className="text-sm font-medium text-gray-600 hover:text-gray-900">About</Link>
+          <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900">Login</Link>
+          <Link href="/#demo" className="text-sm font-medium bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black transition-colors">
+            Book Demo
+          </Link>
         </div>
-        <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded-lg font-medium flex items-center gap-2">
-          <ShieldCheck size={18} /> OCR Price Sync Active
-        </div>
-      </div>
+      </nav>
 
-      {/* Top Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Total Items Tracked</h3>
-          <p className="text-3xl font-bold text-gray-900">1,482</p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-500">
-            Across 4 local suppliers
+      <main className="flex-1">
+
+        {/* Header */}
+        <section className="max-w-4xl mx-auto px-8 pt-20 pb-12 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-sm font-medium mb-6">
+            <Zap size={16} /> Simple, transparent pricing
           </div>
-        </div>
+          <h1 className="text-5xl font-extrabold tracking-tight mb-4">
+            One recovered call pays for months.
+          </h1>
+          <p className="text-xl text-gray-500">
+            No contracts. Cancel anytime. Live in under 1 business day.
+          </p>
+        </section>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-          <h3 className="text-sm font-medium text-gray-500 mb-2">Largest Price Drop (30d)</h3>
-          <p className="text-2xl font-bold text-gray-900 truncate">3/4" EMT Conduit</p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-green-600">
-            <TrendingDown size={14} /> Down 10.2%
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-indigo-900 to-gray-900 p-6 rounded-xl border border-gray-800 shadow-sm text-white">
-          <h3 className="text-sm font-medium text-indigo-200 mb-2">Estimated Monthly Savings</h3>
-          <p className="text-3xl font-bold text-white">$420.50</p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-medium text-indigo-100">
-            <Activity size={14} /> By optimizing supplier purchasing
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col flex-1 overflow-hidden">
-        
-        {/* Toolbar */}
-        <div className="p-4 border-b border-gray-200 bg-gray-50 flex gap-4 items-center">
-          <div className="relative flex-1 max-w-md">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={18} className="text-gray-400" />
+        {/* The Math */}
+        <section className="max-w-4xl mx-auto px-8 pb-12">
+          <div className="bg-gray-900 text-white rounded-2xl p-8 grid md:grid-cols-3 gap-6 text-center">
+            <div>
+              <p className="text-4xl font-extrabold text-blue-400">$1,500</p>
+              <p className="text-gray-400 mt-1 text-sm">Average missed call value for a contractor</p>
             </div>
-            <input 
-              type="text" 
-              placeholder="Search materials (e.g., 'Romex', '200A Panel')" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div>
+              <p className="text-4xl font-extrabold text-blue-400">4–8</p>
+              <p className="text-gray-400 mt-1 text-sm">Extra booked jobs per month after activating Office Angel</p>
+            </div>
+            <div>
+              <p className="text-4xl font-extrabold text-blue-400">1 call</p>
+              <p className="text-gray-400 mt-1 text-sm">Covers 7+ months of Starter. The math is obvious.</p>
+            </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
-            <Filter size={16} /> Filter by Supplier
-          </button>
-        </div>
+        </section>
 
-        {/* Data Table */}
-        <div className="flex-1 overflow-y-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="text-xs text-gray-500 uppercase bg-gray-50 sticky top-0 z-10 shadow-sm">
-              <tr>
-                <th className="px-6 py-4">Material Item</th>
-                <th className="px-6 py-4">30-Day Trend</th>
-                <th className="px-6 py-4 text-center">Best Local Price</th>
-                <th className="px-6 py-4 text-center">Market Average</th>
-                <th className="px-6 py-4"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredMaterials.map((item) => (
-                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-bold text-gray-900">{item.name}</p>
-                    <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                      <FileText size={12} /> Last spotted: {item.suppliers[0].lastSeen}
-                    </p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className={`flex items-center gap-1.5 font-semibold ${
-                      item.trend === 'up' ? 'text-red-600' : 
-                      item.trend === 'down' ? 'text-green-600' : 
-                      'text-gray-500'
-                    }`}>
-                      {item.trend === 'up' && <ArrowUpRight size={16} />}
-                      {item.trend === 'down' && <ArrowDownRight size={16} />}
-                      {item.trend === 'stable' && <TrendingUp size={16} className="text-gray-400" />}
-                      {item.trendAmount}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="inline-flex items-center gap-2 bg-green-50 border border-green-100 px-3 py-1.5 rounded-lg">
-                      <span className="font-black text-green-700">{item.suppliers.reduce((prev, curr) => (parseFloat(prev.price.replace('$', '')) < parseFloat(curr.price.replace('$', '')) ? prev : curr)).price}</span>
-                      <span className="text-xs font-medium text-green-600 uppercase tracking-wide">
-                        {item.suppliers.reduce((prev, curr) => (parseFloat(prev.price.replace('$', '')) < parseFloat(curr.price.replace('$', '')) ? prev : curr)).name}
-                      </span>
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center font-bold text-gray-600">
-                    {item.avgPrice}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1 justify-end w-full">
-                      View Receipts <ArrowRight size={16} />
-                    </button>
-                  </td>
-                </tr>
+        {/* Pricing Cards */}
+        <section className="max-w-6xl mx-auto px-8 pb-20">
+          <div className="grid md:grid-cols-3 gap-8 items-start">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`bg-white rounded-2xl border-2 ${plan.color} shadow-sm p-8 relative`}
+              >
+                {plan.badge && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">
+                    {plan.badge}
+                  </div>
+                )}
+                <h2 className="text-2xl font-bold mb-1">{plan.name}</h2>
+                <div className="flex items-end gap-1 mb-2">
+                  <span className="text-5xl font-extrabold">{plan.price}</span>
+                  <span className="text-gray-500 mb-1">{plan.period}</span>
+                </div>
+                <p className="text-gray-500 text-sm mb-2">{plan.description}</p>
+                <p className="text-xs text-gray-400 mb-6">{plan.setup}</p>
+                <Link
+                  href="/#demo"
+                  className={`w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-colors mb-8 ${plan.buttonStyle}`}
+                >
+                  Get Started <ArrowRight size={16} />
+                </Link>
+                <ul className="space-y-3">
+                  {plan.features.map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm">
+                      {f.included ? (
+                        <Check size={16} className="text-green-500 mt-0.5 shrink-0" />
+                      ) : (
+                        <X size={16} className="text-gray-300 mt-0.5 shrink-0" />
+                      )}
+                      <span className={f.included ? "text-gray-700" : "text-gray-400"}>{f.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Competitor Comparison */}
+        <section className="bg-white border-t border-gray-200 py-20 px-8">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12">How we compare</h2>
+            <div className="overflow-hidden rounded-2xl border border-gray-200">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="text-left px-6 py-4 font-semibold text-gray-700">Provider</th>
+                    <th className="text-left px-6 py-4 font-semibold text-gray-700">Price</th>
+                    <th className="text-left px-6 py-4 font-semibold text-gray-700">What you get</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {competitors.map((c, i) => (
+                    <tr
+                      key={i}
+                      className={`border-b border-gray-100 last:border-0 ${c.highlight ? "bg-blue-50" : ""}`}
+                    >
+                      <td className={`px-6 py-4 font-bold ${c.highlight ? "text-blue-700" : "text-gray-700"}`}>
+                        {c.name} {c.highlight && <span className="ml-2 text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">Best Value</span>}
+                      </td>
+                      <td className="px-6 py-4 text-gray-700">{c.price}</td>
+                      <td className="px-6 py-4 text-gray-500">{c.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="bg-gray-50 border-t border-gray-200 py-20 px-8">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-12">Common questions</h2>
+            <div className="space-y-6">
+              {[
+                {
+                  q: "Is there a contract?",
+                  a: "No contracts, ever. Cancel anytime from your dashboard with one click.",
+                },
+                {
+                  q: "How fast can I get set up?",
+                  a: "Most customers are live within 1 business day. Our team handles the entire setup — you just plug in your phone number and we take it from there.",
+                },
+                {
+                  q: "Does it work with my existing phone number?",
+                  a: "Yes. We forward overflow calls to Office Angel — your number stays exactly the same.",
+                },
+                {
+                  q: "What if I go over my call limit?",
+                  a: "We'll notify you before you hit the cap. You can upgrade anytime or we'll handle overflow gracefully.",
+                },
+                {
+                  q: "Does it work with Google and Apple Calendar?",
+                  a: "Yes, both. Jobs are pushed directly to whichever calendar your crew already uses.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
+                  <p className="font-bold text-gray-900 mb-2">{item.q}</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">{item.a}</p>
+                </div>
               ))}
-              
-              {filteredMaterials.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                    No materials found matching "{searchQuery}"
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-        
-        {/* Footer info */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200 text-xs text-gray-500 text-center">
-          Prices are automatically extracted from your supply house invoices. Because wholesale pricing is private, Office Angel only uses your own verified receipts to generate these averages.
-        </div>
-      </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA */}
+        <section className="bg-gray-900 text-white py-20 px-8 text-center">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-4xl font-bold mb-4">Ready to stop losing jobs to voicemail?</h2>
+            <p className="text-gray-400 text-lg mb-8">Book a free 15-min demo. No slides. Just the real product.</p>
+            <Link
+              href="/#demo"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors"
+            >
+              Book Your Free Demo <ArrowRight size={20} />
+            </Link>
+          </div>
+        </section>
+      </main>
+
+      <footer className="bg-white py-8 border-t border-gray-200 text-center text-sm text-gray-500">
+        <p>© 2026 Hard Hat Holdings LLC. All rights reserved.</p>
+      </footer>
     </div>
   );
 }
