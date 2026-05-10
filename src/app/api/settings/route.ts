@@ -22,7 +22,7 @@ export async function GET() {
 
   const { data, error } = await sb()
     .from("companies")
-    .select("id, name, phone_number, ai_enabled, forward_to_phone")
+    .select("id, name, phone_number, ai_enabled, forward_to_phone, schedule_start_minute, schedule_end_minute")
     .eq("id", companyId)
     .single();
 
@@ -35,7 +35,7 @@ export async function PATCH(req: Request) {
   if (!companyId) return NextResponse.json({ error: "No company" }, { status: 404 });
 
   const body = await req.json();
-  const allowed = ["ai_enabled", "forward_to_phone", "name"];
+  const allowed = ["ai_enabled", "forward_to_phone", "name", "schedule_start_minute", "schedule_end_minute"];
   const updates: Record<string, any> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];

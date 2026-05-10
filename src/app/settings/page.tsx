@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic } from "lucide-react";
+import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock } from "lucide-react";
 
 type Settings = {
   id: string;
@@ -9,6 +9,8 @@ type Settings = {
   phone_number: string;
   ai_enabled: boolean;
   forward_to_phone: string | null;
+  schedule_start_minute?: number | null;
+  schedule_end_minute?: number | null;
 };
 
 export default function SettingsPage() {
@@ -17,6 +19,8 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [forwardPhone, setForwardPhone] = useState("");
+  const [schedStart, setSchedStart] = useState("08:00");
+  const [schedEnd, setSchedEnd] = useState("17:00");
 
   useEffect(() => {
     fetch("/api/settings")
@@ -24,6 +28,14 @@ export default function SettingsPage() {
       .then((json) => {
         setSettings(json.settings);
         setForwardPhone(json.settings?.forward_to_phone || "");
+        const toHHMM = (m?: number | null, fallback = "08:00") => {
+          if (typeof m !== 'number' || !Number.isFinite(m)) return fallback;
+          const hh = String(Math.floor(m / 60)).padStart(2, '0');
+          const mm = String(m % 60).padStart(2, '0');
+          return `${hh}:${mm}`;
+        };
+        setSchedStart(toHHMM(json.settings?.schedule_start_minute, "08:00"));
+        setSchedEnd(toHHMM(json.settings?.schedule_end_minute, "17:00"));
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -49,6 +61,28 @@ export default function SettingsPage() {
       body: JSON.stringify({ forward_to_phone: forwardPhone || null }),
     });
     setSettings((s) => s ? { ...s, forward_to_phone: forwardPhone || null } : s);
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const saveSchedulingHours = async () => {
+    if (!settings) return;
+    const toMin = (hhmm: string) => {
+      const [h, m] = hhmm.split(":").map((x) => Number(x));
+      if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+      return h * 60 + m;
+    };
+    const startMin = toMin(schedStart);
+    const endMin = toMin(schedEnd);
+    if (startMin === null || endMin === null) return;
+    setSaving(true);
+    await fetch("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ schedule_start_minute: startMin, schedule_end_minute: endMin }),
+    });
+    setSettings((s) => s ? { ...s, schedule_start_minute: startMin, schedule_end_minute: endMin } : s);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -151,6 +185,35 @@ export default function SettingsPage() {
             </button>
           </div>
           <p className="text-xs text-gray-400">Enter in E.164 format: +1XXXXXXXXXX</p>
+        </div>
+      </div>
+
+      {/* Scheduling Hours */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-gray-200 bg-gray-50">
+          <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+            <Clock size={18} className="text-blue-600" /> Scheduling Hours
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">Office Angel will only suggest times inside this window (Chicago time).</p>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+              <input type="time" value={schedStart} onChange={(e) => setSchedStart(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-black" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">End</label>
+              <input type="time" value={schedEnd} onChange={(e) => setSchedEnd(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-black" />
+            </div>
+          </div>
+          <button
+            onClick={saveSchedulingHours}
+            disabled={saving}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-60"
+          >
+            {saved ? <><CheckCircle2 size={16} /> Saved!</> : saving ? "Saving..." : <><Save size={16} /> Save Hours</>}
+          </button>
         </div>
       </div>
 

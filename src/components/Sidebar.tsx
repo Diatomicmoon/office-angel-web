@@ -1,7 +1,16 @@
+"use client";
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase } from 'lucide-react';
 
 export default function Sidebar() {
+  const pathname = usePathname();
+  const itemClass = (href: string) => {
+    const active = pathname === href;
+    return `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${active ? 'text-white bg-gray-800' : 'text-gray-400 hover:text-white hover:bg-gray-800/50'}`;
+  };
+
   return (
     <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-screen sticky top-0">
       <div className="p-6">
@@ -13,65 +22,65 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-4 space-y-2 mt-4">
-        <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 text-white bg-gray-800 rounded-lg transition-colors font-medium">
+        <Link href="/dashboard" className={itemClass('/dashboard')}>
           <Home size={20} />
           <span>Dashboard</span>
         </Link>
-        <Link href="/call-logs" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800/50 rounded-lg transition-colors">
+        <Link href="/call-logs" className={itemClass('/call-logs')}>
           <Phone size={20} />
           <span>Call Logs</span>
         </Link>
-        <Link href="/co-pilot" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/co-pilot" className={itemClass('/co-pilot')}>
           <Mic size={20} />
           <span className="flex items-center gap-2">
             Co-Pilot Mode 
             <span className="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">Beta</span>
           </span>
         </Link>
-        <Link href="/crm" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/crm" className={itemClass('/crm')}>
           <Users size={20} />
           <span>Leads & CRM</span>
         </Link>
-        <Link href="/projects" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/projects" className={itemClass('/projects')}>
           <Archive size={20} />
           <span>Customers</span>
         </Link>
-        <Link href="/jobs" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/jobs" className={itemClass('/jobs')}>
           <Briefcase size={20} />
           <span>Job Archive</span>
         </Link>
-        <Link href="/dispatch" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/dispatch" className={itemClass('/dispatch')}>
           <Calendar size={20} />
           <span>Dispatch</span>
         </Link>
-        <Link href="/scheduling-inbox" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
           <Inbox size={20} />
           <span>Scheduling Inbox</span>
         </Link>
-        <Link href="/pricing" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/pricing" className={itemClass('/pricing')}>
           <DollarSign size={20} />
           <span>Material Cost Engine</span>
         </Link>
-        <Link href="/inbox" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors relative">
+        <Link href="/inbox" className={itemClass('/inbox')}>
           <Inbox size={20} />
           <span>AI Inbox & Docs</span>
         </Link>
-        <Link href="/field-app" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/field-app" className={itemClass('/field-app')}>
           <Smartphone size={20} />
           <span>Field App (Techs)</span>
         </Link>
-        <Link href="/marketing" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/marketing" className={itemClass('/marketing')}>
           <Share2 size={20} />
           <span>SEO & Marketing</span>
         </Link>
-        <Link href="/financials" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/financials" className={itemClass('/financials')}>
           <Activity size={20} />
           <span>Financials</span>
         </Link>
       </nav>
 
       <div className="p-4 border-t border-gray-800">
-        <Link href="/settings" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+        <Link href="/settings" className={itemClass('/settings')}>
           <Settings size={20} />
           <span>Settings</span>
         </Link>
