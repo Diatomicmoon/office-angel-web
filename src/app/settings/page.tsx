@@ -11,6 +11,8 @@ type Settings = {
   forward_to_phone: string | null;
   schedule_start_minute?: number | null;
   schedule_end_minute?: number | null;
+  webhook_secret?: string | null;
+  calendar_webhook_url?: string | null;
 };
 
 export default function SettingsPage() {
@@ -21,6 +23,8 @@ export default function SettingsPage() {
   const [forwardPhone, setForwardPhone] = useState("");
   const [schedStart, setSchedStart] = useState("08:00");
   const [schedEnd, setSchedEnd] = useState("17:00");
+  const [calendarWebhook, setCalendarWebhook] = useState("");
+  const [webhookSecret, setWebhookSecret] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -36,6 +40,8 @@ export default function SettingsPage() {
         };
         setSchedStart(toHHMM(json.settings?.schedule_start_minute, "08:00"));
         setSchedEnd(toHHMM(json.settings?.schedule_end_minute, "17:00"));
+        setCalendarWebhook(json.settings?.calendar_webhook_url || "");
+        setWebhookSecret(json.settings?.webhook_secret || null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -83,6 +89,30 @@ export default function SettingsPage() {
       body: JSON.stringify({ schedule_start_minute: startMin, schedule_end_minute: endMin }),
     });
     setSettings((s) => s ? { ...s, schedule_start_minute: startMin, schedule_end_minute: endMin } : s);
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const saveCalendarWebhook = async () => {
+    if (!settings) return;
+    setSaving(true);
+    await fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ calendar_webhook_url: calendarWebhook || null }),
+    });
+    setSettings((s) => s ? { ...s, calendar_webhook_url: calendarWebhook || null } : s);
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const rotateWidgetSecret = async () => {
+    setSaving(true);
+    const r = await fetch('/api/settings', { method: 'POST' });
+    const j = await r.json().catch(() => ({}));
+    if (j?.webhook_secret) setWebhookSecret(j.webhook_secret);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -214,6 +244,53 @@ export default function SettingsPage() {
           >
             {saved ? <><CheckCircle2 size={16} /> Saved!</> : saving ? "Saving..." : <><Save size={16} /> Save Hours</>}
           </button>
+        </div>
+      </div>
+
+      {/* Website widget + Calendar hook */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="p-5 border-b border-gray-200 bg-gray-50">
+          <h2 className="font-semibold text-gray-900">Website Widget + Calendar</h2>
+          <p className="text-sm text-gray-500 mt-1">Connect your website intake and optionally push booked jobs to a calendar via webhook.</p>
+        </div>
+        <div className="p-6 space-y-5">
+          <div>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Widget Secret (multi-tenant mode)</p>
+            <div className="flex items-center gap-3">
+              <input
+                value={webhookSecret || ''}
+                readOnly
+                placeholder="(not set yet)"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm text-black font-mono bg-gray-50"
+              />
+              <button
+                onClick={rotateWidgetSecret}
+                disabled={saving}
+                className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+              >
+                Rotate
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-2">Only needed when we flip to multi-company auth mode.</p>
+          </div>
+
+          <div>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Calendar Webhook URL (optional)</p>
+            <input
+              value={calendarWebhook}
+              onChange={(e) => setCalendarWebhook(e.target.value)}
+              placeholder="https://hooks.zapier.com/..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-black font-mono"
+            />
+            <p className="text-xs text-gray-400 mt-2">When you Book & Assign, we’ll POST job details here. (Use Zapier/Make → Google Calendar.)</p>
+            <button
+              onClick={saveCalendarWebhook}
+              disabled={saving}
+              className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-60"
+            >
+              {saved ? <><CheckCircle2 size={16} /> Saved!</> : saving ? "Saving..." : <><Save size={16} /> Save Calendar Hook</>}
+            </button>
+          </div>
         </div>
       </div>
 

@@ -22,7 +22,7 @@ export async function GET() {
 
   const { data, error } = await sb()
     .from("companies")
-    .select("id, name, phone_number, ai_enabled, forward_to_phone, schedule_start_minute, schedule_end_minute")
+    .select("id, name, phone_number, ai_enabled, forward_to_phone, schedule_start_minute, schedule_end_minute, webhook_secret, calendar_webhook_url")
     .eq("id", companyId)
     .single();
 
@@ -35,7 +35,7 @@ export async function PATCH(req: Request) {
   if (!companyId) return NextResponse.json({ error: "No company" }, { status: 404 });
 
   const body = await req.json();
-  const allowed = ["ai_enabled", "forward_to_phone", "name", "schedule_start_minute", "schedule_end_minute"];
+  const allowed = ["ai_enabled", "forward_to_phone", "name", "schedule_start_minute", "schedule_end_minute", "calendar_webhook_url"];
   const updates: Record<string, any> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];
@@ -44,4 +44,15 @@ export async function PATCH(req: Request) {
   const { error } = await sb().from("companies").update(updates).eq("id", companyId);
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });
+}
+
+export async function POST(req: Request) {
+  // Rotate webhook secret (for website widget auth-tenant mode)
+  const companyId = await getCompanyId();
+  if (!companyId) return NextResponse.json({ error: "No company" }, { status: 404 });
+
+  const secret = `oa_${Math.random().toString(36).slice(2)}_${Date.now().toString(36)}`;
+  const { error } = await sb().from('companies').update({ webhook_secret: secret }).eq('id', companyId);
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json({ ok: true, webhook_secret: secret });
 }

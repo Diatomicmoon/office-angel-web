@@ -258,6 +258,40 @@ export async function POST(req: Request) {
         }
       } catch {}
 
+      // Best-effort: Calendar webhook (Zapier/Make → Google Calendar)
+      try {
+        const { data: company } = await supabase
+          .from('companies')
+          .select('calendar_webhook_url, name')
+          .eq('id', companyId)
+          .maybeSingle();
+
+        const hook = (company as any)?.calendar_webhook_url as string | undefined;
+        if (hook) {
+          await fetch(hook, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              event: 'job.scheduled',
+              company_id: companyId,
+              company_name: (company as any)?.name || null,
+              job_id: data.id,
+              customer_id: data.customer_id,
+              technician_id: data.technician_id,
+              title: data.title,
+              address: data.address,
+              scheduled_start: data.scheduled_start,
+              scheduled_end: data.scheduled_end,
+              status: data.status,
+              priority: data.priority,
+              estimated_minutes: data.estimated_minutes,
+              created_at: data.created_at,
+              updated_at: data.updated_at,
+            }),
+          }).catch(() => {});
+        }
+      } catch {}
+
       return NextResponse.json({ job: data });
     } else {
       // Insert
