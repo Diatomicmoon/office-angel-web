@@ -44,6 +44,10 @@ export default function Sidebar() {
           <Calendar size={20} />
           <span>Dispatch</span>
         </Link>
+        <Link href="/scheduling-inbox" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+          <Inbox size={20} />
+          <span>Scheduling Inbox</span>
+        </Link>
         <Link href="/pricing" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
           <DollarSign size={20} />
           <span>Material Cost Engine</span>

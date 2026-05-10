@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+const DISPLAY_TZ = 'America/Chicago';
+
 function deriveUrgency(text?: string) {
   const s = (text || '').toLowerCase();
   if (s.match(/(emergency|sparking|spark|fire|smoke|smoking|burning smell|burning|burn|arcing|arc|shock|electrocution|power out|no power|flood)/)) return 'high';
@@ -44,6 +46,85 @@ function isYes(s: string) {
 
 function isNo(s: string) {
   return /^(no|nope|nah|can't|cant|cannot|reschedule|change)\b/i.test(s);
+}
+
+function tzParts(d: Date, timeZone: string): { y: number; mo: number; day: number; h: number; mi: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return { y: get('year'), mo: get('month'), day: get('day'), h: get('hour'), mi: get('minute') };
+}
+
+function zonedTimeToUtcMs({ y, mo, day, h, mi, timeZone }: { y: number; mo: number; day: number; h: number; mi: number; timeZone: string }) {
+  // Iteratively adjust a UTC guess until it formats to the desired local time in the timezone.
+  let guess = Date.UTC(y, mo - 1, day, h, mi, 0);
+  for (let i = 0; i < 4; i++) {
+    const p = tzParts(new Date(guess), timeZone);
+    const desired = Date.UTC(y, mo - 1, day, h, mi, 0);
+    const got = Date.UTC(p.y, p.mo - 1, p.day, p.h, p.mi, 0);
+    const delta = desired - got;
+    if (Math.abs(delta) < 60000) break;
+    guess += delta;
+  }
+  return guess;
+}
+
+function parseTimeWindow(text: string): { startIso: string; endIso: string } | null {
+  const s = (text || '').toLowerCase();
+
+  // Require an explicit day hint for safety.
+  let dayOffset: number | null = null;
+  if (s.includes('tomorrow')) dayOffset = 1;
+  else if (s.includes('today')) dayOffset = 0;
+  else return null;
+
+  // Range like 9-11am, 3:30-5pm, 9 to 11
+  const m = s.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:-|to|–)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/);
+  if (!m) return null;
+
+  let sh = Number(m[1]);
+  let sm = Number(m[2] || '0');
+  let sap = (m[3] || '').toLowerCase();
+  let eh = Number(m[4]);
+  let em = Number(m[5] || '0');
+  let eap = (m[6] || '').toLowerCase();
+
+  // Need am/pm at least once.
+  if (!sap && !eap) return null;
+  if (!sap && eap) sap = eap;
+  if (!eap && sap) eap = sap;
+
+  const to24 = (h: number, ap: string) => {
+    let out = h % 12;
+    if (ap === 'pm') out += 12;
+    return out;
+  };
+
+  sh = to24(sh, sap);
+  eh = to24(eh, eap);
+
+  const now = new Date();
+  const base = tzParts(now, DISPLAY_TZ);
+  const targetDay = new Date(Date.UTC(base.y, base.mo - 1, base.day));
+  targetDay.setUTCDate(targetDay.getUTCDate() + (dayOffset || 0));
+
+  const y = targetDay.getUTCFullYear();
+  const mo = targetDay.getUTCMonth() + 1;
+  const day = targetDay.getUTCDate();
+
+  const startUtc = zonedTimeToUtcMs({ y, mo, day, h: sh, mi: sm, timeZone: DISPLAY_TZ });
+  const endUtc = zonedTimeToUtcMs({ y, mo, day, h: eh, mi: em, timeZone: DISPLAY_TZ });
+
+  if (!Number.isFinite(startUtc) || !Number.isFinite(endUtc) || endUtc <= startUtc) return null;
+  return { startIso: new Date(startUtc).toISOString(), endIso: new Date(endUtc).toISOString() };
 }
 
 export async function POST(req: Request) {
@@ -263,11 +344,20 @@ export async function POST(req: Request) {
         .limit(1);
 
       const r0 = recent?.[0];
-      if (r0?.id && String(r0.status || '').toLowerCase() === 'lead') {
+      const status0 = String(r0?.status || '').toLowerCase();
+      if (r0?.id && (status0 === 'lead' || status0.includes('reschedule'))) {
         existingJobId = r0.id;
         const updatePayload: any = {
           updated_at: new Date().toISOString(),
         };
+
+        // If the customer text contains a reschedule window, store it on the job so dispatch can 1-click book.
+        const win = parseTimeWindow(bodyNorm);
+        if (win) {
+          updatePayload.scheduled_start = win.startIso;
+          updatePayload.scheduled_end = win.endIso;
+        }
+
         if (!messagesTableOk) {
           const nextNotes = [r0.notes, `SMS from ${from}: ${body}`].filter(Boolean).join('\n\n');
           updatePayload.notes = nextNotes;
@@ -334,7 +424,7 @@ export async function POST(req: Request) {
 
     const reply = debug
       ? `DEBUG ok. companyId=${companyId} customerId=${customerId || 'null'} jobId=${jobIdForMessage || 'null'} updatedExisting=${updatedExisting} err=${debugErr || 'none'}`
-      : "Got it — we’re logging your request now. Reply with: Name, Address, Best time window, and what’s going on. Example: 'Jordan, 123 Main St, today 3-5pm, breaker keeps tripping.' If this is an emergency, call 911.";
+      : "Got it — we’re logging your request now. Reply with: Name, Address, Best time window (example: 'tomorrow 9-11am'), and what’s going on. If this is an emergency, call 911.";
 
     return new NextResponse(twiml(reply), { status: 200, headers: { 'Content-Type': 'text/xml' } });
   } catch (e) {

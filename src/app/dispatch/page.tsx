@@ -416,6 +416,14 @@ export default function Dispatch() {
     return () => clearInterval(t);
   }, []);
 
+  // Deep-link: /dispatch?job=<id>
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const jobId = new URLSearchParams(window.location.search).get('job');
+    if (jobId) openTicket(jobId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(t);
