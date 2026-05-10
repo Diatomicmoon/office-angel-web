@@ -61,6 +61,18 @@ export async function POST(req: Request) {
 
   for (const k of Object.keys(payload)) if (payload[k] === undefined) delete payload[k];
 
+  // If an id is provided, treat as a status update (PATCH-style via POST)
+  if (body.id && body.status && Object.keys(body).length <= 2) {
+    const { data, error } = await supabase
+      .from("receipts")
+      .update({ status: body.status })
+      .eq("id", body.id)
+      .select()
+      .single();
+    if (error) return NextResponse.json({ error }, { status: 400 });
+    return NextResponse.json({ receipt: data });
+  }
+
   const { data, error } = await supabase.from("receipts").insert([payload]).select().single();
   if (error) return NextResponse.json({ error }, { status: 400 });
 
