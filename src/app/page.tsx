@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { PhoneIncoming, Zap, Calendar, ArrowRight, ShieldCheck, BarChart3, Bot } from "lucide-react";
+import CalendlyEmbed from "@/components/CalendlyEmbed";
 
 export default function LandingPage() {
   return (
@@ -87,15 +88,13 @@ export default function LandingPage() {
         </section>
 
         {/* CTA / Demo */}
-        <section id="demo" className="py-24 bg-gray-900 text-white text-center px-8">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">Ready to scale your crew?</h2>
-            <p className="text-xl text-gray-400 mb-10">
-              Stop losing $1,500 electrical service calls to voicemail. Let us show you exactly how it works in a 15-minute demo.
+        <section id="demo" className="py-24 bg-gray-900 text-white px-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-4">Ready to scale your crew?</h2>
+            <p className="text-xl text-gray-400 mb-12">
+              Stop losing $1,500 electrical service calls to voicemail. Pick a time below and we'll show you exactly how it works.
             </p>
-            <a href="mailto:zaki@ghostoffice.ai" className="inline-flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg transition-colors">
-              <Calendar size={20} /> Schedule a Demo with Zaki
-            </a>
+            <CalendlyEmbed />
           </div>
         </section>
       </main>
