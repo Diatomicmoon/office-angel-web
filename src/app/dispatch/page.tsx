@@ -180,6 +180,8 @@ export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+
+  const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   
   const [techs, setTechs] = useState<Technician[]>([]);
   const [unassignedJobs, setUnassignedJobs] = useState<Job[]>([]);
@@ -223,7 +225,8 @@ export default function Dispatch() {
     const el = dayScrollRef.current;
     if (!el) return;
     const n = new Date();
-    const minutes = minutesSinceGridStart(n);
+    const isToday = isSameTzDay(n, selectedDate, DISPLAY_TZ);
+    const minutes = isToday ? minutesSinceGridStart(n) : scheduleHours.startMin;
     // +GRID_HEADER_PX because the timeline body starts after the header row in the scroll container.
     const y = clamp(GRID_HEADER_PX + (minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_HEADER_PX + GRID_TOTAL_PX);
     // Wait for layout; Safari can ignore immediate scrollTop on first paint.
@@ -236,10 +239,12 @@ export default function Dispatch() {
   const slots = useMemo(() => Array.from({ length: GRID_HOURS * (60 / GRID_SLOT_MINUTES) }, (_, i) => i), []);
 
   const timeLineTop = useMemo(() => {
+    // Only show the red line on the selected day.
+    if (!isSameTzDay(now, selectedDate, DISPLAY_TZ)) return null;
     const minutesSinceStart = minutesSinceGridStart(now);
     if (minutesSinceStart < 0 || minutesSinceStart > GRID_HOURS * 60) return null;
     return (minutesSinceStart / 60) * GRID_HOUR_PX;
-  }, [now]);
+  }, [now, selectedDate]);
 
   const jobStyleForGrid = (job: Job, idx: number) => {
     // Fallback stack layout if no schedule
@@ -267,6 +272,16 @@ export default function Dispatch() {
     setTicketOpen(true);
     setTicketLoading(true);
     setTicketMessagesLoading(true);
+
+    // persist in URL for deep-linking
+    try {
+      if (typeof window !== 'undefined') {
+        const u = new URL(window.location.href);
+        u.searchParams.set('job', jobId);
+        window.history.replaceState({}, '', u.toString());
+      }
+    } catch {}
+
     try {
       const [resJob, resMsg] = await Promise.all([
         fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`),
@@ -289,6 +304,17 @@ export default function Dispatch() {
       setTicketLoading(false);
       setTicketMessagesLoading(false);
     }
+  };
+
+  const closeTicket = () => {
+    setTicketOpen(false);
+    try {
+      if (typeof window !== 'undefined') {
+        const u = new URL(window.location.href);
+        u.searchParams.delete('job');
+        window.history.replaceState({}, '', u.toString());
+      }
+    } catch {}
   };
 
   const geocodeDemo = async () => {
@@ -329,7 +355,7 @@ export default function Dispatch() {
     // Choose the day we’re trying to schedule.
     const baseDate =
       scheduleSelection[job.id]?.date ||
-      (job.scheduled_start ? toDateInputValue(new Date(job.scheduled_start)) : toDateInputValue(new Date()));
+      (job.scheduled_start ? toDateInputValue(new Date(job.scheduled_start)) : toDateInputValue(selectedDate));
 
     const businessStart = new Date(`${baseDate}T${minToTimeStr(scheduleHours.startMin)}`);
     const businessEnd = new Date(`${baseDate}T${minToTimeStr(scheduleHours.endMin)}`);
@@ -613,7 +639,7 @@ export default function Dispatch() {
       {/* Job Ticket Slide-over */}
       {ticketOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setTicketOpen(false)} />
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeTicket} />
           <div className="relative z-10 w-full max-w-lg bg-white shadow-2xl flex flex-col h-full overflow-hidden">
             <div className="p-6 border-b border-gray-200 bg-gray-50 flex items-start justify-between">
               <div>
@@ -627,7 +653,7 @@ export default function Dispatch() {
                   </p>
                 )}
               </div>
-              <button onClick={() => setTicketOpen(false)} className="text-sm font-semibold text-gray-600 hover:text-gray-900">
+              <button onClick={closeTicket} className="text-sm font-semibold text-gray-600 hover:text-gray-900">
                 Close
               </button>
             </div>
@@ -733,18 +759,31 @@ export default function Dispatch() {
       {/* Calendar Controls */}
       <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
             <ChevronLeft size={20} className="text-gray-600" />
           </button>
-          <h2 className="text-lg font-semibold text-gray-900">Today</h2>
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
             <ChevronRight size={20} className="text-gray-600" />
           </button>
           <button
-            onClick={() => jumpToNow()}
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
             className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
           >
-            Now
+            Today
           </button>
 
           {viewMode === 'day' ? (
@@ -1079,15 +1118,15 @@ export default function Dispatch() {
                   {techs.length === 0 ? (
                     <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
                   ) : techs.map((tech) => {
-                    // Only render jobs scheduled for TODAY in DISPLAY_TZ.
-                    const today = new Date();
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
 
                     const jobsForTech = assignedJobs.filter((j) => {
                       if (j.technician_id !== tech.id) return false;
                       if (!j.scheduled_start) return false;
                       const start = new Date(j.scheduled_start);
                       if (Number.isNaN(start.getTime())) return false;
-                      return isSameTzDay(start, today, DISPLAY_TZ);
+                      return isSameTzDay(start, day, DISPLAY_TZ);
                     });
 
                     return (
