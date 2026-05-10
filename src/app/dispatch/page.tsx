@@ -2,7 +2,7 @@
 
 import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { APIProvider, Map, Marker } from '@vis.gl/react-google-maps';
+import { APIProvider, Map as GMap, Marker } from '@vis.gl/react-google-maps';
 
 type Technician = {
   id: string;
@@ -42,6 +42,14 @@ type Msg = {
   to_value?: string | null;
   body?: string | null;
   created_at?: string;
+};
+
+type Suggestion = {
+  techId: string;
+  techName: string;
+  date: string; // YYYY-MM-DD
+  time: string; // HH:MM
+  duration: number;
 };
 
 const center = { lat: 44.9778, lng: -93.2650 };
@@ -158,6 +166,16 @@ function toTimeInputValue(d: Date) {
   return `${h}:${m}`;
 }
 
+function minToTimeStr(min: number) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
+function ceilToSlot(min: number, slot = 30) {
+  return Math.ceil(min / slot) * slot;
+}
+
 export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
@@ -175,6 +193,8 @@ export default function Dispatch() {
   const [ticket, setTicket] = useState<JobTicket | null>(null);
   const [ticketMessages, setTicketMessages] = useState<Msg[]>([]);
   const [ticketMessagesLoading, setTicketMessagesLoading] = useState(false);
+  const [scheduleHours, setScheduleHours] = useState<{ startMin: number; endMin: number }>({ startMin: 480, endMin: 1020 });
+  const [aiSuggestions, setAiSuggestions] = useState<Record<string, Suggestion[]>>({});
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
   const [now, setNow] = useState<Date>(() => new Date());
@@ -301,6 +321,96 @@ export default function Dispatch() {
     return 240;
   };
 
+  const recommendSlots = (job: Job): Suggestion[] => {
+    if (!techs.length) return [];
+
+    const duration = scheduleSelection[job.id]?.duration ?? getDefaultDuration(job);
+
+    // Choose the day we’re trying to schedule.
+    const baseDate =
+      scheduleSelection[job.id]?.date ||
+      (job.scheduled_start ? toDateInputValue(new Date(job.scheduled_start)) : toDateInputValue(new Date()));
+
+    const businessStart = new Date(`${baseDate}T${minToTimeStr(scheduleHours.startMin)}`);
+    const businessEnd = new Date(`${baseDate}T${minToTimeStr(scheduleHours.endMin)}`);
+    const startOfDay = new Date(`${baseDate}T00:00`);
+    const endOfDay = new Date(`${baseDate}T23:59`);
+
+    const durMin = Math.max(30, Number(duration) || 60);
+    const businessStartMin = Math.round((businessStart.getTime() - startOfDay.getTime()) / 60000);
+    const businessEndMin = Math.round((businessEnd.getTime() - startOfDay.getTime()) / 60000);
+
+    const suggestions: Suggestion[] = [];
+
+    for (const tech of techs) {
+      // Gather this tech’s scheduled blocks for that date.
+      const blocks = assignedJobs
+        .filter((j) => j.technician_id === tech.id && j.scheduled_start)
+        .map((j) => {
+          const st = new Date(j.scheduled_start!);
+          if (Number.isNaN(st.getTime()) || st < startOfDay || st > endOfDay) return null;
+          let et: Date;
+          if (j.scheduled_end) et = new Date(j.scheduled_end);
+          else if (j.estimated_minutes) et = new Date(st.getTime() + j.estimated_minutes * 60000);
+          else et = new Date(st.getTime() + 60 * 60000);
+          if (Number.isNaN(et.getTime())) et = new Date(st.getTime() + 60 * 60000);
+          const sMin = Math.round((st.getTime() - startOfDay.getTime()) / 60000);
+          const eMin = Math.round((et.getTime() - startOfDay.getTime()) / 60000);
+          return { sMin, eMin };
+        })
+        .filter(Boolean) as { sMin: number; eMin: number }[];
+
+      blocks.sort((a, b) => a.sMin - b.sMin);
+
+      let cursor = businessStartMin;
+      cursor = ceilToSlot(cursor, GRID_SLOT_MINUTES);
+
+      for (const b of blocks) {
+        // skip blocks outside business hours
+        if (b.eMin <= businessStartMin) continue;
+        if (b.sMin >= businessEndMin) break;
+
+        // if gap fits
+        if (cursor + durMin <= b.sMin) break;
+        // move cursor past this block
+        cursor = Math.max(cursor, b.eMin);
+        cursor = ceilToSlot(cursor, GRID_SLOT_MINUTES);
+      }
+
+      if (cursor + durMin <= businessEndMin) {
+        const dt = new Date(startOfDay.getTime() + cursor * 60000);
+        suggestions.push({
+          techId: tech.id,
+          techName: tech.name || 'Technician',
+          date: baseDate,
+          time: toTimeInputValue(dt),
+          duration: durMin,
+        });
+      }
+    }
+
+    // Prefer available techs, then earliest time.
+    const statusRank = (t: Technician) => {
+      const s = String(t.status || '').toLowerCase();
+      if (s === 'available') return 0;
+      if (s.includes('route')) return 1;
+      if (s.includes('site')) return 2;
+      return 3;
+    };
+    const techById = new Map<string, Technician>(techs.map((t) => [t.id, t]));
+
+    suggestions.sort((a, b) => {
+      const ra = statusRank(techById.get(a.techId) as Technician);
+      const rb = statusRank(techById.get(b.techId) as Technician);
+      if (ra !== rb) return ra - rb;
+      const ta = new Date(`${a.date}T${a.time}`).getTime();
+      const tb = new Date(`${b.date}T${b.time}`).getTime();
+      return ta - tb;
+    });
+
+    return suggestions.slice(0, 3);
+  };
+
   const toIso = (date?: string, time?: string) => {
     if (!date || !time) return null;
     // datetime-local style string; parse as local time
@@ -414,6 +524,19 @@ export default function Dispatch() {
     load();
     const t = setInterval(load, 15000);
     return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    // Pull company scheduling hours (fallback 8–5)
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((json) => {
+        const s = json?.settings || {};
+        const startMin = typeof s.schedule_start_minute === 'number' ? s.schedule_start_minute : 480;
+        const endMin = typeof s.schedule_end_minute === 'number' ? s.schedule_end_minute : 1020;
+        setScheduleHours({ startMin, endMin });
+      })
+      .catch(() => {});
   }, []);
 
   // Deep-link: /dispatch?job=<id>
@@ -661,6 +784,42 @@ export default function Dispatch() {
 
                 {/* Quick book (assign + schedule) */}
                 <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            setAssignSelection((prev) => ({ ...prev, [job.id]: sug.techId }));
+                            setScheduleSelection((prev) => ({
+                              ...prev,
+                              [job.id]: { date: sug.date, time: sug.time, duration: sug.duration },
+                            }));
+                          }}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
                   <div className="flex items-center gap-2">
                     <select
                       value={assignSelection[job.id] || ""}
@@ -786,14 +945,14 @@ export default function Dispatch() {
               ) : (
                 <APIProvider apiKey={apiKey}>
                   <div style={{ width: '100%', height: '100%' }}>
-                    <Map defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
                       {techs
                         .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
                         .filter((x) => x.pos)
                         .map(({ tech, pos }: any) => (
                           <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
                         ))}
-                    </Map>
+                    </GMap>
                   </div>
                 </APIProvider>
               )}
