@@ -7,7 +7,6 @@ import {
   Calendar,
   ArrowRight,
   ShieldCheck,
-  BarChart3,
   Bot,
   MapPin,
   Inbox,
@@ -48,7 +47,7 @@ export default function LandingPage() {
             <span className="text-blue-600">Running on autopilot.</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Office Angel is a full AI office suite built for home service contractors. Calls, scheduling, dispatch, CRM, financials, and field tracking — all in one place, running 24/7.
+            Office Angel is a full AI back-office platform built for home service contractors. From the first inbound call to the final invoice — handled automatically, around the clock.
           </p>
           <div className="flex justify-center gap-4">
             <Link href="#demo" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center gap-2">
@@ -60,7 +59,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Social Proof Bar */}
+        {/* Industry Bar */}
         <section className="bg-white border-t border-b border-gray-200 py-8 px-8">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-gray-500 text-sm font-medium uppercase tracking-widest mb-4">Built for home service businesses</p>
@@ -75,115 +74,112 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Full Feature Suite */}
+        {/* Feature Suite */}
         <section id="features" className="bg-gray-50 py-24 border-t border-gray-200">
           <div className="max-w-6xl mx-auto px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold text-gray-900">Everything your office needs. Nothing it doesn't.</h2>
-              <p className="text-gray-500 mt-2 text-lg">One platform. Zero office drama.</p>
+              <p className="text-gray-500 mt-2 text-lg">One platform. Built for the trades.</p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
 
-              {/* AI Voice Dispatcher */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
                   <PhoneIncoming size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">AI Voice Dispatcher</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Answers overflow and after-hours calls with your company name, sounds exactly like a human, asks the right triage questions, and never lets a lead go to voicemail.
+                  Handles overflow and after-hours calls using your company name. Asks the right questions, captures the job details, and keeps your pipeline full — even when your team is unavailable.
                 </p>
               </div>
 
-              {/* AI Co-Pilot */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-6">
                   <Mic size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">AI Co-Pilot Mode</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  When a human takes the call, AI listens silently in the background. It extracts the address, job type, and urgency — and has the calendar event ready before you hang up.
+                  Assists your team during live calls in real time. By the time you hang up, the job is already drafted and ready to confirm — no manual data entry required.
                 </p>
               </div>
 
-              {/* Smart Scheduling Inbox */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-6">
                   <Inbox size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Smart Scheduling Inbox</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Every inbound job request — from calls, texts, and web forms — lands in one unified inbox. Review, approve, and dispatch in seconds.
+                  Every inbound job request — from calls, texts, and web forms — routed into one unified inbox. Review, approve, and dispatch in seconds.
                 </p>
               </div>
 
-              {/* Auto Job Scheduling */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6">
                   <Calendar size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Auto Job Scheduling</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Job details are instantly pushed to your crew's Google or Apple Calendar. Field guys see it on their phones the second it's booked. No calls, no texts, no confusion.
+                  Confirmed jobs are pushed directly to your crew's existing calendar. Field techs see the update instantly — no calls, no texts, no back and forth.
                 </p>
               </div>
 
-              {/* Live Field Tracking */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-6">
                   <MapPin size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Live Field Tracking</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  See exactly where every technician is and what job they're on — in real time. Know who's available to take the next job without making a single call.
+                  A real-time view of your crew in the field — who's available, who's on-site, and what's next on their schedule. Smarter dispatch, fewer wasted hours.
                 </p>
               </div>
 
-              {/* CRM & Customer Profiles */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center mb-6">
                   <Users size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">CRM & Customer Profiles</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Full job history, notes, and contact info for every customer. Know who called before, what work was done, and when to follow up — all in one place.
+                  Job history, notes, and contact records for every customer — organized and searchable. Know the full picture before your crew ever pulls up to the driveway.
                 </p>
               </div>
 
-              {/* Financial Dashboard */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6">
                   <DollarSign size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Financial Dashboard</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Track revenue, open invoices, and job profitability at a glance. Know exactly where your money is without logging into QuickBooks or chasing down your accountant.
+                  Revenue, open invoices, and job profitability — at a glance. Know where your business stands without chasing spreadsheets or waiting on your accountant.
                 </p>
               </div>
 
-              {/* Call Logs */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center mb-6">
                   <ClipboardList size={24} />
                 </div>
-                <h3 className="text-xl font-bold mb-3">Call Logs & Transcripts</h3>
+                <h3 className="text-xl font-bold mb-3">Call Logs & Summaries</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Every AI call is recorded, transcribed, and summarized automatically. Review any call in seconds. Never lose a job detail buried in a voicemail again.
+                  Every AI-handled call is logged and summarized automatically. Review what was said, what was booked, and what needs follow-up — all in one place.
                 </p>
               </div>
 
-              {/* Lead Qualification */}
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
                 <div className="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-6">
                   <ShieldCheck size={24} />
                 </div>
                 <h3 className="text-xl font-bold mb-3">Lead Triage & Qualification</h3>
                 <p className="text-gray-600 leading-relaxed">
-                  AI asks the right questions on every call — address, job type, emergency level, homeowner status — so your crew only shows up to qualified, booked jobs.
+                  Every inbound lead is screened automatically — job type, location, urgency, and homeowner status — so your crew shows up to real, bookable jobs.
                 </p>
               </div>
 
+            </div>
+
+            <div className="text-center mt-14">
+              <Link href="#demo" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-lg">
+                Book a Demo to See It All <ArrowRight size={20} />
+              </Link>
             </div>
           </div>
         </section>
@@ -191,12 +187,12 @@ export default function LandingPage() {
         {/* How It Plugs In */}
         <section className="bg-white py-24 border-t border-gray-200">
           <div className="max-w-4xl mx-auto px-8 text-center">
-            <h2 className="text-3xl font-bold mb-4">Zero learning curve. Plug in and go.</h2>
-            <p className="text-gray-500 text-lg mb-12">We connect to the tools your crew already uses. No new apps to install. No training required.</p>
+            <h2 className="text-3xl font-bold mb-4">Plugs into what you already use.</h2>
+            <p className="text-gray-500 text-lg mb-12">No new hardware. No app installs for your crew. No retraining anyone.</p>
             <div className="grid md:grid-cols-3 gap-8 text-left">
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                 <p className="font-bold text-lg mb-2">Your existing phone number</p>
-                <p className="text-gray-600 text-sm">We forward overflow calls to Office Angel — your number stays the same.</p>
+                <p className="text-gray-600 text-sm">Overflow calls route to Office Angel automatically. Your number stays the same.</p>
               </div>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                 <p className="font-bold text-lg mb-2">Google & Apple Calendar</p>
@@ -204,7 +200,7 @@ export default function LandingPage() {
               </div>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                 <p className="font-bold text-lg mb-2">Your website & web forms</p>
-                <p className="text-gray-600 text-sm">Web leads and contact forms route automatically into your scheduling inbox.</p>
+                <p className="text-gray-600 text-sm">Web leads route automatically into your scheduling inbox alongside your calls.</p>
               </div>
             </div>
           </div>
@@ -213,16 +209,15 @@ export default function LandingPage() {
         {/* CTA / Demo */}
         <section id="demo" className="py-24 bg-gray-900 text-white px-8">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold mb-4">See the whole thing live.</h2>
+            <h2 className="text-4xl font-bold mb-4">See the whole platform live.</h2>
             <p className="text-xl text-gray-400 mb-12">
-              Pick a time below and we'll walk you through the full platform in 30 minutes. No slides. Just the real product.
+              Pick a time below. We'll walk you through the full product in 30 minutes — no slides, no fluff.
             </p>
             <CalendlyEmbed />
           </div>
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="bg-white py-8 border-t border-gray-200 text-center text-sm text-gray-500">
         <p>© 2026 Hard Hat Holdings LLC. All rights reserved.</p>
       </footer>

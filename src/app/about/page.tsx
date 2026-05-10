@@ -50,7 +50,7 @@ export default function AboutPage() {
                 It happens dozens of times a week across every trade. Electricians, HVAC techs, plumbers, roofers — every one of them running lean crews with no office staff, no receptionist, no one holding down the phones. They're doing the work and trying to run the business at the same time. Something always falls through the cracks.
               </p>
               <p className="text-lg leading-relaxed">
-                We built Office Angel to be the thing that doesn't fall through the cracks. An AI that answers like a human, qualifies the lead, books the job, and puts it on the crew's calendar — all before the contractor even climbs back down the ladder.
+                We built Office Angel to be the thing that doesn't fall through the cracks. An AI that handles inbound calls professionally, qualifies the lead, books the job, and puts it on the crew's calendar — all before the contractor even climbs back down the ladder.
               </p>
               <p className="text-lg leading-relaxed">
                 But we didn't stop at call answering. We kept asking: what else is slowing these guys down? The answer was everything — dispatch, scheduling, tracking the crew, managing customers, knowing if the business is actually making money. So we built the whole back office.
@@ -78,7 +78,7 @@ export default function AboutPage() {
                 },
                 {
                   title: "One recovered call changes everything.",
-                  body: "We're not selling software. We're selling recovered revenue. If Office Angel pays for itself on day one, everything after that is pure profit.",
+                  body: "We're not selling software. We're selling recovered opportunity. Contractors who plug the gaps in their front office unlock revenue that was already there — they just couldn't capture it.",
                 },
               ].map((v, i) => (
                 <div key={i} className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">

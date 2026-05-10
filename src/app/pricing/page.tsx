@@ -82,10 +82,10 @@ const plans = [
 ];
 
 const competitors = [
-  { name: "GoodCall", note: "Basic voice only. No scheduling, no CRM, no dashboard." },
-  { name: "NextPhone", note: "Generic AI. Not built for trades. No job flow." },
-  { name: "Smith.ai", note: "Human hybrid. Slower, expensive, not automated." },
-  { name: "Office Angel", note: "Purpose-built for trades. Full AI back-office suite.", highlight: true },
+  { name: "Basic Voice Tools", note: "Answer calls only. No scheduling, no CRM, no dashboard." },
+  { name: "Generic AI Platforms", note: "Not built for trades. Miss the job flow entirely." },
+  { name: "Human Answering Services", note: "Slower, expensive, and still require manual follow-up." },
+  { name: "Office Angel", note: "Purpose-built for trades. The complete AI back-office suite.", highlight: true },
 ];
 
 export default function PricingPage() {
@@ -127,16 +127,16 @@ export default function PricingPage() {
         <section className="max-w-4xl mx-auto px-8 pb-12">
           <div className="bg-gray-900 text-white rounded-2xl p-8 grid md:grid-cols-3 gap-6 text-center">
             <div>
-              <p className="text-4xl font-extrabold text-blue-400">$1,500</p>
-              <p className="text-gray-400 mt-1 text-sm">Average value of a missed contractor service call</p>
+              <p className="text-4xl font-extrabold text-blue-400">$1,500+</p>
+              <p className="text-gray-400 mt-1 text-sm">Estimated value of a typical missed contractor service call*</p>
             </div>
             <div>
-              <p className="text-4xl font-extrabold text-blue-400">4–8</p>
-              <p className="text-gray-400 mt-1 text-sm">Extra booked jobs per month after activating Office Angel</p>
+              <p className="text-4xl font-extrabold text-blue-400">24/7</p>
+              <p className="text-gray-400 mt-1 text-sm">Coverage across calls, scheduling, dispatch, and field ops</p>
             </div>
             <div>
-              <p className="text-4xl font-extrabold text-blue-400">Day 1</p>
-              <p className="text-gray-400 mt-1 text-sm">Most customers recover the cost on their very first recovered call</p>
+              <p className="text-4xl font-extrabold text-blue-400">1 platform</p>
+              <p className="text-gray-400 mt-1 text-sm">Replacing the patchwork of tools contractors are stuck managing today</p>
             </div>
           </div>
         </section>
@@ -184,14 +184,14 @@ export default function PricingPage() {
               </div>
             ))}
           </div>
-          <p className="text-center text-gray-400 text-sm mt-8">Subscriptions are month-to-month · Custom builds contracted individually · Live in under 1 business day</p>
+          <p className="text-center text-gray-400 text-sm mt-8">Subscriptions are month-to-month · Custom builds contracted individually · Setup timeline confirmed at onboarding</p>
         </section>
 
         {/* Competitor Comparison */}
         <section className="bg-white border-t border-gray-200 py-20 px-8">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-4">Why Office Angel wins.</h2>
-            <p className="text-center text-gray-500 mb-12">The competition sells one piece. We built the whole back office.</p>
+            <h2 className="text-3xl font-bold text-center mb-4">Why contractors choose Office Angel.</h2>
+            <p className="text-center text-gray-500 mb-12">Most tools solve one problem. We built the whole back office.</p>
             <div className="overflow-hidden rounded-2xl border border-gray-200">
               <table className="w-full text-sm">
                 <thead>
@@ -233,7 +233,7 @@ export default function PricingPage() {
                 },
                 {
                   q: "How fast can I get set up?",
-                  a: "Most customers are live within 1 business day. We handle the entire setup — you just plug in your phone number.",
+                  a: "Setup is handled by our team and typically completed quickly after onboarding. Your exact timeline will be confirmed when we scope your setup.",
                 },
                 {
                   q: "Does it work with my existing phone number?",
@@ -270,6 +270,7 @@ export default function PricingPage() {
 
       <footer className="bg-white py-8 border-t border-gray-200 text-center text-sm text-gray-500">
         <p>© 2026 Hard Hat Holdings LLC. All rights reserved.</p>
+        <p className="mt-2 text-xs text-gray-400 max-w-xl mx-auto px-4">* Figures are estimates based on industry data and are provided for illustrative purposes only. Individual results will vary based on business type, call volume, and market conditions. Office Angel makes no guarantee of specific outcomes.</p>
       </footer>
     </div>
   );
