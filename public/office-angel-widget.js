@@ -53,6 +53,9 @@
       </div>
       <label class="oa-label">What’s going on?</label>
       <textarea class="oa-ta" data-oa-message placeholder="Breaker keeps tripping. Best time tomorrow 9–11am."></textarea>
+
+      <label class="oa-label">Preferred time window</label>
+      <input class="oa-in" data-oa-window placeholder="tomorrow 9-11am" />
       <div class="oa-actions">
         <button class="oa-cancel" data-oa-close>Cancel</button>
         <button class="oa-send" data-oa-send>Send</button>
@@ -85,7 +88,10 @@
       name: modal.querySelector('[data-oa-name]').value,
       phone: modal.querySelector('[data-oa-phone]').value,
       address: modal.querySelector('[data-oa-address]').value,
-      message: modal.querySelector('[data-oa-message]').value,
+      message: [
+        modal.querySelector('[data-oa-message]').value,
+        modal.querySelector('[data-oa-window]').value ? `Preferred window: ${modal.querySelector('[data-oa-window]').value}` : ''
+      ].filter(Boolean).join('\n'),
     };
 
     try {
@@ -105,4 +111,3 @@
     }
   });
 })();
-

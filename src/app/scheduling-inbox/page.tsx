@@ -7,6 +7,7 @@ import Link from "next/link";
 type Item = {
   job: any;
   latestMessage: any;
+  suggestions?: any[];
 };
 
 function fmtPhone(p?: string) {
@@ -37,6 +38,7 @@ function pillClass(status?: string) {
 export default function SchedulingInbox() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [booking, setBooking] = useState<string | null>(null);
 
   const refresh = () => {
     setLoading(true);
@@ -45,6 +47,26 @@ export default function SchedulingInbox() {
       .then((json) => setItems(json.items || []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
+  };
+
+  const book = async (jobId: string, sug: any) => {
+    setBooking(jobId);
+    try {
+      await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: jobId,
+          technician_id: sug.techId,
+          scheduled_start: sug.startIso,
+          scheduled_end: sug.endIso,
+          status: 'Scheduled',
+        }),
+      });
+      refresh();
+    } finally {
+      setBooking(null);
+    }
   };
 
   useEffect(() => {
@@ -114,10 +136,31 @@ export default function SchedulingInbox() {
                   {it.latestMessage?.created_at ? (
                     <p className="mt-1 text-xs text-gray-500 flex items-center gap-1"><Clock size={12}/> {new Date(it.latestMessage.created_at).toLocaleString()}</p>
                   ) : null}
+
+                  {it.suggestions?.length ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {it.suggestions.map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => book(it.job.id, sug)}
+                          disabled={booking === it.job.id}
+                          className="px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50 text-left"
+                        >
+                          <div className="text-[11px] font-bold text-gray-900">{sug.techName}</div>
+                          <div className="text-[11px] text-gray-600">{new Date(sug.startIso).toLocaleString([], { hour: 'numeric', minute: '2-digit', month: 'short', day: 'numeric' })}</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-3 text-[11px] text-gray-400">No AI suggestions yet (add techs + schedules).</div>
+                  )}
                 </div>
 
                 <div className="flex flex-col items-end gap-2 shrink-0">
                   <Link href={`/dispatch?job=${encodeURIComponent(it.job.id)}`} className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-800">Open</Link>
+                  {booking === it.job.id ? (
+                    <div className="text-xs text-gray-500">Booking…</div>
+                  ) : null}
                   {it.job.customers?.phone_number ? (
                     <div className="text-xs text-gray-500 flex items-center gap-1"><Phone size={12}/> {fmtPhone(it.job.customers.phone_number)}</div>
                   ) : null}
@@ -130,4 +173,3 @@ export default function SchedulingInbox() {
     </div>
   );
 }
-

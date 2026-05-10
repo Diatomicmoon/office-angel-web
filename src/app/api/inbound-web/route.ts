@@ -97,6 +97,52 @@ function suggestStartTime(urgencyFlag: string, scheduleStartMin: number, schedul
   return dt;
 }
 
+function parseTimeWindow(text: string): { startIso: string; endIso: string } | null {
+  const s = (text || '').toLowerCase();
+
+  let dayOffset: number | null = null;
+  if (s.includes('tomorrow')) dayOffset = 1;
+  else if (s.includes('today')) dayOffset = 0;
+  else return null;
+
+  const m = s.match(/\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*(?:-|to|–)\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\b/);
+  if (!m) return null;
+
+  let sh = Number(m[1]);
+  let sm = Number(m[2] || '0');
+  let sap = (m[3] || '').toLowerCase();
+  let eh = Number(m[4]);
+  let em = Number(m[5] || '0');
+  let eap = (m[6] || '').toLowerCase();
+
+  if (!sap && !eap) return null;
+  if (!sap && eap) sap = eap;
+  if (!eap && sap) eap = sap;
+
+  const to24 = (h: number, ap: string) => {
+    let out = h % 12;
+    if (ap === 'pm') out += 12;
+    return out;
+  };
+
+  sh = to24(sh, sap);
+  eh = to24(eh, eap);
+
+  const now = new Date();
+  const base = tzParts(now, DISPLAY_TZ);
+  const targetDay = new Date(Date.UTC(base.y, base.mo - 1, base.day));
+  targetDay.setUTCDate(targetDay.getUTCDate() + (dayOffset || 0));
+
+  const y = targetDay.getUTCFullYear();
+  const mo = targetDay.getUTCMonth() + 1;
+  const day = targetDay.getUTCDate();
+
+  const startUtc = zonedTimeToUtcMs({ y, mo, day, h: sh, mi: sm, timeZone: DISPLAY_TZ });
+  const endUtc = zonedTimeToUtcMs({ y, mo, day, h: eh, mi: em, timeZone: DISPLAY_TZ });
+  if (!Number.isFinite(startUtc) || !Number.isFinite(endUtc) || endUtc <= startUtc) return null;
+  return { startIso: new Date(startUtc).toISOString(), endIso: new Date(endUtc).toISOString() };
+}
+
 export async function POST(req: Request) {
   try {
     const origin = req.headers.get('origin');
@@ -194,7 +240,10 @@ export async function POST(req: Request) {
     const urgencyFlag = deriveUrgency(text);
     const estimatedMinutes = heuristicDurationMinutes(text);
     const title = urgencyFlag === 'high' ? 'Emergency Web Message' : 'Website Message';
-    const suggestedStart = suggestStartTime(urgencyFlag, scheduleStartMin, scheduleEndMin);
+
+    const win = parseTimeWindow(text);
+    let suggestedStart = win ? new Date(win.startIso) : suggestStartTime(urgencyFlag, scheduleStartMin, scheduleEndMin);
+    suggestedStart = clampToBusinessHours(suggestedStart, scheduleStartMin, scheduleEndMin);
     const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
 
     const insertPayload: any = {

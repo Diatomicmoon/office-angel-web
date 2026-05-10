@@ -41,6 +41,7 @@ type Msg = {
   from_value?: string | null;
   to_value?: string | null;
   body?: string | null;
+  meta?: any;
   created_at?: string;
 };
 
@@ -716,6 +717,35 @@ export default function Dispatch() {
                         ))}
                       </div>
                     )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
                   </div>
 
                   <div className="text-xs text-gray-400">
