@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 
 export default function Login() {
@@ -35,6 +36,11 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 relative z-50">
       <div className="max-w-md w-full bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+        <div className="mb-6 text-center">
+          <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+            ← Back to Home
+          </Link>
+        </div>
 
         {!showLogin ? (
           // === DEMO GATE ===
