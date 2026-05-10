@@ -26,9 +26,33 @@ function roundUpToNextSlot(d: Date, slotMinutes = 30) {
   return new Date(Math.ceil(ms / slotMs) * slotMs);
 }
 
-function suggestStartTime(urgencyFlag: string) {
+function clampToBusinessHours(d: Date, scheduleStartMin: number, scheduleEndMin: number) {
+  const p = tzParts(d, DISPLAY_TZ);
+  const localMin = p.h * 60 + p.mi;
+
+  const setLocal = (y: number, mo: number, day: number, minuteOfDay: number) => {
+    const h = Math.floor(minuteOfDay / 60);
+    const mi = minuteOfDay % 60;
+    const utc = zonedTimeToUtcMs({ y, mo, day, h, mi, timeZone: DISPLAY_TZ });
+    return new Date(utc);
+  };
+
+  if (localMin < scheduleStartMin) return setLocal(p.y, p.mo, p.day, scheduleStartMin);
+  if (localMin >= scheduleEndMin) {
+    const tomorrow = tzParts(new Date(d.getTime() + 24 * 60 * 60 * 1000), DISPLAY_TZ);
+    return setLocal(tomorrow.y, tomorrow.mo, tomorrow.day, scheduleStartMin);
+  }
+  return d;
+}
+
+function suggestStartTime(urgencyFlag: string, scheduleStartMin: number, scheduleEndMin: number) {
   const bufferMin = urgencyFlag === 'high' ? 0 : urgencyFlag === 'medium' ? 60 : 180;
-  return roundUpToNextSlot(new Date(Date.now() + bufferMin * 60000), 30);
+  let dt = new Date(Date.now() + bufferMin * 60000);
+  dt = clampToBusinessHours(dt, scheduleStartMin, scheduleEndMin);
+  dt = roundUpToNextSlot(dt, 30);
+  // If rounding pushed us past end, bump to next day start.
+  dt = clampToBusinessHours(dt, scheduleStartMin, scheduleEndMin);
+  return dt;
 }
 
 function twiml(message?: string) {
@@ -168,6 +192,20 @@ export async function POST(req: Request) {
       });
     }
 
+    // Load per-company scheduling rules (fallback to 8–5).
+    const { data: companySettings } = await supabase
+      .from('companies')
+      .select('schedule_start_minute, schedule_end_minute, sms_auto_reply_enabled')
+      .eq('id', companyId)
+      .maybeSingle();
+
+    const scheduleStartMin = typeof (companySettings as any)?.schedule_start_minute === 'number'
+      ? Number((companySettings as any).schedule_start_minute)
+      : 480;
+    const scheduleEndMin = typeof (companySettings as any)?.schedule_end_minute === 'number'
+      ? Number((companySettings as any).schedule_end_minute)
+      : 1020;
+
     let debugErr: string | null = null;
     let jobIdForMessage: string | null = null;
 
@@ -206,7 +244,7 @@ export async function POST(req: Request) {
     const urgencyFlag = deriveUrgency(body);
     const estimatedMinutes = heuristicDurationMinutes(body);
     const title = urgencyFlag === 'high' ? 'Emergency Text Message' : 'Inbound Text Message';
-    const suggestedStart = suggestStartTime(urgencyFlag);
+    const suggestedStart = suggestStartTime(urgencyFlag, scheduleStartMin, scheduleEndMin);
     const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
 
     // 0) Handle confirmation replies (YES/NO) for the most recent scheduled job.
@@ -354,8 +392,11 @@ export async function POST(req: Request) {
         // If the customer text contains a reschedule window, store it on the job so dispatch can 1-click book.
         const win = parseTimeWindow(bodyNorm);
         if (win) {
-          updatePayload.scheduled_start = win.startIso;
-          updatePayload.scheduled_end = win.endIso;
+          const start0 = clampToBusinessHours(new Date(win.startIso), scheduleStartMin, scheduleEndMin);
+          const durationMin = Math.max(30, Math.round((new Date(win.endIso).getTime() - new Date(win.startIso).getTime()) / 60000));
+          const end0 = new Date(start0.getTime() + durationMin * 60000);
+          updatePayload.scheduled_start = start0.toISOString();
+          updatePayload.scheduled_end = end0.toISOString();
         }
 
         if (!messagesTableOk) {
@@ -424,7 +465,9 @@ export async function POST(req: Request) {
 
     const reply = debug
       ? `DEBUG ok. companyId=${companyId} customerId=${customerId || 'null'} jobId=${jobIdForMessage || 'null'} updatedExisting=${updatedExisting} err=${debugErr || 'none'}`
-      : "Got it — we’re logging your request now. Reply with: Name, Address, Best time window (example: 'tomorrow 9-11am'), and what’s going on. If this is an emergency, call 911.";
+      : ((companySettings as any)?.sms_auto_reply_enabled === false
+        ? ''
+        : "Got it — we’re logging your request now. Reply with: Name, Address, Best time window (example: 'tomorrow 9-11am'), and what’s going on. If this is an emergency, call 911.");
 
     return new NextResponse(twiml(reply), { status: 200, headers: { 'Content-Type': 'text/xml' } });
   } catch (e) {

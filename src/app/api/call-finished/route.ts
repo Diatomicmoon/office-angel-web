@@ -79,10 +79,62 @@ function roundUpToNextSlot(d: Date, slotMinutes = 30) {
   return new Date(Math.ceil(ms / slotMs) * slotMs);
 }
 
-function suggestStartTime({ urgencyFlag }: { urgencyFlag: string | null }) {
+const DISPLAY_TZ = 'America/Chicago';
+
+function tzParts(d: Date, timeZone: string): { y: number; mo: number; day: number; h: number; mi: number } {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value);
+  return { y: get('year'), mo: get('month'), day: get('day'), h: get('hour'), mi: get('minute') };
+}
+
+function zonedTimeToUtcMs({ y, mo, day, h, mi, timeZone }: { y: number; mo: number; day: number; h: number; mi: number; timeZone: string }) {
+  let guess = Date.UTC(y, mo - 1, day, h, mi, 0);
+  for (let i = 0; i < 4; i++) {
+    const p = tzParts(new Date(guess), timeZone);
+    const desired = Date.UTC(y, mo - 1, day, h, mi, 0);
+    const got = Date.UTC(p.y, p.mo - 1, p.day, p.h, p.mi, 0);
+    const delta = desired - got;
+    if (Math.abs(delta) < 60000) break;
+    guess += delta;
+  }
+  return guess;
+}
+
+function clampToBusinessHours(d: Date, scheduleStartMin: number, scheduleEndMin: number) {
+  const p = tzParts(d, DISPLAY_TZ);
+  const localMin = p.h * 60 + p.mi;
+
+  const setLocal = (y: number, mo: number, day: number, minuteOfDay: number) => {
+    const h = Math.floor(minuteOfDay / 60);
+    const mi = minuteOfDay % 60;
+    const utc = zonedTimeToUtcMs({ y, mo, day, h, mi, timeZone: DISPLAY_TZ });
+    return new Date(utc);
+  };
+
+  if (localMin < scheduleStartMin) return setLocal(p.y, p.mo, p.day, scheduleStartMin);
+  if (localMin >= scheduleEndMin) {
+    const tomorrow = tzParts(new Date(d.getTime() + 24 * 60 * 60 * 1000), DISPLAY_TZ);
+    return setLocal(tomorrow.y, tomorrow.mo, tomorrow.day, scheduleStartMin);
+  }
+  return d;
+}
+
+function suggestStartTime({ urgencyFlag, scheduleStartMin, scheduleEndMin }: { urgencyFlag: string | null; scheduleStartMin: number; scheduleEndMin: number }) {
   // Simple + safe: buffer by urgency, then snap to next 30-min boundary.
   const bufferMin = urgencyFlag === 'high' ? 0 : urgencyFlag === 'medium' ? 60 : 180;
-  return roundUpToNextSlot(new Date(Date.now() + bufferMin * 60000), 30);
+  let dt = new Date(Date.now() + bufferMin * 60000);
+  dt = clampToBusinessHours(dt, scheduleStartMin, scheduleEndMin);
+  dt = roundUpToNextSlot(dt, 30);
+  dt = clampToBusinessHours(dt, scheduleStartMin, scheduleEndMin);
+  return dt;
 }
 
 async function aiEstimateDurationMinutes(args: {
@@ -452,7 +504,20 @@ export async function POST(req: Request) {
         const estimatedMinutes = durationRes.minutes;
 
         // Suggested schedule (pre-fills Dispatch so dispatcher can 1-click book).
-        const suggestedStart = suggestStartTime({ urgencyFlag });
+        const { data: companySettings } = await supabase
+          .from('companies')
+          .select('schedule_start_minute, schedule_end_minute')
+          .eq('id', companyId)
+          .maybeSingle();
+
+        const scheduleStartMin = typeof (companySettings as any)?.schedule_start_minute === 'number'
+          ? Number((companySettings as any).schedule_start_minute)
+          : 480;
+        const scheduleEndMin = typeof (companySettings as any)?.schedule_end_minute === 'number'
+          ? Number((companySettings as any).schedule_end_minute)
+          : 1020;
+
+        const suggestedStart = suggestStartTime({ urgencyFlag, scheduleStartMin, scheduleEndMin });
         const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
 
         // Some Supabase projects may not have the dispatch columns migrated yet.
