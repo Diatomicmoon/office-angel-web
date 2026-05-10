@@ -53,13 +53,11 @@ type Suggestion = {
 };
 
 const center = { lat: 44.9778, lng: -93.2650 };
-const GRID_START_HOUR = 0; // 12am
-const GRID_HOURS = 24; // full day
 const GRID_HEADER_PX = 80; // h-20
 const GRID_HOUR_PX = 128; // h-32
 const GRID_SLOT_MINUTES = 30;
 const GRID_SLOT_PX = GRID_HOUR_PX / 2;
-const GRID_TOTAL_PX = GRID_HOURS * GRID_HOUR_PX;
+// Total height is computed dynamically from company scheduling hours.
 
 // UI
 const GUTTER_W = 112; // px (w-28-ish)
@@ -78,6 +76,10 @@ function halfHourLabel(h24: number) {
   const h = ((h24 + 11) % 12) + 1;
   // Keep this compact so it doesn't wrap in the gutter.
   return `${h}:30`;
+}
+
+function hourOf(minuteOfDay: number) {
+  return Math.floor(minuteOfDay / 60);
 }
 
 function fmtTime(d: Date, timeZone: string) {
@@ -99,9 +101,9 @@ function tzParts(d: Date, timeZone: string): { y: number; mo: number; day: numbe
   return { y: get('year'), mo: get('month'), day: get('day'), h: get('hour'), mi: get('minute') };
 }
 
-function minutesSinceGridStart(d: Date) {
+function minutesSinceGridStart(d: Date, gridStartMin: number) {
   const { h, mi } = tzParts(d, DISPLAY_TZ);
-  return (h - GRID_START_HOUR) * 60 + mi;
+  return (h * 60 + mi) - gridStartMin;
 }
 
 function isSameTzDay(a: Date, b: Date, timeZone: string) {
@@ -226,25 +228,29 @@ export default function Dispatch() {
     if (!el) return;
     const n = new Date();
     const isToday = isSameTzDay(n, selectedDate, DISPLAY_TZ);
-    const minutes = isToday ? minutesSinceGridStart(n) : scheduleHours.startMin;
+    const minutes = isToday ? minutesSinceGridStart(n, gridStartMin) : (scheduleHours.startMin - gridStartMin);
     // +GRID_HEADER_PX because the timeline body starts after the header row in the scroll container.
-    const y = clamp(GRID_HEADER_PX + (minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_HEADER_PX + GRID_TOTAL_PX);
+    const y = clamp(GRID_HEADER_PX + (minutes / 60) * GRID_HOUR_PX - 2 * GRID_HOUR_PX, 0, GRID_HEADER_PX + gridTotalPx);
     // Wait for layout; Safari can ignore immediate scrollTop on first paint.
     requestAnimationFrame(() => requestAnimationFrame(() => {
       el.scrollTo({ top: y, behavior: 'auto' });
     }));
   };
 
-  const hours = useMemo(() => Array.from({ length: GRID_HOURS }, (_, i) => GRID_START_HOUR + i), []);
-  const slots = useMemo(() => Array.from({ length: GRID_HOURS * (60 / GRID_SLOT_MINUTES) }, (_, i) => i), []);
+  const gridStartMin = useMemo(() => clamp(scheduleHours.startMin - 60, 0, 23 * 60), [scheduleHours.startMin]);
+  const gridEndMin = useMemo(() => clamp(scheduleHours.endMin + 60, gridStartMin + 60, 24 * 60), [scheduleHours.endMin, gridStartMin]);
+  const gridTotalMin = useMemo(() => Math.max(60, gridEndMin - gridStartMin), [gridEndMin, gridStartMin]);
+  const gridTotalPx = useMemo(() => (gridTotalMin / 60) * GRID_HOUR_PX, [gridTotalMin]);
+  const slotCount = useMemo(() => Math.ceil(gridTotalMin / GRID_SLOT_MINUTES), [gridTotalMin]);
+  const slots = useMemo(() => Array.from({ length: slotCount }, (_, i) => i), [slotCount]);
 
   const timeLineTop = useMemo(() => {
     // Only show the red line on the selected day.
     if (!isSameTzDay(now, selectedDate, DISPLAY_TZ)) return null;
-    const minutesSinceStart = minutesSinceGridStart(now);
-    if (minutesSinceStart < 0 || minutesSinceStart > GRID_HOURS * 60) return null;
+    const minutesSinceStart = minutesSinceGridStart(now, gridStartMin);
+    if (minutesSinceStart < 0 || minutesSinceStart > gridTotalMin) return null;
     return (minutesSinceStart / 60) * GRID_HOUR_PX;
-  }, [now, selectedDate]);
+  }, [now, selectedDate, gridStartMin, gridTotalMin]);
 
   const jobStyleForGrid = (job: Job, idx: number) => {
     // Fallback stack layout if no schedule
@@ -262,9 +268,9 @@ export default function Dispatch() {
       durationMinutes = job.estimated_minutes;
     }
 
-    const mins = minutesSinceGridStart(start);
-    const topPx = clamp((mins / 60) * GRID_HOUR_PX, 0, GRID_HOURS * GRID_HOUR_PX - 20);
-    const heightPx = clamp((durationMinutes / 60) * GRID_HOUR_PX - 8, 52, GRID_HOURS * GRID_HOUR_PX);
+    const mins = minutesSinceGridStart(start, gridStartMin);
+    const topPx = clamp((mins / 60) * GRID_HOUR_PX, 0, gridTotalPx - 20);
+    const heightPx = clamp((durationMinutes / 60) * GRID_HOUR_PX - 8, 52, gridTotalPx);
     return { top: `${topPx}px`, height: `${heightPx}px` } as any;
   };
 
@@ -272,16 +278,6 @@ export default function Dispatch() {
     setTicketOpen(true);
     setTicketLoading(true);
     setTicketMessagesLoading(true);
-
-    // persist in URL for deep-linking
-    try {
-      if (typeof window !== 'undefined') {
-        const u = new URL(window.location.href);
-        u.searchParams.set('job', jobId);
-        window.history.replaceState({}, '', u.toString());
-      }
-    } catch {}
-
     try {
       const [resJob, resMsg] = await Promise.all([
         fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`),
@@ -308,13 +304,6 @@ export default function Dispatch() {
 
   const closeTicket = () => {
     setTicketOpen(false);
-    try {
-      if (typeof window !== 'undefined') {
-        const u = new URL(window.location.href);
-        u.searchParams.delete('job');
-        window.history.replaceState({}, '', u.toString());
-      }
-    } catch {}
   };
 
   const geocodeDemo = async () => {
@@ -600,7 +589,15 @@ export default function Dispatch() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const jobId = new URLSearchParams(window.location.search).get('job');
-    if (jobId) openTicket(jobId);
+    if (jobId) {
+      openTicket(jobId);
+      // Clear the query param so navigating back to Dispatch doesn't keep popping the ticket.
+      try {
+        const u = new URL(window.location.href);
+        u.searchParams.delete('job');
+        window.history.replaceState({}, '', u.toString());
+      } catch {}
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1079,8 +1076,9 @@ export default function Dispatch() {
                 {/* Time gutter */}
                 <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
                   {slots.map((i) => {
-                    const h24 = GRID_START_HOUR + Math.floor(i / 2);
-                    const isHalf = i % 2 === 1;
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
                     return (
                       <div
                         key={i}
@@ -1131,8 +1129,8 @@ export default function Dispatch() {
 
                     return (
                       <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
-                        <div className="relative" style={{ height: GRID_TOTAL_PX }}>
-                          {[...Array(GRID_HOURS * 2)].map((_, i) => (
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
                             <div
                               key={i}
                               className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
