@@ -207,12 +207,19 @@ export async function POST(req: Request) {
           confirmation_status: 'reschedule_requested',
           reschedule_requested_at: new Date().toISOString(),
           status: 'Reschedule Requested',
+          // Kick it back to Parking Lot
+          technician_id: null,
+          scheduled_start: null,
+          scheduled_end: null,
           updated_at: new Date().toISOString(),
         } as any).eq('id', target.id);
 
         if (upd2.error && String(upd2.error.message || '').match(/confirmation_status|reschedule_requested_at/)) {
           await supabase.from('jobs').update({
             status: 'Reschedule Requested',
+            technician_id: null,
+            scheduled_start: null,
+            scheduled_end: null,
             updated_at: new Date().toISOString(),
           } as any).eq('id', target.id);
         }

@@ -1,0 +1,13 @@
+<!-- Office Angel Website Widget -->
+<!-- Pinned-tenant (single company per deployment): -->
+<script src="https://www.office-angel.com/office-angel-widget.js"></script>
+
+<!-- Multi-tenant (auth mode): include company id + secret -->
+<!--
+<script
+  src="https://www.office-angel.com/office-angel-widget.js"
+  data-company-id="YOUR_COMPANY_UUID"
+  data-secret="YOUR_COMPANY_WEBHOOK_SECRET"
+></script>
+-->
+
