@@ -4,9 +4,8 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 async function parseReceiptWithAI(sender: string, subject: string, body: string) {
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
     const prompt = `You are parsing a contractor supply house invoice or receipt email.
 Extract the following fields from the email below. Return ONLY valid JSON, no markdown.
