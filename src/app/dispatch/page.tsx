@@ -715,7 +715,3179 @@ export default function Dispatch() {
                           <div key={r.id} className="p-3 border border-gray-100 rounded-lg bg-gray-50">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-bold text-gray-900">{r.supplier_name || "Supplier"}</p>
-                              <p className="text-sm font-bold text-orange-600">{r.total_amount ? '
+                              <p className="text-sm font-bold text-orange-600">{r.total_amount ? '$' + r.total_amount.toFixed(2) : ""}</p>
+                            </div>
+                            {r.line_items && r.line_items.length > 0 && (
+                              <ul className="mt-2 text-xs text-gray-600 space-y-1 pl-2 border-l-2 border-gray-200">
+                                {r.line_items.map((li: any, i: number) => (
+                                  <li key={i} className="flex justify-between">
+                                    <span className="truncate pr-2">{li.description} (x{li.quantity || 1})</span>
+                                    <span>{li.total ? '$' + li.total.toFixed(2) : ""}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes && ticketMessages.length === 0 ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <Sun size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+            </div>
+          </div>
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Users size={18} />
+            Filter Crews
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Plus size={18} />
+            Manual Book
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
+            <ChevronLeft size={20} className="text-gray-600" />
+          </button>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
+            <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Today
+          </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        {/* Left Sidebar: AI Parking Lot */}
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
+          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+            <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
+            {unassignedJobs.length === 0 ? (
+              <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
+            ) : unassignedJobs.map(job => (
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {job.priority || 'Normal'}
+                  </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
+                </div>
+                <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
+                {job.address && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <MapPin size={12} /> {job.address}
+                  </div>
+                )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times (click to book)
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Board or Map */}
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
+          {viewMode === 'map' ? (
+            <div className="flex-1 relative overflow-hidden bg-gray-100">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                {!techTableAvailable ? (
+                  <p className="text-xs text-gray-500">Technician table not set up yet.</p>
+                ) : techs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No technicians yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {techs.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full ${String(t.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(t.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(t.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          {t.name || 'Technician'}
+                        </span>
+                        <span className="font-bold text-gray-700">{t.status || 'Unknown'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
+              </div>
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
+                </div>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </GMap>
+                  </div>
+                </APIProvider>
+              )}
+            </div>
+          ) : (
+            <div
+              ref={dayScrollRef}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
+            >
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                          <User size={18} className="text-blue-600" />
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
+                        >
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return isSameTzDay(start, day, DISPLAY_TZ);
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+ + r.total_amount.toFixed(2) : ""}</p>
+                            </div>
+                            {r.line_items && r.line_items.length > 0 && (
+                              <ul className="mt-2 text-xs text-gray-600 space-y-1 pl-2 border-l-2 border-gray-200">
+                                {r.line_items.map((li: any, i: number) => (
+                                  <li key={i} className="flex justify-between">
+                                    <span className="truncate pr-2">{li.description} (x{li.quantity || 1})</span>
+                                    <span>{li.total ? '
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes && ticketMessages.length === 0 ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <Sun size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+            </div>
+          </div>
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Users size={18} />
+            Filter Crews
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Plus size={18} />
+            Manual Book
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
+            <ChevronLeft size={20} className="text-gray-600" />
+          </button>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
+            <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Today
+          </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        {/* Left Sidebar: AI Parking Lot */}
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
+          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+            <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
+            {unassignedJobs.length === 0 ? (
+              <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
+            ) : unassignedJobs.map(job => (
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {job.priority || 'Normal'}
+                  </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
+                </div>
+                <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
+                {job.address && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <MapPin size={12} /> {job.address}
+                  </div>
+                )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times (click to book)
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Board or Map */}
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
+          {viewMode === 'map' ? (
+            <div className="flex-1 relative overflow-hidden bg-gray-100">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                {!techTableAvailable ? (
+                  <p className="text-xs text-gray-500">Technician table not set up yet.</p>
+                ) : techs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No technicians yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {techs.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full ${String(t.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(t.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(t.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          {t.name || 'Technician'}
+                        </span>
+                        <span className="font-bold text-gray-700">{t.status || 'Unknown'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
+              </div>
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
+                </div>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </GMap>
+                  </div>
+                </APIProvider>
+              )}
+            </div>
+          ) : (
+            <div
+              ref={dayScrollRef}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
+            >
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                          <User size={18} className="text-blue-600" />
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
+                        >
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return isSameTzDay(start, day, DISPLAY_TZ);
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+ + li.total.toFixed(2) : ""}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Messages / Notes */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes && ticketMessages.length === 0 ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <Sun size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+            </div>
+          </div>
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Users size={18} />
+            Filter Crews
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Plus size={18} />
+            Manual Book
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
+            <ChevronLeft size={20} className="text-gray-600" />
+          </button>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
+            <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Today
+          </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        {/* Left Sidebar: AI Parking Lot */}
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
+          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+            <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
+            {unassignedJobs.length === 0 ? (
+              <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
+            ) : unassignedJobs.map(job => (
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {job.priority || 'Normal'}
+                  </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
+                </div>
+                <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
+                {job.address && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <MapPin size={12} /> {job.address}
+                  </div>
+                )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times (click to book)
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Board or Map */}
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
+          {viewMode === 'map' ? (
+            <div className="flex-1 relative overflow-hidden bg-gray-100">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                {!techTableAvailable ? (
+                  <p className="text-xs text-gray-500">Technician table not set up yet.</p>
+                ) : techs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No technicians yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {techs.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full ${String(t.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(t.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(t.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          {t.name || 'Technician'}
+                        </span>
+                        <span className="font-bold text-gray-700">{t.status || 'Unknown'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
+              </div>
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
+                </div>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </GMap>
+                  </div>
+                </APIProvider>
+              )}
+            </div>
+          ) : (
+            <div
+              ref={dayScrollRef}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
+            >
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                          <User size={18} className="text-blue-600" />
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
+                        >
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return isSameTzDay(start, day, DISPLAY_TZ);
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+ + r.total_amount.toFixed(2) : ""}</p>
+                            </div>
+                            {r.line_items && r.line_items.length > 0 && (
+                              <ul className="mt-2 text-xs text-gray-600 space-y-1 pl-2 border-l-2 border-gray-200">
+                                {r.line_items.map((li: any, i: number) => (
+                                  <li key={i} className="flex justify-between">
+                                    <span className="truncate pr-2">{li.description} (x{li.quantity || 1})</span>
+                                    <span>{li.total ? '
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes && ticketMessages.length === 0 ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <Sun size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+            </div>
+          </div>
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Users size={18} />
+            Filter Crews
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Plus size={18} />
+            Manual Book
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
+            <ChevronLeft size={20} className="text-gray-600" />
+          </button>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
+            <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Today
+          </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        {/* Left Sidebar: AI Parking Lot */}
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
+          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+            <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
+            {unassignedJobs.length === 0 ? (
+              <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
+            ) : unassignedJobs.map(job => (
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {job.priority || 'Normal'}
+                  </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
+                </div>
+                <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
+                {job.address && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <MapPin size={12} /> {job.address}
+                  </div>
+                )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times (click to book)
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Board or Map */}
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
+          {viewMode === 'map' ? (
+            <div className="flex-1 relative overflow-hidden bg-gray-100">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                {!techTableAvailable ? (
+                  <p className="text-xs text-gray-500">Technician table not set up yet.</p>
+                ) : techs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No technicians yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {techs.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full ${String(t.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(t.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(t.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          {t.name || 'Technician'}
+                        </span>
+                        <span className="font-bold text-gray-700">{t.status || 'Unknown'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
+              </div>
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
+                </div>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </GMap>
+                  </div>
+                </APIProvider>
+              )}
+            </div>
+          ) : (
+            <div
+              ref={dayScrollRef}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
+            >
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                          <User size={18} className="text-blue-600" />
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
+                        >
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return isSameTzDay(start, day, DISPLAY_TZ);
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+ + r.total_amount.toFixed(2) : ""}</p>
+                            </div>
+                            {r.line_items && r.line_items.length > 0 && (
+                              <ul className="mt-2 text-xs text-gray-600 space-y-1 pl-2 border-l-2 border-gray-200">
+                                {r.line_items.map((li: any, i: number) => (
+                                  <li key={i} className="flex justify-between">
+                                    <span className="truncate pr-2">{li.description} (x{li.quantity || 1})</span>
+                                    <span>{li.total ? '
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes && ticketMessages.length === 0 ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <Sun size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+            </div>
+          </div>
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Users size={18} />
+            Filter Crews
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Plus size={18} />
+            Manual Book
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
+            <ChevronLeft size={20} className="text-gray-600" />
+          </button>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
+            <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Today
+          </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        {/* Left Sidebar: AI Parking Lot */}
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
+          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+            <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
+            {unassignedJobs.length === 0 ? (
+              <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
+            ) : unassignedJobs.map(job => (
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {job.priority || 'Normal'}
+                  </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
+                </div>
+                <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
+                {job.address && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <MapPin size={12} /> {job.address}
+                  </div>
+                )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times (click to book)
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Board or Map */}
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
+          {viewMode === 'map' ? (
+            <div className="flex-1 relative overflow-hidden bg-gray-100">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                {!techTableAvailable ? (
+                  <p className="text-xs text-gray-500">Technician table not set up yet.</p>
+                ) : techs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No technicians yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {techs.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full ${String(t.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(t.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(t.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          {t.name || 'Technician'}
+                        </span>
+                        <span className="font-bold text-gray-700">{t.status || 'Unknown'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
+              </div>
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
+                </div>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </GMap>
+                  </div>
+                </APIProvider>
+              )}
+            </div>
+          ) : (
+            <div
+              ref={dayScrollRef}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
+            >
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                          <User size={18} className="text-blue-600" />
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
+                        >
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return isSameTzDay(start, day, DISPLAY_TZ);
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+ + li.total.toFixed(2) : ""}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Messages / Notes */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
+                      {ticketMessagesLoading ? (
+                        <span className="text-xs text-gray-400">Loading…</span>
+                      ) : (
+                        <span className="text-xs text-gray-400">{ticketMessages.length} items</span>
+                      )}
+                    </div>
+
+                    {ticket.notes && ticketMessages.length === 0 ? (
+                      <div className="mt-3">
+                        <p className="text-[11px] text-gray-500 font-bold uppercase">Notes</p>
+                        <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{ticket.notes}</p>
+                      </div>
+                    ) : null}
+
+                    {ticketMessages.length === 0 ? (
+                      <p className="text-sm text-gray-500 mt-3">No messages yet.</p>
+                    ) : (
+                      <div className="mt-3 space-y-2">
+                        {ticketMessages.map((m) => (
+                          <div key={m.id} className="border border-gray-200 rounded-lg p-2 bg-gray-50">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] font-bold text-gray-600 uppercase">{m.direction || 'inbound'} {m.channel ? `• ${m.channel}` : ''}</span>
+                              <span className="text-[11px] text-gray-500">{m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+                            </div>
+                            <p className="text-sm text-gray-800 whitespace-pre-wrap mt-1">{m.body || ''}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Activity */}
+                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-gray-500 uppercase">Activity</span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm text-gray-700">
+                      {ticket?.status ? <div>• Status: <span className="font-bold">{ticket.status}</span></div> : null}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_yes')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer confirmed via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.meta?.kind === 'confirm_no')
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Customer requested reschedule via SMS ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages
+                        .filter((m) => m?.direction === 'outbound' && m?.meta?.twilio?.sid)
+                        .slice(0, 1)
+                        .map((m) => (
+                          <div key={m.id}>• Confirmation SMS sent ({m.created_at ? new Date(m.created_at).toLocaleString() : ''})</div>
+                        ))}
+                      {ticketMessages.length === 0 && !ticket?.status ? <div>• No activity yet.</div> : null}
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-400">
+                    Tip: for now, the full customer history + call summaries live in the Customer Profile.
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <Sun size={20} className="text-yellow-500" />
+            <div>
+              <p className="text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+            </div>
+          </div>
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Users size={18} />
+            Filter Crews
+          </button>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
+            <Plus size={18} />
+            Manual Book
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar Controls */}
+      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Previous day"
+          >
+            <ChevronLeft size={20} className="text-gray-600" />
+          </button>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
+          </h2>
+          <button
+            onClick={() => setSelectedDate((d) => new Date(d.getTime() + 24 * 60 * 60 * 1000))}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            title="Next day"
+          >
+            <ChevronRight size={20} className="text-gray-600" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedDate(new Date());
+              setTimeout(() => jumpToNow(), 0);
+            }}
+            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+          >
+            Today
+          </button>
+
+          {viewMode === 'day' ? (
+            <div className="ml-2 flex items-center gap-2">
+              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            </div>
+          ) : null}
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-lg">
+          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        </div>
+      </div>
+
+      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+        {/* Left Sidebar: AI Parking Lot */}
+        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
+          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  // manual refresh
+                  fetch("/api/technicians")
+                    .then((r) => r.json())
+                    .then((json) => {
+                      setTechs(json.technicians || []);
+                      setTechTableAvailable(json.tableAvailable !== false);
+                    })
+                    .catch(() => {});
+                  loadJobs();
+                }}
+                className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+              >
+                Refresh
+              </button>
+              <span className="bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full">{unassignedJobs.length} Pending</span>
+            </div>
+          </div>
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
+            <p className="text-xs text-gray-500 mb-2">Jobs caught by AI needing manual assignment.</p>
+            {unassignedJobs.length === 0 ? (
+              <div className="text-center p-4 text-sm text-gray-500">No unassigned jobs.</div>
+            ) : unassignedJobs.map(job => (
+              <div key={job.id} className="bg-white p-3 rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                <div className="flex justify-between items-start mb-2">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${job.priority === 'high' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {job.priority || 'Normal'}
+                  </span>
+                  <button
+                    onClick={() => openTicket(job.id)}
+                    className="text-[10px] font-bold text-gray-600 hover:text-gray-900 underline"
+                  >
+                    View
+                  </button>
+                </div>
+                <h4 className="font-semibold text-gray-900 text-sm">{job.title || 'Untitled Job'}</h4>
+                <div className="mt-1 text-xs text-gray-600 flex items-center gap-2">
+                  <User size={12} className="text-gray-400" />
+                  <span className="truncate">{customerLabel(job)}</span>
+                </div>
+                {job.address && (
+                  <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                    <MapPin size={12} /> {job.address}
+                  </div>
+                )}
+
+                {/* Quick book (assign + schedule) */}
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <button
+                      onClick={() => {
+                        const recs = recommendSlots(job);
+                        setAiSuggestions((prev) => ({ ...prev, [job.id]: recs }));
+                      }}
+                      className="text-[10px] font-bold text-blue-700 hover:text-blue-900 underline"
+                    >
+                      AI Recommend Times (click to book)
+                    </button>
+                    {aiSuggestions[job.id]?.length ? (
+                      <span className="text-[10px] font-bold text-gray-400">{aiSuggestions[job.id].length} suggestions</span>
+                    ) : null}
+                  </div>
+
+                  {aiSuggestions[job.id]?.length ? (
+                    <div className="flex flex-col gap-2">
+                      {aiSuggestions[job.id].map((sug, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => bookJobWithSuggestion(job.id, sug)}
+                          className="w-full text-left px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-blue-50"
+                        >
+                          <div className="text-xs font-bold text-gray-900">{sug.techName} • {sug.date} {sug.time}</div>
+                          <div className="text-[11px] text-gray-500">{sug.duration} min</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={assignSelection[job.id] || ""}
+                      onChange={(e) => setAssignSelection((prev) => ({ ...prev, [job.id]: e.target.value }))}
+                      className="flex-1 px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      disabled={!techTableAvailable || techs.length === 0}
+                    >
+                      <option value="">Assign tech…</option>
+                      {techs.map((t) => (
+                        <option key={t.id} value={t.id}>{t.name || 'Technician'}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Date</label>
+                      <input
+                        type="date"
+                        value={scheduleSelection[job.id]?.date || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), date: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Start</label>
+                      <input
+                        type="time"
+                        value={scheduleSelection[job.id]?.time || ""}
+                        onChange={(e) => setScheduleSelection((prev) => ({
+                          ...prev,
+                          [job.id]: { ...(prev[job.id] || {}), time: e.target.value, duration: prev[job.id]?.duration ?? getDefaultDuration(job) },
+                        }))}
+                        className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Duration</label>
+                    <select
+                      value={scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)}
+                      onChange={(e) => setScheduleSelection((prev) => ({
+                        ...prev,
+                        [job.id]: { ...(prev[job.id] || {}), duration: Number(e.target.value) },
+                      }))}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded-md text-xs text-black bg-white"
+                    >
+                      {[30, 60, 90, 120, 180, 240].map((m) => (
+                        <option key={m} value={m}>{m} min</option>
+                      ))}
+                    </select>
+                    {job.estimated_minutes ? (
+                      <p className="mt-1 text-[10px] text-gray-400">AI guess: ~{job.estimated_minutes} min</p>
+                    ) : null}
+                  </div>
+
+                  <button
+                    onClick={() => bookJob(job.id)}
+                    disabled={!assignSelection[job.id] || !scheduleSelection[job.id]?.date || !scheduleSelection[job.id]?.time || !(scheduleSelection[job.id]?.duration ?? getDefaultDuration(job)) || assignSaving === job.id}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-blue-600 text-white disabled:opacity-50"
+                  >
+                    {assignSaving === job.id ? 'Booking…' : 'Book & Assign'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Board or Map */}
+        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
+          {viewMode === 'map' ? (
+            <div className="flex-1 relative overflow-hidden bg-gray-100">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                {!techTableAvailable ? (
+                  <p className="text-xs text-gray-500">Technician table not set up yet.</p>
+                ) : techs.length === 0 ? (
+                  <p className="text-xs text-gray-500">No technicians yet.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {techs.map((t) => (
+                      <div key={t.id} className="flex justify-between items-center text-xs">
+                        <span className="flex items-center gap-1.5">
+                          <div className={`w-2 h-2 rounded-full ${String(t.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(t.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(t.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          {t.name || 'Technician'}
+                        </span>
+                        <span className="font-bold text-gray-700">{t.status || 'Unknown'}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                  <button
+                    onClick={async () => {
+                      await geocodeDemo();
+                      // reload after geocoding
+                      fetch("/api/technicians")
+                        .then((r) => r.json())
+                        .then((json) => {
+                          setTechs(json.technicians || []);
+                          setTechTableAvailable(json.tableAvailable !== false);
+                        })
+                        .catch(() => {});
+                    }}
+                    disabled={geoBusy}
+                    className="w-full px-3 py-2 rounded-md text-xs font-semibold bg-white border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {geoBusy ? 'Geocoding…' : 'Geocode Demo Addresses'}
+                  </button>
+                  {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
+                </div>
+              </div>
+              {!apiKey ? (
+                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
+                </div>
+              ) : (
+                <APIProvider apiKey={apiKey}>
+                  <div style={{ width: '100%', height: '100%' }}>
+                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
+                      {techs
+                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
+                        .filter((x) => x.pos)
+                        .map(({ tech, pos }: any) => (
+                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
+                        ))}
+                    </GMap>
+                  </div>
+                </APIProvider>
+              )}
+            </div>
+          ) : (
+            <div
+              ref={dayScrollRef}
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
+              onPointerDown={(e) => {
+                // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
+                const el = dayScrollRef.current;
+                if (!el) return;
+                // only left-click / primary touch
+                if ((e as any).button !== undefined && (e as any).button !== 0) return;
+                dragRef.current = {
+                  active: true,
+                  x: e.clientX,
+                  y: e.clientY,
+                  left: el.scrollLeft,
+                  top: el.scrollTop,
+                };
+                (e.currentTarget as any).setPointerCapture?.(e.pointerId);
+              }}
+              onPointerMove={(e) => {
+                const el = dayScrollRef.current;
+                if (!el) return;
+                if (!dragRef.current.active) return;
+                const dx = e.clientX - dragRef.current.x;
+                const dy = e.clientY - dragRef.current.y;
+                el.scrollLeft = dragRef.current.left - dx;
+                el.scrollTop = dragRef.current.top - dy;
+              }}
+              onPointerUp={() => { dragRef.current.active = false; }}
+              onPointerCancel={() => { dragRef.current.active = false; }}
+            >
+              {/* Sticky header row (single, reliable) */}
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
+                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+                <div className="flex min-w-max">
+                  {techs.map((tech) => (
+                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                          <User size={18} className="text-blue-600" />
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
+                          <p className="text-xs text-gray-500 capitalize truncate">{tech.status}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex min-w-max relative" style={{ paddingTop: 0 }}>
+                {/* Time gutter */}
+                <div className="border-r border-gray-200 bg-gray-50 flex flex-col sticky left-0 z-30" style={{ width: GUTTER_W }}>
+                  {slots.map((i) => {
+                    const minuteOfDay = gridStartMin + i * GRID_SLOT_MINUTES;
+                    const h24 = hourOf(minuteOfDay);
+                    const isHalf = (minuteOfDay % 60) === 30;
+                    return (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pr-3 flex items-start justify-end"
+                        style={{ height: GRID_SLOT_PX }}
+                      >
+                        <span
+                          className={`whitespace-nowrap leading-tight mt-1 ${
+                            isHalf
+                              ? 'text-[11px] text-gray-500 font-medium'
+                              : 'text-[12px] text-gray-900 font-bold'
+                          }`}
+                        >
+                          {isHalf ? halfHourLabel(h24) : hourLabel(h24)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Columns */}
+                <div className="flex-1 flex min-w-max relative bg-gray-50/30">
+                  {timeLineTop !== null && (
+                    <div className="absolute left-0 right-0 z-10" style={{ top: `${timeLineTop}px` }}>
+                      <div className="h-0.5 bg-red-500 w-full" />
+                      <div className="absolute -top-2 left-0 flex items-center">
+                        <div className="h-2 w-2 rounded-full bg-red-500 -ml-1"></div>
+                        <span className="ml-2 text-[10px] font-bold text-red-600 bg-white/90 border border-red-200 px-2 py-0.5 rounded">
+                          {fmtTime(now, DISPLAY_TZ)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {techs.length === 0 ? (
+                    <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
+                  ) : techs.map((tech) => {
+                    // Only render jobs scheduled for the selected day in DISPLAY_TZ.
+                    const day = selectedDate;
+
+                    const jobsForTech = assignedJobs.filter((j) => {
+                      if (j.technician_id !== tech.id) return false;
+                      if (!j.scheduled_start) return false;
+                      const start = new Date(j.scheduled_start);
+                      if (Number.isNaN(start.getTime())) return false;
+                      return isSameTzDay(start, day, DISPLAY_TZ);
+                    });
+
+                    return (
+                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                        <div className="relative" style={{ height: gridTotalPx }}>
+                          {[...Array(slotCount)].map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-full absolute ${i % 2 === 0 ? 'border-b border-gray-100' : 'border-b border-gray-50'}`}
+                              style={{ top: `${i * GRID_SLOT_PX}px`, height: GRID_SLOT_PX }}
+                            />
+                          ))}
+
+                          {jobsForTech.map((job, idx) => (
+                            <div
+                              key={job.id}
+                              onClick={() => openTicket(job.id)}
+                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              style={jobStyleForGrid(job, idx)}
+                            >
+                              <div className="flex items-center justify-between mb-2">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
+                                {job.scheduled_start && (
+                                  <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
+                                    {new Date(job.scheduled_start).toLocaleTimeString([], { timeZone: DISPLAY_TZ, hour: 'numeric', minute: '2-digit' })}
+                                  </span>
+                                )}
+                              </div>
+                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                        </div>
+                      ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+ + li.total.toFixed(2) : ""}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   <div className="bg-white border border-gray-200 rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
