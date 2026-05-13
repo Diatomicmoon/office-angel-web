@@ -10,6 +10,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const limit = Math.min(Number(url.searchParams.get("limit") || 50), 200);
   const status = url.searchParams.get("status") || undefined;
+  const jobId = url.searchParams.get("job_id") || undefined;
 
   let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
@@ -20,12 +21,13 @@ export async function GET(req: Request) {
 
   let q = supabase
     .from("receipts")
-    .select("id, company_id, job_id, supplier_name, total_amount, receipt_url, line_items, status, created_at")
+    .select("id, company_id, job_id, supplier_name, total_amount, receipt_url, line_items, status, created_at, jobs(title)")
     .eq("company_id", companyId)
     .order("created_at", { ascending: false })
     .limit(limit);
 
   if (status) q = q.eq("status", status);
+  if (jobId) q = q.eq("job_id", jobId);
 
   const { data, error } = await q;
   if (error) return NextResponse.json({ receipts: [], error }, { status: 400 });
