@@ -57,7 +57,7 @@ export default function JobsArchivePage() {
   const [status, setStatus] = useState<string>("all");
 
   useEffect(() => {
-    fetch("/api/jobs")
+    fetch("/api/jobs", { cache: "no-store" })
       .then((r) => r.json())
       .then((json) => {
         setJobs(json.jobs || []);
@@ -143,7 +143,9 @@ export default function JobsArchivePage() {
                       </span>
                       <span className="text-xs text-gray-500">· created {timeAgo(j.created_at)}</span>
                     </div>
-                    <p className="text-sm font-bold text-gray-900 mt-1">{j.title || "Untitled Job"}</p>
+                    <Link href={`/jobs/${j.id}`} className="hover:text-blue-600 hover:underline">
+                      <p className="text-sm font-bold text-gray-900 mt-1 hover:text-blue-600 transition-colors">{j.title || "Untitled Job"}</p>
+                    </Link>
                     <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
                       <span className="inline-flex items-center gap-1"><BadgeDollarSign size={12} /> {fmtMoney(j.quoted_amount)}</span>
                       {j.scheduled_start && (
@@ -182,7 +184,13 @@ export default function JobsArchivePage() {
                     )}
                   </div>
 
-                  <div className="col-span-2 flex items-center justify-end gap-3">
+                  <div className="col-span-2 flex items-center justify-end gap-2">
+                    <Link
+                      href={`/jobs/${j.id}`}
+                      className="text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 border border-gray-300 shadow-sm"
+                    >
+                      View
+                    </Link>
                     <Link
                       href="/dispatch"
                       className="text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 border border-blue-200"

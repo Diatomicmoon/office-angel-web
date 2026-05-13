@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock } from "lucide-react";
 
-type Settings = {
+export type Settings = {
   id: string;
   name: string;
   phone_number: string;
@@ -13,6 +13,7 @@ type Settings = {
   schedule_end_minute?: number | null;
   webhook_secret?: string | null;
   calendar_webhook_url?: string | null;
+  inbox_token?: string | null;
 };
 
 export default function SettingsPage() {
@@ -25,6 +26,7 @@ export default function SettingsPage() {
   const [schedEnd, setSchedEnd] = useState("17:00");
   const [calendarWebhook, setCalendarWebhook] = useState("");
   const [webhookSecret, setWebhookSecret] = useState<string | null>(null);
+  const [inboxToken, setInboxToken] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -42,6 +44,7 @@ export default function SettingsPage() {
         setSchedEnd(toHHMM(json.settings?.schedule_end_minute, "17:00"));
         setCalendarWebhook(json.settings?.calendar_webhook_url || "");
         setWebhookSecret(json.settings?.webhook_secret || null);
+        setInboxToken(json.settings?.inbox_token || null);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -254,6 +257,18 @@ export default function SettingsPage() {
           <p className="text-sm text-gray-500 mt-1">Connect your website intake and optionally push booked jobs to a calendar via webhook.</p>
         </div>
         <div className="p-6 space-y-5">
+          <div>
+            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Inbound Receipt Email Address</p>
+            <div className="flex items-center gap-3">
+              <input
+                value={inboxToken ? `inbox_${inboxToken}@receipts.office-angel.com` : "Loading..."}
+                readOnly
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm text-black font-mono bg-gray-50"
+              />
+            </div>
+            <p className="text-xs text-gray-400 mt-2">Forward or auto-forward supply house receipts to this email address to auto-ingest them into Financials.</p>
+          </div>
+
           <div>
             <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Widget Secret (multi-tenant mode)</p>
             <div className="flex items-center gap-3">

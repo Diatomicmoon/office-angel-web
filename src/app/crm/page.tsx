@@ -244,7 +244,7 @@ export default function CRM() {
   const [selected, setSelected] = useState<Lead | null>(null);
 
   useEffect(() => {
-    fetch("/api/call-logs?limit=50")
+    fetch("/api/call-logs?limit=50", { cache: "no-store" })
       .then((r) => r.json())
       .then((json) => {
         const mapped: Lead[] = (json.calls || []).map((c: any) => {
@@ -306,7 +306,7 @@ export default function CRM() {
           return;
         }
 
-        fetch(`/api/jobs?ids=${encodeURIComponent(jobIds.join(','))}`)
+        fetch(`/api/jobs?ids=${encodeURIComponent(jobIds.join(','))}`, { cache: "no-store" })
           .then((r) => r.json())
           .then((j) => {
             const jobs: JobLite[] = (j.jobs || []) as JobLite[];

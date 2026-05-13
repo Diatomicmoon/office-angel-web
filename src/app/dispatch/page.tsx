@@ -291,7 +291,7 @@ export default function Dispatch() {
     setTicketMessagesLoading(true);
     try {
       const [resJob, resMsg, resRec] = await Promise.all([
-        fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`),
+        fetch(`/api/jobs?id=${encodeURIComponent(jobId)}`, { cache: "no-store" }),
         fetch(`/api/messages?job_id=${encodeURIComponent(jobId)}&limit=50`),
         fetch(`/api/receipts?job_id=${encodeURIComponent(jobId)}&limit=50`),
       ]);
@@ -455,7 +455,7 @@ export default function Dispatch() {
   };
 
   const loadJobs = () => {
-    fetch("/api/jobs?view=unassigned")
+    fetch("/api/jobs?view=unassigned", { cache: "no-store" })
       .then((r) => r.json())
       .then((json) => {
         const jobs = (json.jobs || []) as Job[];
@@ -502,7 +502,7 @@ export default function Dispatch() {
       })
       .catch(() => setUnassignedJobs([]));
 
-    fetch("/api/jobs?view=assigned")
+    fetch("/api/jobs?view=assigned", { cache: "no-store" })
       .then((r) => r.json())
       .then((json) => setAssignedJobs(json.jobs || []))
       .catch(() => setAssignedJobs([]));

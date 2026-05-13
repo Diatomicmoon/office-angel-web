@@ -4,39 +4,57 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-async function parseReceiptWithAI(sender: string, subject: string, body: string) {
+async function parseEmailContentWithAI(sender: string, subject: string, body: string, images: string[]) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
-    const prompt = `You are parsing a contractor supply house invoice or receipt email.
-Extract the following fields from the email below. Return ONLY valid JSON, no markdown.
+    const prompt = `You are parsing an inbound email for a trade contractor. 
+It could either be a "receipt" from a supply house, or a "lead" (a new work order or customer inquiry from a website form or direct email).
+
+Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
+
+{
+  "type": "receipt" | "lead",
+  
+  // IF IT IS A RECEIPT, FILL THESE:
+  "supplier_name": "string or null",
+  "total_amount": number or null,
+  "invoice_number": "string or null",
+  "job_number_or_po": "string or null",
+  "invoice_date": "string or null",
+  "line_items": [
+    { "description": "string", "quantity": number or null, "unit_price": number or null, "total": number or null }
+  ],
+  
+  // IF IT IS A LEAD/WORK ORDER, FILL THESE:
+  "customer_name": "string or null",
+  "customer_phone": "string or null",
+  "customer_email": "string or null",
+  "address": "string or null",
+  "issue_description": "string or null",
+  "urgency": "high" | "medium" | "low" (default to medium if unsure)
+}
 
 Email From: ${sender}
 Subject: ${subject}
 Body:
-${body.slice(0, 4000)}
+${body.slice(0, 4000)}`;
 
-Return this exact JSON structure:
-{
-  "supplier_name": "string (company that sent the invoice, e.g. CED, Home Depot, Menards, Viking Electric)",
-  "total_amount": number or null (total dollar amount as a number, no $ sign),
-  "invoice_number": "string or null",
-  "job_number_or_po": "string or null (Look for a PO Number, Job Number, Job Name, or Reference)",
-  "invoice_date": "string or null (ISO date format if possible)",
-  "line_items": [
-    { "description": "string", "quantity": number or null, "unit_price": number or null, "total": number or null }
-  ],
-  "notes": "string or null (anything else relevant)"
-}`;
+    const contentArray: any[] = [{ type: 'text', text: prompt }];
+    for (const imgBase64 of images) {
+      contentArray.push({
+        type: 'image_url',
+        image_url: { url: imgBase64 }
+      });
+    }
 
     const res = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [{ role: 'user', content: prompt }],
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: contentArray }],
       temperature: 0,
       max_tokens: 800,
     });
 
     const raw = res.choices[0]?.message?.content?.trim() || '{}';
-    // Strip markdown code fences if present
     const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
     return JSON.parse(cleaned);
   } catch (err) {
@@ -77,11 +95,35 @@ export async function POST(req: Request) {
 
     const body = `${textBody}\n${htmlBody}`.slice(0, 5000);
 
-    // Try OpenAI first, fall back to naive
-    let parsed = await parseReceiptWithAI(sender, subject, body);
-    if (!parsed || !parsed.supplier_name) {
-      console.log('[INBOUND EMAIL] Falling back to naive parser');
-      parsed = naiveParse(sender, subject, body);
+    // Extract image attachments
+    const attachmentsCount = parseInt((formData.get('attachments') as string) || '0', 10);
+    console.log(`[INBOUND EMAIL] Attachments count: ${attachmentsCount}`);
+    const images: string[] = [];
+    for (let i = 1; i <= attachmentsCount; i++) {
+      const file = formData.get(`attachment${i}`) as File | null;
+      console.log(`[INBOUND EMAIL] Attachment ${i}: name=${file?.name} type=${file?.type} size=${file?.size}`);
+      if (file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const base64 = Buffer.from(arrayBuffer).toString('base64');
+        // Accept images AND PDFs (pass PDFs as image/png fallback won't work, but log them)
+        if (file.type.startsWith('image/')) {
+          images.push(`data:${file.type};base64,${base64}`);
+          console.log(`[INBOUND EMAIL] Added image attachment: ${file.name}`);
+        } else if (file.type === 'application/pdf') {
+          console.log(`[INBOUND EMAIL] PDF attachment detected (${file.name}) - skipping Vision for now, will parse text only`);
+        } else {
+          // Try treating unknown types as image/jpeg and let OpenAI handle it
+          images.push(`data:image/jpeg;base64,${base64}`);
+          console.log(`[INBOUND EMAIL] Unknown type ${file.type} - passing as image/jpeg to Vision`);
+        }
+      }
+    }
+
+    // Try OpenAI first
+    let parsed = await parseEmailContentWithAI(sender, subject, body, images);
+    if (!parsed) {
+      console.log('[INBOUND EMAIL] Falling back to naive receipt parser');
+      parsed = { ...naiveParse(sender, subject, body), type: 'receipt' };
     }
 
     const supabase = createClient(
@@ -90,7 +132,6 @@ export async function POST(req: Request) {
     );
 
     // Route to correct company by matching the "to" email address UUID prefix
-    // e.g. inbox_<uuid>@receipts.officeangel.ai → company lookup by inbox_token
     let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
 
     if (!companyId && toEmail) {
@@ -106,19 +147,58 @@ export async function POST(req: Request) {
     }
 
     if (!companyId) {
-      const { data: c0 } = await supabase
-        .from('companies')
-        .select('id')
-        .order('created_at', { ascending: true })
-        .limit(1);
+      const { data: c0 } = await supabase.from('companies').select('id').order('created_at', { ascending: true }).limit(1);
       companyId = c0?.[0]?.id;
     }
 
-    if (!companyId) {
-      return NextResponse.json({ success: false, error: 'No company found' }, { status: 400 });
+    if (!companyId) return NextResponse.json({ success: false, error: 'No company found' }, { status: 400 });
+
+    if (parsed.type === 'lead') {
+      // 1. Create or find customer
+      let customerId = null;
+      if (parsed.customer_name || parsed.customer_phone || parsed.customer_email) {
+        const [first, ...rest] = (parsed.customer_name || 'Web Lead').split(' ');
+        const last = rest.join(' ');
+        
+        const { data: cust } = await supabase.from('customers').insert([{
+          company_id: companyId,
+          first_name: first,
+          last_name: last,
+          phone_number: parsed.customer_phone,
+          email: parsed.customer_email,
+        }]).select('id').single();
+        customerId = cust?.id;
+      }
+
+      // 2. Create Job in Dispatch board
+      const { data: job } = await supabase.from('jobs').insert([{
+        company_id: companyId,
+        customer_id: customerId,
+        title: parsed.issue_description || subject || 'New Work Order (Email)',
+        address: parsed.address,
+        status: 'Lead',
+        priority: parsed.urgency === 'high' ? 'high' : 'normal',
+        estimated_minutes: 90
+      }]).select('id').single();
+
+      // 3. Drop notification in AI Inbox
+      await supabase.from('messages').insert([{
+        company_id: companyId,
+        job_id: job?.id,
+        customer_id: customerId,
+        channel: 'email',
+        direction: 'inbound',
+        from_value: parsed.customer_email || sender,
+        to_value: toEmail,
+        body: `📥 New Lead from Website/Email\nName: ${parsed.customer_name || 'N/A'}\nPhone: ${parsed.customer_phone || 'N/A'}\nAddress: ${parsed.address || 'N/A'}\n\nRequest: ${parsed.issue_description || textBody.slice(0, 200)}`,
+        meta: { type: 'lead' }
+      }]);
+
+      console.log(`[INBOUND EMAIL] Saved lead: ${parsed.customer_name} → job ${job?.id}`);
+      return NextResponse.json({ success: true, type: 'lead', jobId: job?.id });
     }
 
-    // Attempt to match the PO / Job Number to an existing job in the database
+    // --- RECEIPT FLOW ---
     let jobId = null;
     let customerId = null;
     if (parsed.job_number_or_po) {
@@ -132,14 +212,12 @@ export async function POST(req: Request) {
       if (matchedJobs && matchedJobs.length > 0) {
         jobId = matchedJobs[0].id;
         customerId = matchedJobs[0].customer_id;
-        console.log(`[INBOUND EMAIL] Matched PO/Job ref '${parsed.job_number_or_po}' to job_id: ${jobId}`);
       }
     }
 
-    // 1. Save the actual receipt (linked to job if found)
     const { data: receiptData, error: receiptError } = await supabase.from('receipts').insert([{
       company_id:     companyId,
-      supplier_name:  parsed.supplier_name,
+      supplier_name:  parsed.supplier_name || 'Unknown',
       total_amount:   parsed.total_amount,
       status:         'Action Required',
       line_items:     parsed.line_items?.length ? parsed.line_items : [{ raw_sender: sender, raw_subject: subject }],
@@ -147,15 +225,11 @@ export async function POST(req: Request) {
       job_id:         jobId,
     }]).select('id').single();
 
-    if (receiptError) {
-      console.error('[INBOUND EMAIL] Supabase insert error for receipt:', receiptError);
-      return NextResponse.json({ success: false, error: receiptError.message }, { status: 500 });
-    }
+    if (receiptError) return NextResponse.json({ success: false, error: receiptError.message }, { status: 500 });
 
-    // 2. Drop a message into the AI Inbox so the dispatcher sees it immediately
-    const messageBody = `🧾 New Material Receipt: $${parsed.total_amount || '0.00'} from ${parsed.supplier_name}\nPO/Job Ref: ${parsed.job_number_or_po || 'None'}\nLine Items: ${parsed.line_items?.length || 0} items parsed.`;
+    const messageBody = `🧾 New Material Receipt: $${parsed.total_amount || '0.00'} from ${parsed.supplier_name || 'Unknown'}\nPO/Job Ref: ${parsed.job_number_or_po || 'None'}\nLine Items: ${parsed.line_items?.length || 0} items parsed.`;
 
-    const { error: msgError } = await supabase.from('messages').insert([{
+    await supabase.from('messages').insert([{
       company_id: companyId,
       job_id: jobId,
       customer_id: customerId,
@@ -167,13 +241,7 @@ export async function POST(req: Request) {
       meta: { type: 'receipt', receipt_id: receiptData?.id }
     }]);
 
-    if (msgError) {
-      console.error('[INBOUND EMAIL] Failed to drop notification in AI Inbox:', msgError);
-      // We don't fail the whole request if just the inbox notification fails
-    }
-
-    console.log(`[INBOUND EMAIL] Saved receipt: ${parsed.supplier_name} $${parsed.total_amount} → company ${companyId}`);
-    return NextResponse.json({ success: true, parsed, jobId });
+    return NextResponse.json({ success: true, type: 'receipt', parsed, jobId });
 
   } catch (err) {
     console.error('[INBOUND EMAIL ERROR]', err);
