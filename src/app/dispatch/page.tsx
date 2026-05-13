@@ -715,25 +715,7 @@ export default function Dispatch() {
                           <div key={r.id} className="p-3 border border-gray-100 rounded-lg bg-gray-50">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-bold text-gray-900">{r.supplier_name || "Supplier"}</p>
-                              <p className="text-sm font-bold text-orange-600">{r.total_amount ? '$' + r.total_amount.toFixed(2) : ""}</p>
-                            </div>
-                            {r.line_items && r.line_items.length > 0 && (
-                              <ul className="mt-2 text-xs text-gray-600 space-y-1 pl-2 border-l-2 border-gray-200">
-                                {r.line_items.map((li: any, i: number) => (
-                                  <li key={i} className="flex justify-between">
-                                    <span className="truncate pr-2">{li.description} (x{li.quantity || 1})</span>
-                                    <span>{li.total ? '$' + li.total.toFixed(2) : ""}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
+                              <p className="text-sm font-bold text-orange-600">{r.total_amount ? '
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
                       {ticketMessagesLoading ? (
@@ -2309,7 +2291,6 @@ export default function Dispatch() {
                                   <li key={i} className="flex justify-between">
                                     <span className="truncate pr-2">{li.description} (x{li.quantity || 1})</span>
                                     <span>{li.total ? '
-                  <div className="bg-white border border-gray-200 rounded-xl p-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-gray-500 uppercase">Messages</span>
                       {ticketMessagesLoading ? (
