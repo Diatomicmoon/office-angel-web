@@ -103,7 +103,7 @@ export default function InboxPage() {
           </button>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-8 text-white shadow-lg flex items-center justify-between">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-8 text-white shadow-lg flex items-center justify-between flex-shrink-0">
           <div>
             <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
               <UploadCloud size={24} />
@@ -129,7 +129,7 @@ export default function InboxPage() {
         </div>
 
         {/* Analytics Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-shrink-0">
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-center">
             <h3 className="font-bold text-gray-900 flex items-center gap-2 mb-2">
               <TrendingUp size={18} className="text-blue-600"/> Total Ingested Spend
@@ -161,7 +161,7 @@ export default function InboxPage() {
 
         {/* Top Items List */}
         {analytics.topItems.length > 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex-shrink-0">
             <div className="p-5 border-b border-gray-200 bg-white">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2"><TrendingUp size={18} className="text-blue-600"/> Highest Volume Material</h2>
             </div>
@@ -189,7 +189,7 @@ export default function InboxPage() {
         )}
 
         {/* Receipts Feed */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex-shrink-0">
           <div className="p-5 border-b border-gray-200 bg-white flex items-center justify-between">
             <h2 className="font-semibold text-gray-900 flex items-center gap-2">
               <FileText size={18} className="text-orange-500" /> Recent Receipts
