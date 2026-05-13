@@ -20,6 +20,7 @@ Return this exact JSON structure:
   "supplier_name": "string (company that sent the invoice, e.g. CED, Home Depot, Menards, Viking Electric)",
   "total_amount": number or null (total dollar amount as a number, no $ sign),
   "invoice_number": "string or null",
+  "job_number_or_po": "string or null (Look for a PO Number, Job Number, Job Name, or Reference)",
   "invoice_date": "string or null (ISO date format if possible)",
   "line_items": [
     { "description": "string", "quantity": number or null, "unit_price": number or null, "total": number or null }
@@ -59,7 +60,7 @@ function naiveParse(sender: string, subject: string, body: string) {
   else if (s.includes('crescent')) supplier_name = 'Crescent Electric';
   else if (s.includes('fastenal')) supplier_name = 'Fastenal';
 
-  return { supplier_name, total_amount, invoice_number: null, invoice_date: null, line_items: [], notes: null };
+  return { supplier_name, total_amount, invoice_number: null, job_number_or_po: null, invoice_date: null, line_items: [], notes: null };
 }
 
 export async function POST(req: Request) {
@@ -117,23 +118,62 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'No company found' }, { status: 400 });
     }
 
-    const { error } = await supabase.from('receipts').insert([{
+    // Attempt to match the PO / Job Number to an existing job in the database
+    let jobId = null;
+    let customerId = null;
+    if (parsed.job_number_or_po) {
+      const { data: matchedJobs } = await supabase
+        .from('jobs')
+        .select('id, customer_id')
+        .eq('company_id', companyId)
+        .ilike('title', `%${parsed.job_number_or_po}%`)
+        .limit(1);
+
+      if (matchedJobs && matchedJobs.length > 0) {
+        jobId = matchedJobs[0].id;
+        customerId = matchedJobs[0].customer_id;
+        console.log(`[INBOUND EMAIL] Matched PO/Job ref '${parsed.job_number_or_po}' to job_id: ${jobId}`);
+      }
+    }
+
+    // 1. Save the actual receipt (linked to job if found)
+    const { data: receiptData, error: receiptError } = await supabase.from('receipts').insert([{
       company_id:     companyId,
       supplier_name:  parsed.supplier_name,
       total_amount:   parsed.total_amount,
       status:         'Action Required',
       line_items:     parsed.line_items?.length ? parsed.line_items : [{ raw_sender: sender, raw_subject: subject }],
       receipt_url:    null,
-      job_id:         null,
+      job_id:         jobId,
+    }]).select('id').single();
+
+    if (receiptError) {
+      console.error('[INBOUND EMAIL] Supabase insert error for receipt:', receiptError);
+      return NextResponse.json({ success: false, error: receiptError.message }, { status: 500 });
+    }
+
+    // 2. Drop a message into the AI Inbox so the dispatcher sees it immediately
+    const messageBody = `🧾 New Material Receipt: $${parsed.total_amount || '0.00'} from ${parsed.supplier_name}\nPO/Job Ref: ${parsed.job_number_or_po || 'None'}\nLine Items: ${parsed.line_items?.length || 0} items parsed.`;
+
+    const { error: msgError } = await supabase.from('messages').insert([{
+      company_id: companyId,
+      job_id: jobId,
+      customer_id: customerId,
+      channel: 'email',
+      direction: 'inbound',
+      from_value: sender,
+      to_value: toEmail,
+      body: messageBody,
+      meta: { type: 'receipt', receipt_id: receiptData?.id }
     }]);
 
-    if (error) {
-      console.error('[INBOUND EMAIL] Supabase insert error:', error);
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    if (msgError) {
+      console.error('[INBOUND EMAIL] Failed to drop notification in AI Inbox:', msgError);
+      // We don't fail the whole request if just the inbox notification fails
     }
 
     console.log(`[INBOUND EMAIL] Saved receipt: ${parsed.supplier_name} $${parsed.total_amount} → company ${companyId}`);
-    return NextResponse.json({ success: true, parsed });
+    return NextResponse.json({ success: true, parsed, jobId });
 
   } catch (err) {
     console.error('[INBOUND EMAIL ERROR]', err);
