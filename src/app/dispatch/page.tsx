@@ -302,14 +302,14 @@ export default function Dispatch() {
       if (resMsg.ok) {
         const mj = await resMsg.json();
         setTicketMessages(mj.messages || []);
+      } else {
+        setTicketMessages([]);
       }
       if (resRec.ok) {
         const rj = await resRec.json();
         setTicketReceipts(rj.receipts || []);
       } else {
         setTicketReceipts([]);
-      } else {
-        setTicketMessages([]);
       }
     } catch {
       setTicket(null);
