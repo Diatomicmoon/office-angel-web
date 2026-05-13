@@ -92,7 +92,7 @@ export default function InboxPage() {
 
   if (!isDemoMode) {
     return (
-      <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
+      <div className="max-w-7xl mx-auto p-8 pb-24 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
         <div className="flex justify-between items-end">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Material Cost Engine</h1>
@@ -162,16 +162,25 @@ export default function InboxPage() {
         {/* Top Items List */}
         {analytics.topItems.length > 0 && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200 bg-gray-50">
-              <h2 className="font-semibold text-gray-900">Most Purchased Items (By Spend)</h2>
+            <div className="p-5 border-b border-gray-200 bg-white">
+              <h2 className="font-semibold text-gray-900 flex items-center gap-2"><TrendingUp size={18} className="text-blue-600"/> Highest Volume Material</h2>
             </div>
-            <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 divide-y divide-gray-100">
               {analytics.topItems.map(([desc, data], i) => (
-                <div key={i} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
-                  <p className="font-medium text-gray-900 text-sm truncate" title={desc}>{desc}</p>
-                  <div className="flex items-center justify-between mt-2 text-xs">
-                    <span className="text-gray-500">Qty: {data.count}</span>
-                    <span className="font-bold text-blue-700">${data.spend.toFixed(2)}</span>
+                <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm">#{i + 1}</div>
+                    <p className="font-medium text-gray-900 text-sm">{desc}</p>
+                  </div>
+                  <div className="text-right flex items-center gap-8">
+                    <div>
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-0.5">Quantity</p>
+                      <p className="text-sm font-medium text-gray-900">{data.count}</p>
+                    </div>
+                    <div className="w-24">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider font-bold mb-0.5">Total Spend</p>
+                      <p className="text-sm font-bold text-blue-700">${data.spend.toFixed(2)}</p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -181,11 +190,11 @@ export default function InboxPage() {
 
         {/* Receipts Feed */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+          <div className="p-5 border-b border-gray-200 bg-white flex items-center justify-between">
             <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-              <FileText size={18} /> Ingested Receipts
+              <FileText size={18} className="text-orange-500" /> Recent Receipts
             </h2>
-            <button onClick={() => window.location.reload()} className="text-xs font-bold text-blue-700 hover:text-blue-900 flex items-center gap-1">
+            <button onClick={() => window.location.reload()} className="text-xs font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1.5 border border-gray-200 px-3 py-1.5 rounded-lg bg-white shadow-sm hover:bg-gray-50 transition-colors">
               <RefreshCw size={14} /> Refresh
             </button>
           </div>
@@ -223,7 +232,7 @@ export default function InboxPage() {
                       <div className="flex items-center gap-6 text-right">
                         <div>
                           <p className="font-bold text-gray-900 text-lg">{typeof r.total_amount === 'number' ? `$${r.total_amount.toFixed(2)}` : ""}</p>
-                          <p className="text-xs font-semibold text-gray-500 mt-1">{r.status}</p>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full mt-1.5 inline-block ${r.status === 'Action Required' ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-green-50 text-green-700 border border-green-100'}`}>{r.status}</span>
                         </div>
                         <div className="text-gray-400">
                           {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
