@@ -37,7 +37,7 @@ Extract the details into this exact JSON structure. Return ONLY valid JSON, no m
 Email From: ${sender}
 Subject: ${subject}
 Body:
-${body.slice(0, 4000)}`;
+${body.slice(0, 20000)}`;
 
     const contentArray: any[] = [{ type: 'text', text: prompt }];
     for (const imgBase64 of images) {
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 
     console.log(`[INBOUND EMAIL] From: ${sender} | Subject: ${subject} | To: ${toEmail}`);
 
-    let body = `${textBody}\n${htmlBody}`.slice(0, 5000);
+    let body = `${textBody}\n${htmlBody}`.slice(0, 2000);
 
     // Extract image attachments
     const attachmentsCount = parseInt((formData.get('attachments') as string) || '0', 10);
