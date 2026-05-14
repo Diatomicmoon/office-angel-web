@@ -106,6 +106,7 @@ export async function POST(req: Request) {
     const attachmentsCount = parseInt((formData.get('attachments') as string) || '0', 10);
     console.log(`[INBOUND EMAIL] Attachments count: ${attachmentsCount}`);
     body += `\n\nDEBUG_ATTACHMENTS: ${attachmentsCount}\n`;
+    body += `\n\nDEBUG_FORMDATA_KEYS: ${Array.from(formData.keys()).join(', ')}\n`;
     for (const [key, value] of formData.entries()) {
       if (key.includes('attachment-info')) body += `\n${key}: ${value}`;
     }
