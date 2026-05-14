@@ -77,12 +77,14 @@ function naiveParse(sender: string, subject: string, body: string) {
   else if (s.includes('ced')) supplier_name = 'CED';
   else if (s.includes('crescent')) supplier_name = 'Crescent Electric';
   else if (s.includes('fastenal')) supplier_name = 'Fastenal';
+  else if (s.includes('jh larson') || s.includes('jhlarson')) supplier_name = 'JH Larson';
 
   return { supplier_name, total_amount, invoice_number: null, job_number_or_po: null, invoice_date: null, line_items: [], notes: null };
 }
 
 export async function POST(req: Request) {
   try {
+    const pdfParse = require('pdf-parse');
     const formData = await req.formData();
 
     const sender   = (formData.get('from')    as string) || '';
@@ -93,7 +95,7 @@ export async function POST(req: Request) {
 
     console.log(`[INBOUND EMAIL] From: ${sender} | Subject: ${subject} | To: ${toEmail}`);
 
-    const body = `${textBody}\n${htmlBody}`.slice(0, 5000);
+    let body = `${textBody}\n${htmlBody}`.slice(0, 5000);
 
     // Extract image attachments
     const attachmentsCount = parseInt((formData.get('attachments') as string) || '0', 10);
@@ -110,7 +112,13 @@ export async function POST(req: Request) {
           images.push(`data:${file.type};base64,${base64}`);
           console.log(`[INBOUND EMAIL] Added image attachment: ${file.name}`);
         } else if (file.type === 'application/pdf') {
-          console.log(`[INBOUND EMAIL] PDF attachment detected (${file.name}) - skipping Vision for now, will parse text only`);
+          console.log(`[INBOUND EMAIL] PDF attachment detected (${file.name}) - extracting text with pdf-parse`);
+          try {
+            const pdfData = await pdfParse(Buffer.from(arrayBuffer));
+            body += '\n\n--- PDF ATTACHMENT TEXT (' + file.name + ') ---\n' + pdfData.text;
+          } catch (pdfErr) {
+            console.error(`[INBOUND EMAIL] Failed to parse PDF ${file.name}:`, pdfErr);
+          }
         } else {
           // Try treating unknown types as image/jpeg and let OpenAI handle it
           images.push(`data:image/jpeg;base64,${base64}`);
