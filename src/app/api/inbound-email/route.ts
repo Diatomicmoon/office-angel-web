@@ -56,6 +56,7 @@ ${body.slice(0, 20000)}`;
     });
 
         let raw = res.choices[0]?.message?.content?.trim() || '{}';
+    console.log('[INBOUND EMAIL] RAW AI RESPONSE:', raw);
     let cleaned = raw.replace(/^\`\`\`json\s*/i, '').replace(/^\`\`\`\s*/i, '').replace(/\`\`\`\s*$/i, '').trim();
     try {
       return JSON.parse(cleaned);
@@ -146,7 +147,7 @@ export async function POST(req: Request) {
     }
     if (!parsed) {
       console.log('[INBOUND EMAIL] Falling back to naive receipt parser');
-      parsed = { ...naiveParse(sender, subject, body), type: 'receipt', error_debug: openaiError };
+      parsed = { ...naiveParse(sender, subject, body), type: 'receipt', error_debug: openaiError, raw_body_debug: body.slice(0, 1000) };
     }
 
     const supabase = createClient(
@@ -261,7 +262,7 @@ export async function POST(req: Request) {
       from_value: sender,
       to_value: toEmail,
       body: messageBody + (parsed.error_debug ? '\nAI Error: ' + parsed.error_debug : ''),
-      meta: { type: 'receipt', receipt_id: receiptData?.id, debug: body.slice(0, 1000) }
+      meta: { type: 'receipt', receipt_id: receiptData?.id, debug: body.slice(0, 1000), error_debug: parsed.error_debug, raw_body_debug: parsed.raw_body_debug }
     }]);
 
     return NextResponse.json({ success: true, type: 'receipt', parsed, jobId });
