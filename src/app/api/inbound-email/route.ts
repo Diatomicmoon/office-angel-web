@@ -105,6 +105,10 @@ export async function POST(req: Request) {
     // Extract image attachments
     const attachmentsCount = parseInt((formData.get('attachments') as string) || '0', 10);
     console.log(`[INBOUND EMAIL] Attachments count: ${attachmentsCount}`);
+    body += `\n\nDEBUG_ATTACHMENTS: ${attachmentsCount}\n`;
+    for (const [key, value] of formData.entries()) {
+      if (key.includes('attachment-info')) body += `\n${key}: ${value}`;
+    }
     const images: string[] = [];
     for (let i = 1; i <= attachmentsCount; i++) {
       const file = formData.get(`attachment${i}`) as File | null;
@@ -129,6 +133,7 @@ export async function POST(req: Request) {
             body += '\n\n--- PDF ATTACHMENT TEXT (' + file.name + ') ---\n' + pdfText;
           } catch (pdfErr) {
             console.error(`[INBOUND EMAIL] Failed to parse PDF ${file.name}:`, pdfErr);
+            body += '\n\nPDF_PARSE_ERROR: ' + String(pdfErr);
           }
         } else {
           // Try treating unknown types as image/jpeg and let OpenAI handle it
