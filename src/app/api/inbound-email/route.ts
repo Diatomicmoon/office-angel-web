@@ -55,12 +55,16 @@ ${body.slice(0, 20000)}`;
       max_tokens: 800,
     });
 
-    const raw = res.choices[0]?.message?.content?.trim() || '{}';
-    const cleaned = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-    return JSON.parse(cleaned);
+        let raw = res.choices[0]?.message?.content?.trim() || '{}';
+    let cleaned = raw.replace(/^\`\`\`json\s*/i, '').replace(/^\`\`\`\s*/i, '').replace(/\`\`\`\s*$/i, '').trim();
+    try {
+      return JSON.parse(cleaned);
+    } catch (e) {
+      return { error_debug: 'JSON Parse Error: ' + (e as any).message + ' RAW: ' + raw.slice(0, 500) };
+    }
   } catch (err) {
     console.error('[INBOUND EMAIL] OpenAI parse error:', err);
-    return null;
+    return { error_debug: (err as any).message || String(err) };
   }
 }
 
@@ -135,9 +139,14 @@ export async function POST(req: Request) {
 
     // Try OpenAI first
     let parsed = await parseEmailContentWithAI(sender, subject, body, images);
+    let openaiError = null;
+    if (parsed && parsed.error_debug) {
+      openaiError = parsed.error_debug;
+      parsed = null;
+    }
     if (!parsed) {
       console.log('[INBOUND EMAIL] Falling back to naive receipt parser');
-      parsed = { ...naiveParse(sender, subject, body), type: 'receipt' };
+      parsed = { ...naiveParse(sender, subject, body), type: 'receipt', error_debug: openaiError };
     }
 
     const supabase = createClient(
@@ -251,8 +260,8 @@ export async function POST(req: Request) {
       direction: 'inbound',
       from_value: sender,
       to_value: toEmail,
-      body: messageBody,
-      meta: { type: 'receipt', receipt_id: receiptData?.id }
+      body: messageBody + (parsed.error_debug ? '\nAI Error: ' + parsed.error_debug : ''),
+      meta: { type: 'receipt', receipt_id: receiptData?.id, debug: body.slice(0, 1000) }
     }]);
 
     return NextResponse.json({ success: true, type: 'receipt', parsed, jobId });
