@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
+
 async function parseEmailContentWithAI(sender: string, subject: string, body: string, images: string[]) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
@@ -84,7 +85,6 @@ function naiveParse(sender: string, subject: string, body: string) {
 
 export async function POST(req: Request) {
   try {
-    const pdfParse = require('pdf-parse');
     const formData = await req.formData();
 
     const sender   = (formData.get('from')    as string) || '';
@@ -112,10 +112,16 @@ export async function POST(req: Request) {
           images.push(`data:${file.type};base64,${base64}`);
           console.log(`[INBOUND EMAIL] Added image attachment: ${file.name}`);
         } else if (file.type === 'application/pdf') {
-          console.log(`[INBOUND EMAIL] PDF attachment detected (${file.name}) - extracting text with pdf-parse`);
+          console.log(`[INBOUND EMAIL] PDF attachment detected (${file.name}) - extracting text with pdf2json`);
           try {
-            const pdfData = await pdfParse(Buffer.from(arrayBuffer));
-            body += '\n\n--- PDF ATTACHMENT TEXT (' + file.name + ') ---\n' + pdfData.text;
+            const PDFParser = require("pdf2json");
+            const pdfText = await new Promise((resolve, reject) => {
+              const pdfParser = new PDFParser(null, 1);
+              pdfParser.on("pdfParser_dataError",  (errData: any) => reject(errData.parserError));
+              pdfParser.on("pdfParser_dataReady", () => resolve(pdfParser.getRawTextContent()));
+              pdfParser.parseBuffer(Buffer.from(arrayBuffer));
+            });
+            body += '\n\n--- PDF ATTACHMENT TEXT (' + file.name + ') ---\n' + pdfText;
           } catch (pdfErr) {
             console.error(`[INBOUND EMAIL] Failed to parse PDF ${file.name}:`, pdfErr);
           }
