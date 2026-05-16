@@ -83,14 +83,22 @@ export async function POST(req: Request) {
     const htmlBody = (formData.get('html')    as string) || '';
     const toEmail  = (formData.get('to')      as string) || '';
 
+    // Some clients send images inside the HTML body as base64 instead of as actual attachments
+    // Let's do a quick regex to rip out any embedded images if attachments are empty
     let body = `${textBody}\n${htmlBody}`.slice(0, 2000);
     const images: string[] = [];
-    const debugLog: string[] = [];
+    
+    // Look for base64 embedded images in HTML
+    const imgRegex = /<img[^>]+src="data:image\/([^;]+);base64,([^"]+)"/g;
+    let match;
+    while ((match = imgRegex.exec(htmlBody)) !== null) {
+      const type = match[1];
+      const b64 = match[2];
+      images.push(`data:image/${type};base64,${b64}`);
+    }
 
     // SendGrid passes attachments by key, either as attachmentX or just scanning all files
     for (const [key, value] of Array.from(formData.entries())) {
-      debugLog.push(`Key: ${key}, Type: ${typeof value}, isFile: ${typeof value === 'object' && value !== null && 'name' in value}`);
-      
       // Use duck-typing instead of instanceof Blob because Next.js polyfills can break instanceof
       if (typeof value === 'object' && value !== null && 'arrayBuffer' in value) {
         const file = value as any;
@@ -112,6 +120,18 @@ export async function POST(req: Request) {
             images.push(`data:image/jpeg;base64,${base64}`);
         }
       }
+    }
+    
+    // Fallback: If SendGrid sends the raw email string, attachments might be hidden in there.
+    const rawEmail = (formData.get('email') as string) || '';
+    if (images.length === 0 && rawEmail.length > 0) {
+       // Super hacky fallback for multi-part base64 blocks inside raw email text
+       const b64Regex = /Content-Transfer-Encoding:\s*base64\s+([A-Za-z0-9+\/=\s]{500,})/g;
+       let m2;
+       while ((m2 = b64Regex.exec(rawEmail)) !== null) {
+          const rawB64 = m2[1].replace(/\s+/g, '');
+          images.push(`data:image/jpeg;base64,${rawB64}`);
+       }
     }
 
     let parsed = await parseEmailContentWithAI(sender, subject, body, images);
@@ -170,7 +190,7 @@ export async function POST(req: Request) {
       company_id: companyId, supplier_name: parsed.supplier_name || sender, total_amount: parsed.total_amount, status: 'Action Required', line_items: parsed.line_items || []
     }]);
 
-    await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length}) | Debug: ${debugLog.join('; ')}` }]);
+    await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length})` }]);
     return NextResponse.json({ success: true, type: 'receipt' });
 
   } catch (err) {
