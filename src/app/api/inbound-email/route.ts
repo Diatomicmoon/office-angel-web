@@ -141,8 +141,15 @@ export async function POST(req: Request) {
     }
 
     let parsed = await parseEmailContentWithAI(sender, subject, body, images);
+    
+    // Safety check: if AI failed to parse JSON, try to guess type from text
     if (!parsed || parsed.error_debug) {
-      parsed = { type: 'receipt', error_debug: parsed?.error_debug }; // Fallback
+      const allText = (subject + " " + body).toLowerCase();
+      if (allText.includes("permit") || allText.includes("inspection")) {
+         parsed = { type: 'permit', error_debug: parsed?.error_debug, city_ahj: "Unknown City (Fallback)", fee_amount: 0 };
+      } else {
+         parsed = { type: 'receipt', error_debug: parsed?.error_debug }; // Fallback
+      }
     }
 
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
