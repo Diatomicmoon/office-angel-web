@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, FileText, CheckCircle2, Mail, AlertCircle, RefreshCw, Inbox, ExternalLink } from "lucide-react";
+import { DollarSign, FileText, CheckCircle2, Mail, AlertCircle, RefreshCw, Inbox, ExternalLink, X, PieChart, Building } from "lucide-react";
 
 type Receipt = {
   id: string;
@@ -25,6 +25,7 @@ export default function ReceiptsPage() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [totalSpend, setTotalSpend] = useState(0);
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   const fetchReceipts = async () => {
     setLoading(true);
@@ -52,8 +53,102 @@ export default function ReceiptsPage() {
   const actionRequired = receipts.filter(r => r.status === "Action Required").length;
   const reviewed = receipts.filter(r => r.status === "Reviewed").length;
 
+  // Breakdown calculations
+  const spendBySupplier = receipts.reduce((acc, r) => {
+    const name = r.supplier_name || "Unknown Supplier";
+    acc[name] = (acc[name] || 0) + (r.total_amount || 0);
+    return acc;
+  }, {} as Record<string, number>);
+  
+  const sortedSuppliers = Object.entries(spendBySupplier)
+    .sort((a, b) => b[1] - a[1])
+    .filter(([_, amount]) => amount > 0);
+
+  const spendByItem = receipts.reduce((acc, r) => {
+    if (r.line_items && Array.isArray(r.line_items)) {
+      r.line_items.forEach(item => {
+        const desc = item.description || "Unknown Item";
+        const total = Number(item.total) || 0;
+        acc[desc] = (acc[desc] || 0) + total;
+      });
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  const sortedItems = Object.entries(spendByItem)
+    .sort((a, b) => b[1] - a[1])
+    .filter(([_, amount]) => amount > 0)
+    .slice(0, 15); // Show top 15 items
+
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 h-[calc(100vh-2rem)] overflow-y-auto">
+
+      {/* Breakdown Modal */}
+      {showBreakdown && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowBreakdown(false)} />
+          <div className="relative z-10 w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] animate-slide-in">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 p-2 rounded-lg"><PieChart size={20} className="text-blue-600" /></div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Spend Breakdown</h2>
+                  <p className="text-sm text-gray-500">Analytics across all parsed supply receipts</p>
+                </div>
+              </div>
+              <button onClick={() => setShowBreakdown(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Supplier Breakdown */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Building size={16} className="text-gray-400" /> Where are we spending?
+                </h3>
+                <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3">
+                  {sortedSuppliers.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-4">No supplier data yet.</p>
+                  ) : (
+                    sortedSuppliers.map(([name, amount]) => (
+                      <div key={name} className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-700">{name}</span>
+                        <span className="text-sm font-bold text-gray-900">${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Item Breakdown */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <FileText size={16} className="text-gray-400" /> What are we buying? (Top 15)
+                </h3>
+                <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3">
+                  {sortedItems.length === 0 ? (
+                    <p className="text-sm text-gray-500 text-center py-4">No item data yet.</p>
+                  ) : (
+                    sortedItems.map(([desc, amount]) => (
+                      <div key={desc} className="flex items-start justify-between gap-4">
+                        <span className="text-sm font-medium text-gray-700 break-words">{desc}</span>
+                        <span className="text-sm font-bold text-gray-900 shrink-0">${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-4 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex justify-end">
+              <button onClick={() => setShowBreakdown(false)} className="px-6 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -71,15 +166,21 @@ export default function ReceiptsPage() {
 
       {/* KPI Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+        <div 
+          onClick={() => setShowBreakdown(true)}
+          className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:border-blue-300 hover:shadow-md transition-all group"
+        >
           <div className="flex items-center justify-between text-gray-500 mb-3">
-            <h3 className="font-medium text-sm">Total Supply Spend</h3>
-            <div className="bg-blue-50 p-2 rounded-lg"><DollarSign size={18} className="text-blue-600" /></div>
+            <h3 className="font-medium text-sm group-hover:text-blue-600 transition-colors">Total Supply Spend</h3>
+            <div className="bg-blue-50 p-2 rounded-lg group-hover:bg-blue-100 transition-colors"><DollarSign size={18} className="text-blue-600" /></div>
           </div>
           <p className="text-3xl font-bold text-gray-900">
             {loading ? "..." : `$${totalSpend.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </p>
-          <p className="text-sm text-gray-400 mt-2">From {receipts.length} parsed invoices</p>
+          <p className="text-sm text-gray-400 mt-2 flex items-center justify-between">
+            <span>From {receipts.length} parsed invoices</span>
+            <span className="text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">View Breakdown <PieChart size={12}/></span>
+          </p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-yellow-200 shadow-sm">
