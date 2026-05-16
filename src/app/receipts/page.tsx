@@ -20,7 +20,7 @@ function statusBadge(status: string) {
   return "bg-gray-50 text-gray-600 border-gray-200";
 }
 
-export default function Financials() {
+export default function ReceiptsPage() {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
@@ -58,7 +58,7 @@ export default function Financials() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Financials</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Receipts & Financials</h1>
           <p className="text-gray-500 mt-1">Supply invoices parsed from email. QuickBooks sync coming soon.</p>
         </div>
         <button

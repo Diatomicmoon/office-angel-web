@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase } from 'lucide-react';
+import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -57,6 +57,10 @@ export default function Sidebar() {
           <Inbox size={20} />
           <span>Scheduling Inbox</span>
         </Link>
+        <Link href="/permits" className={itemClass('/permits')}>
+          <FileText size={20} />
+          <span>Permits & Inspections</span>
+        </Link>
         <Link href="/pricing" className={itemClass('/pricing')}>
           <DollarSign size={20} />
           <span>Material Cost Engine</span>
@@ -73,9 +77,9 @@ export default function Sidebar() {
           <Share2 size={20} />
           <span>SEO & Marketing</span>
         </Link>
-        <Link href="/financials" className={itemClass('/financials')}>
-          <Activity size={20} />
-          <span>Financials</span>
+        <Link href="/receipts" className={itemClass('/receipts')}>
+          <DollarSign size={20} />
+          <span>Receipts & Financials</span>
         </Link>
       </nav>
 
