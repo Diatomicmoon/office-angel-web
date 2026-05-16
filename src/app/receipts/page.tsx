@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, FileText, CheckCircle2, Mail, AlertCircle, RefreshCw, Inbox, ExternalLink, X, PieChart, Building } from "lucide-react";
+import { DollarSign, FileText, CheckCircle2, Mail, AlertCircle, RefreshCw, Inbox, ExternalLink, X, PieChart, Building, Briefcase } from "lucide-react";
 
 type Receipt = {
   id: string;
@@ -11,6 +11,7 @@ type Receipt = {
   line_items: any[];
   receipt_url: string | null;
   created_at: string;
+  jobs?: { title: string } | null;
 };
 
 function statusBadge(status: string) {
@@ -294,7 +295,16 @@ export default function ReceiptsPage() {
                         {r.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 mt-0.5">
+                    {r.jobs?.title ? (
+                      <p className="text-sm font-medium text-blue-600 mt-0.5 flex items-center gap-1">
+                        <Briefcase size={14} /> Job: {r.jobs.title}
+                      </p>
+                    ) : (
+                      <p className="text-sm font-medium text-gray-400 mt-0.5 flex items-center gap-1">
+                        <Briefcase size={14} /> Unassigned Material
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">
                       {new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       {r.line_items?.length > 0 && ` · ${r.line_items.length} line item${r.line_items.length !== 1 ? "s" : ""}`}
                     </p>
