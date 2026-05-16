@@ -58,7 +58,10 @@ export async function POST(req: Request) {
       : { data: null };
 
     const aiEnabled = company?.ai_enabled !== false; // default ON
-    const forwardPhone = company?.forward_to_phone;
+    const rawForwardPhone = company?.forward_to_phone || "";
+    // Clean up user input formatting (e.g. "+1 612 598 6260" -> "+16125986260")
+    const cleanDigits = rawForwardPhone.replace(/\D/g, "");
+    const forwardPhone = cleanDigits ? (cleanDigits.length === 10 ? `+1${cleanDigits}` : `+${cleanDigits}`) : null;
 
     // Lookup caller name regardless of mode
     const lookupName = await twilioLookup(callerPhone);
