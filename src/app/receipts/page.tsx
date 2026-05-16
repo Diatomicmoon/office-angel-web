@@ -23,6 +23,7 @@ function statusBadge(status: string) {
 
 export default function ReceiptsPage() {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [activeJobs, setActiveJobs] = useState<{id: string, title: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [totalSpend, setTotalSpend] = useState(0);
@@ -30,10 +31,16 @@ export default function ReceiptsPage() {
 
   const fetchReceipts = async () => {
     setLoading(true);
-    const res = await fetch("/api/receipts?limit=50");
-    const json = await res.json();
-    const data: Receipt[] = json.receipts || [];
+    const [resReceipts, resJobs] = await Promise.all([
+      fetch("/api/receipts?limit=50"),
+      fetch("/api/jobs?limit=100")
+    ]);
+    const jsonReceipts = await resReceipts.json();
+    const jsonJobs = await resJobs.json();
+    
+    const data: Receipt[] = jsonReceipts.receipts || [];
     setReceipts(data);
+    setActiveJobs(jsonJobs.jobs || []);
     setTotalSpend(data.reduce((sum, r) => sum + (r.total_amount || 0), 0));
     setLoading(false);
   };
@@ -48,6 +55,18 @@ export default function ReceiptsPage() {
       body: JSON.stringify({ id, status: "Reviewed" }),
     });
     setReceipts(prev => prev.map(r => r.id === id ? { ...r, status: "Reviewed" } : r));
+    setUpdating(null);
+  };
+
+  const assignJob = async (receiptId: string, jobId: string) => {
+    setUpdating(receiptId);
+    const jobData = activeJobs.find(j => j.id === jobId);
+    await fetch(`/api/receipts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: receiptId, job_id: jobId }),
+    });
+    setReceipts(prev => prev.map(r => r.id === receiptId ? { ...r, jobs: { title: jobData?.title || "" } } : r));
     setUpdating(null);
   };
 
@@ -300,9 +319,21 @@ export default function ReceiptsPage() {
                         <Briefcase size={14} /> Job: {r.jobs.title}
                       </p>
                     ) : (
-                      <p className="text-sm font-medium text-gray-400 mt-0.5 flex items-center gap-1">
-                        <Briefcase size={14} /> Unassigned Material
-                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-sm font-medium text-gray-400 flex items-center gap-1">
+                          <Briefcase size={14} /> Unassigned Material
+                        </p>
+                        <select 
+                          className="text-xs border border-gray-200 rounded px-2 py-0.5 text-gray-600 bg-white"
+                          onChange={(e) => assignJob(r.id, e.target.value)}
+                          value=""
+                        >
+                          <option value="" disabled>Assign to Job...</option>
+                          {activeJobs.map(j => (
+                            <option key={j.id} value={j.id}>{j.title}</option>
+                          ))}
+                        </select>
+                      </div>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
                       {new Date(r.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}

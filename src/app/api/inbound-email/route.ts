@@ -17,6 +17,8 @@ CRITICAL CLASSIFICATION RULES:
 
 FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). DO NOT just copy the raw cryptic part numbers into the description. Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
 
+FOR JOB NUMBER OR PO (Receipts only): Carefully scan the receipt/invoice for a "PO Number", "Job Name", "Ship To", "Project", or handwritten notes indicating which job this material was purchased for. If you find one, extract it into 'job_number_or_po'.
+
 FOR SUPPLIER NAME (Receipts only): Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). If the receipt was forwarded, look at the original sender's email address domain.
 
 Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
@@ -196,6 +198,15 @@ export async function POST(req: Request) {
     if (parsed.type === 'permit') {
       await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🎫 Permit: ${parsed.city_ahj || 'Unknown City'} - ${parsed.permit_number || 'No #'} - $${parsed.fee_amount || 0}` }]);
       
+      // Push to permits table
+      await supabase.from('permits').insert([{
+        company_id: companyId,
+        municipality: parsed.city_ahj || 'Unknown City',
+        permit_number: parsed.permit_number || null,
+        fee_amount: parsed.fee_amount || 0,
+        status: 'Active'
+      }]);
+
       // Also push to receipts table but flagged as a permit for the financial dashboard
       await supabase.from('receipts').insert([{
         company_id: companyId,
@@ -210,8 +221,30 @@ export async function POST(req: Request) {
     }
 
     // Receipt
+    
+    // Try to auto-link the job if a PO or Job Name was found on the receipt
+    let matchedJobId = null;
+    if (parsed.job_number_or_po) {
+      // Fuzzy search against active jobs
+      const { data: possibleJobs } = await supabase
+        .from('jobs')
+        .select('id, title')
+        .eq('company_id', companyId)
+        .ilike('title', `%${parsed.job_number_or_po.substring(0, 10)}%`)
+        .limit(1);
+      
+      if (possibleJobs && possibleJobs.length > 0) {
+        matchedJobId = possibleJobs[0].id;
+      }
+    }
+
     await supabase.from('receipts').insert([{
-      company_id: companyId, supplier_name: parsed.supplier_name || sender, total_amount: parsed.total_amount, status: 'Action Required', line_items: parsed.line_items || []
+      company_id: companyId,
+      job_id: matchedJobId,
+      supplier_name: parsed.supplier_name || sender,
+      total_amount: parsed.total_amount,
+      status: 'Action Required',
+      line_items: parsed.line_items || []
     }]);
 
     await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length})` }]);
