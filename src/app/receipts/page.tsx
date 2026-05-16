@@ -64,20 +64,35 @@ export default function ReceiptsPage() {
     .sort((a, b) => b[1] - a[1])
     .filter(([_, amount]) => amount > 0);
 
+  type ItemPurchase = { supplier: string; unitPrice: number; qty: number; total: number };
+  
   const spendByItem = receipts.reduce((acc, r) => {
+    const supplier = r.supplier_name || "Unknown Supplier";
     if (r.line_items && Array.isArray(r.line_items)) {
       r.line_items.forEach(item => {
         const desc = item.description || "Unknown Item";
         const total = Number(item.total) || 0;
-        acc[desc] = (acc[desc] || 0) + total;
+        const qty = Number(item.quantity) || 1;
+        const unitPrice = Number(item.unit_price) || (total / qty);
+        
+        if (!acc[desc]) acc[desc] = { total: 0, purchases: [] as ItemPurchase[] };
+        acc[desc].total += total;
+        
+        const existing = acc[desc].purchases.find((p: ItemPurchase) => p.supplier === supplier && Math.abs(p.unitPrice - unitPrice) < 0.01);
+        if (existing) {
+          existing.qty += qty;
+          existing.total += total;
+        } else {
+          acc[desc].purchases.push({ supplier, unitPrice, qty, total });
+        }
       });
     }
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, { total: number; purchases: ItemPurchase[] }>);
 
   const sortedItems = Object.entries(spendByItem)
-    .sort((a, b) => b[1] - a[1])
-    .filter(([_, amount]) => amount > 0)
+    .sort((a, b) => b[1].total - a[1].total)
+    .filter(([_, data]) => data.total > 0)
     .slice(0, 15); // Show top 15 items
 
   return (
@@ -126,14 +141,24 @@ export default function ReceiptsPage() {
                 <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                   <FileText size={16} className="text-gray-400" /> What are we buying? (Top 15)
                 </h3>
-                <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-3">
+                <div className="bg-gray-50 rounded-xl border border-gray-100 p-4 space-y-4">
                   {sortedItems.length === 0 ? (
                     <p className="text-sm text-gray-500 text-center py-4">No item data yet.</p>
                   ) : (
-                    sortedItems.map(([desc, amount]) => (
-                      <div key={desc} className="flex items-start justify-between gap-4">
-                        <span className="text-sm font-medium text-gray-700 break-words">{desc}</span>
-                        <span className="text-sm font-bold text-gray-900 shrink-0">${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    sortedItems.map(([desc, data]) => (
+                      <div key={desc} className="border-b border-gray-200 last:border-0 pb-4 last:pb-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <span className="text-sm font-bold text-gray-900 break-words">{desc}</span>
+                          <span className="text-sm font-bold text-gray-900 shrink-0">${data.total.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                        </div>
+                        <div className="mt-2 space-y-1.5">
+                          {data.purchases.map((p, i) => (
+                            <div key={i} className="flex justify-between items-center text-xs text-gray-600 bg-white px-2 py-1.5 rounded border border-gray-100 shadow-sm">
+                              <span className="truncate pr-2">{p.supplier} <span className="text-gray-400 px-1">•</span> {p.qty} @ ${p.unitPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                              <span className="font-medium shrink-0">${p.total.toLocaleString(undefined, {minimumFractionDigits: 2})}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))
                   )}
