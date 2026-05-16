@@ -8,10 +8,12 @@ import OpenAI from 'openai';
 async function parseEmailContentWithAI(sender: string, subject: string, body: string, images: string[]) {
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   try {
-    const prompt = `You are parsing an inbound email for a trade contractor. 
+    const prompt = `You are parsing an inbound email for an electrical contractor. 
 It could either be a "receipt" from a supply house, a "lead" (a new work order or customer inquiry from a website form or direct email), or a "permit" (from a city or inspector).
 
 EXTREMELY IMPORTANT: If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip, you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
+
+FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). DO NOT just copy the raw cryptic part numbers into the description. Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
 
 Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
 
