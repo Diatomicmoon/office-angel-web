@@ -12,6 +12,7 @@ async function parseEmailContentWithAI(sender: string, subject: string, body: st
 It could either be a "receipt" from a supply house, a "lead" (a new work order or customer inquiry from a website form or direct email), or a "permit" (from a city or inspector).
 
 EXTREMELY IMPORTANT: If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip, you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
+IF THE EMAIL IS ABOUT A PERMIT (from a city, municipality, state inspector, or AHJ), classify it as "permit". Even if it includes a fee or payment confirmation for the permit, it is a "permit", NOT a "receipt".
 
 FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). DO NOT just copy the raw cryptic part numbers into the description. Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
 
@@ -185,7 +186,18 @@ export async function POST(req: Request) {
     }
 
     if (parsed.type === 'permit') {
-      await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🎫 Permit: ${parsed.city_ahj}` }]);
+      await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🎫 Permit: ${parsed.city_ahj || 'Unknown City'} - ${parsed.permit_number || 'No #'} - $${parsed.fee_amount || 0}` }]);
+      
+      // Also push to receipts table but flagged as a permit for the financial dashboard
+      await supabase.from('receipts').insert([{
+        company_id: companyId,
+        supplier_name: parsed.city_ahj || 'City Permit Office',
+        total_amount: parsed.fee_amount || 0,
+        status: 'Action Required',
+        job_id: null,
+        line_items: [{ description: `Permit: ${parsed.permit_number || ''}`, total: parsed.fee_amount || 0 }]
+      }]);
+
       return NextResponse.json({ success: true, type: 'permit' });
     }
 
