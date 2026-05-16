@@ -145,7 +145,7 @@ export async function POST(req: Request) {
       company_id: companyId, supplier_name: parsed.supplier_name || sender, total_amount: parsed.total_amount, status: 'Action Required'
     }]);
 
-    await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name}` }]);
+    await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length})` }]);
     return NextResponse.json({ success: true, type: 'receipt' });
 
   } catch (err) {
