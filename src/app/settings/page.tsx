@@ -324,6 +324,66 @@ export default function SettingsPage() {
           </ul>
         </div>
       )}
+      {/* QuickBooks Integration */}
+      <div id="quickbooks" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-12">
+        <div className="p-5 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+               QuickBooks Online
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Sync material receipts directly to your chart of accounts.
+            </p>
+          </div>
+          {(settings as any).quickbooks_realm_id ? (
+            <span className="bg-green-100 text-green-700 border border-green-200 px-3 py-1 text-xs font-bold rounded-full flex items-center gap-1">
+              <CheckCircle2 size={12} /> Connected
+            </span>
+          ) : (
+            <span className="bg-gray-100 text-gray-500 border border-gray-200 px-3 py-1 text-xs font-bold rounded-full">
+              Not Connected
+            </span>
+          )}
+        </div>
+        <div className="p-6">
+          {(settings as any).quickbooks_realm_id ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900">Active Connection</p>
+                <p className="text-xs text-gray-500 mt-1">Company ID: {(settings as any).quickbooks_realm_id}</p>
+              </div>
+              <button 
+                onClick={() => alert("Disconnecting coming soon")}
+                className="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-colors border border-red-100"
+              >
+                Disconnect
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center text-center space-y-4 py-4">
+              <div className="bg-gray-50 p-4 rounded-full border border-gray-100">
+                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" fill="#2CA01C"/>
+                  <path d="M12 16.5C14.4853 16.5 16.5 14.4853 16.5 12C16.5 9.51472 14.4853 7.5 12 7.5C9.51472 7.5 7.5 9.51472 7.5 12C7.5 14.4853 9.51472 16.5 12 16.5Z" fill="white"/>
+                 </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">Connect to QuickBooks Online</p>
+                <p className="text-xs text-gray-500 mt-1 max-w-sm">
+                  Authorize Office Angel to read your Chart of Accounts and automatically push material receipts as Bills.
+                </p>
+              </div>
+              <a 
+                href="/api/quickbooks/auth"
+                className="text-sm font-bold text-white bg-[#2CA01C] hover:bg-[#268a18] px-6 py-2.5 rounded-lg transition-colors shadow-sm"
+              >
+                Connect to QuickBooks
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
     </div>
   );
 }
