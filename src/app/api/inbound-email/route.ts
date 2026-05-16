@@ -93,16 +93,17 @@ export async function POST(req: Request) {
         const base64 = Buffer.from(arrayBuffer).toString('base64');
         
         const fileType = file.type || 'application/octet-stream';
+        const fileName = file.name || '';
         
-        if (fileType.startsWith('image/')) {
+        // Sometimes SendGrid sends an image but fileType is blank or octet-stream. Let's check extensions too.
+        const isImage = fileType.startsWith('image/') || /\.(png|jpe?g|gif|webp)$/i.test(fileName);
+        
+        if (isImage) {
           if (file.size > 20 * 1024 * 1024) continue; // Skip files > 20MB (OpenAI limit)
-          images.push(`data:${fileType};base64,${base64}`);
-        } else if (fileType === 'application/pdf') {
-            // Can't pass raw PDF bytes directly to OpenAI Vision url, but we can pass as image/jpeg 
-            // and see if OpenAI rejects it or somehow handles it. (Ideally we'd use pdf2json here)
+          images.push(`data:image/jpeg;base64,${base64}`); // Force jpeg to ensure OpenAI accepts it
+        } else if (fileType === 'application/pdf' || /\.pdf$/i.test(fileName)) {
             images.push(`data:image/jpeg;base64,${base64}`); 
         } else {
-            // Unrecognized blob from Apple Mail etc. Assumed image.
             images.push(`data:image/jpeg;base64,${base64}`);
         }
       }
@@ -142,7 +143,7 @@ export async function POST(req: Request) {
 
     // Receipt
     await supabase.from('receipts').insert([{
-      company_id: companyId, supplier_name: parsed.supplier_name || sender, total_amount: parsed.total_amount, status: 'Action Required'
+      company_id: companyId, supplier_name: parsed.supplier_name || sender, total_amount: parsed.total_amount, status: 'Action Required', line_items: parsed.line_items || []
     }]);
 
     await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length})` }]);
