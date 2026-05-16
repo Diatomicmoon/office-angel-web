@@ -95,7 +95,7 @@ export async function POST(req: Request) {
         const fileType = file.type || 'application/octet-stream';
         
         if (fileType.startsWith('image/')) {
-          if (file.size > 4 * 1024 * 1024) continue; // Skip huge files
+          if (file.size > 20 * 1024 * 1024) continue; // Skip files > 20MB (OpenAI limit)
           images.push(`data:${fileType};base64,${base64}`);
         } else if (fileType === 'application/pdf') {
             // Can't pass raw PDF bytes directly to OpenAI Vision url, but we can pass as image/jpeg 
