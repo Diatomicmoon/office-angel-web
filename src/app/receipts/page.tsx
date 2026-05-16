@@ -270,10 +270,10 @@ export default function ReceiptsPage() {
       <div className="bg-gray-900 rounded-xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <p className="font-semibold text-white">Connect QuickBooks</p>
-          <p className="text-sm text-gray-400 mt-0.5">Pull live invoices, revenue, and A/R directly from your QuickBooks account.</p>
+          <p className="text-sm text-gray-400 mt-0.5">Push material costs directly into your QuickBooks file for perfect job costing.</p>
         </div>
         <a
-          href="/settings#quickbooks"
+          href="/api/quickbooks/auth"
           className="shrink-0 text-sm font-bold bg-green-500 hover:bg-green-400 text-white px-5 py-2.5 rounded-lg transition-colors"
         >
           Connect QuickBooks →
