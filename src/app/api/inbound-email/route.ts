@@ -135,6 +135,25 @@ export async function POST(req: Request) {
       }]).select('id').single();
       
       await supabase.from('messages').insert([{ company_id: companyId, job_id: job?.id, channel: 'email', direction: 'inbound', from_value: sender, body: `📥 New Lead: ${subject}` }]);
+
+      // Push into call_logs so it appears on the CRM / Leads page
+      await supabase.from('call_logs').insert([{
+        company_id: companyId,
+        call_status: 'completed',
+        urgency_flag: parsed.urgency || 'low',
+        summary: parsed.issue_description || subject || 'Email Inquiry',
+        action_items: `Respond to email lead from ${sender}`,
+        meta: {
+          structured: {
+            caller_name: parsed.customer_name || sender,
+            address: parsed.address || 'Address unknown',
+            job_type: 'Email Lead',
+            job_details: parsed.issue_description || body.slice(0, 500),
+            job_id: job?.id
+          }
+        }
+      }]);
+
       return NextResponse.json({ success: true, type: 'lead' });
     }
 
