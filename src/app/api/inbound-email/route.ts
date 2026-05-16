@@ -86,17 +86,23 @@ export async function POST(req: Request) {
 
     // SendGrid passes attachments by key, either as attachmentX or just scanning all files
     for (const [key, value] of Array.from(formData.entries())) {
-      if (value instanceof Blob) {
-        const arrayBuffer = await value.arrayBuffer();
+      // Use duck-typing instead of instanceof Blob because Next.js polyfills can break instanceof
+      if (typeof value === 'object' && value !== null && 'arrayBuffer' in value) {
+        const file = value as any;
+        const arrayBuffer = await file.arrayBuffer();
         const base64 = Buffer.from(arrayBuffer).toString('base64');
         
-        if (value.type.startsWith('image/')) {
-          if (value.size > 4 * 1024 * 1024) continue; // Skip huge files
-          images.push(`data:${value.type};base64,${base64}`);
-        } else if (value.type === 'application/pdf') {
-            images.push(`data:image/jpeg;base64,${base64}`); // Pass directly to OpenAI and let it fail/succeed
+        const fileType = file.type || 'application/octet-stream';
+        
+        if (fileType.startsWith('image/')) {
+          if (file.size > 4 * 1024 * 1024) continue; // Skip huge files
+          images.push(`data:${fileType};base64,${base64}`);
+        } else if (fileType === 'application/pdf') {
+            // Can't pass raw PDF bytes directly to OpenAI Vision url, but we can pass as image/jpeg 
+            // and see if OpenAI rejects it or somehow handles it. (Ideally we'd use pdf2json here)
+            images.push(`data:image/jpeg;base64,${base64}`); 
         } else {
-            // Unrecognized blob from Apple Mail etc.
+            // Unrecognized blob from Apple Mail etc. Assumed image.
             images.push(`data:image/jpeg;base64,${base64}`);
         }
       }
