@@ -21,7 +21,7 @@ export default function Sidebar() {
         <p className="text-gray-400 text-xs mt-1">Hardhat Holdings LLC</p>
       </div>
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
+      <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-4">
         <Link href="/dashboard" className={itemClass('/dashboard')}>
           <Home size={20} />
           <span>Dashboard</span>
