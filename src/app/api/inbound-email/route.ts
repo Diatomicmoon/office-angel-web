@@ -11,6 +11,8 @@ async function parseEmailContentWithAI(sender: string, subject: string, body: st
     const prompt = `You are parsing an inbound email for a trade contractor. 
 It could either be a "receipt" from a supply house, a "lead" (a new work order or customer inquiry from a website form or direct email), or a "permit" (from a city or inspector).
 
+EXTREMELY IMPORTANT: If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip, you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
+
 Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
 
 {
