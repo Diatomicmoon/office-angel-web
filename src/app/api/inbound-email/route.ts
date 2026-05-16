@@ -85,9 +85,12 @@ export async function POST(req: Request) {
 
     let body = `${textBody}\n${htmlBody}`.slice(0, 2000);
     const images: string[] = [];
+    const debugLog: string[] = [];
 
     // SendGrid passes attachments by key, either as attachmentX or just scanning all files
     for (const [key, value] of Array.from(formData.entries())) {
+      debugLog.push(`Key: ${key}, Type: ${typeof value}, isFile: ${typeof value === 'object' && value !== null && 'name' in value}`);
+      
       // Use duck-typing instead of instanceof Blob because Next.js polyfills can break instanceof
       if (typeof value === 'object' && value !== null && 'arrayBuffer' in value) {
         const file = value as any;
@@ -167,7 +170,7 @@ export async function POST(req: Request) {
       company_id: companyId, supplier_name: parsed.supplier_name || sender, total_amount: parsed.total_amount, status: 'Action Required', line_items: parsed.line_items || []
     }]);
 
-    await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length})` }]);
+    await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length}) | Debug: ${debugLog.join('; ')}` }]);
     return NextResponse.json({ success: true, type: 'receipt' });
 
   } catch (err) {
