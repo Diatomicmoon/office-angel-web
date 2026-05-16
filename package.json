@@ -16,6 +16,7 @@
     "@vis.gl/react-google-maps": "^1.8.3",
     "dotenv": "^17.4.2",
     "lucide-react": "^1.14.0",
+    "multiparty": "^4.3.0",
     "next": "16.2.4",
     "openai": "^6.37.0",
     "pdf2json": "^4.0.3",
