@@ -100,7 +100,7 @@ export async function POST(req: Request) {
 
       // Save incoming call log for the banner
       if (companyId) {
-        await sb().from('call_logs').insert([{
+        const { data: logData } = await sb().from('call_logs').insert([{
           company_id: companyId,
           customer_id: customerId,
           call_status: 'incoming',
@@ -110,7 +110,11 @@ export async function POST(req: Request) {
             provider: aiEnabled ? 'vapi' : 'copilot',
             ai_enabled: aiEnabled,
           },
-        }]);
+        }]).select('id').single();
+        if (logData) {
+          // We will pass this to conference dialer if needed
+          (req as any)._callLogId = logData.id;
+        }
       }
     }
 
@@ -197,6 +201,7 @@ export async function POST(req: Request) {
           companyId,
           customerId,
           lookupName,
+          callLogId: (req as any)._callLogId,
         }),
       }).catch((e) => console.error('conference-dial error:', e));
 

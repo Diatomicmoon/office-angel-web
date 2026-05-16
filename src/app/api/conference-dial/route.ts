@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 // Called async from twilio-voice to add the dispatcher phone + Vapi AI listener to the conference
 export async function POST(req: Request) {
   try {
-    const { conferenceName, dispatcherPhone, vapiAssistantId, callerPhone, companyId, customerId, lookupName } = await req.json();
+    const { conferenceName, dispatcherPhone, vapiAssistantId, callerPhone, companyId, customerId, lookupName, callLogId } = await req.json();
 
     const accountSid = process.env.TWILIO_ACCOUNT_SID!;
     const authToken = process.env.TWILIO_AUTH_TOKEN!;
