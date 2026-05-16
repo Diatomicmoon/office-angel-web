@@ -15,6 +15,8 @@ EXTREMELY IMPORTANT: If the email contains a photo or attachment that looks like
 
 FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). DO NOT just copy the raw cryptic part numbers into the description. Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
 
+FOR SUPPLIER NAME: Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). If the receipt was forwarded, look at the original sender's email address domain.
+
 Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
 
 {
