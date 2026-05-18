@@ -1,33 +1,32 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("Incoming Vapi Payload:", JSON.stringify(body, null, 2));
-    
-    // Very bare-bones assistant for testing to ensure Vapi accepts the JSON
+    console.log("Vapi Assistant Request Payload:", JSON.stringify(body, null, 2));
+
+    // The correct Vapi response format for an assistant-request webhook
     return NextResponse.json({
       assistant: {
+        firstMessage: "Testing. Testing. One. Two. Three.",
         model: {
           provider: "openai",
-          model: "gpt-4",
+          model: "gpt-3.5-turbo",
           messages: [
             {
               role: "system",
-              content: "You are a helpful assistant. Keep your answers brief."
+              content: "You are a polite assistant."
             }
           ]
         },
         voice: {
-          provider: "11labs",
-          voiceId: "pNInz6obpgDQGcFmaJcg" // standard vapi default voice
-        },
-        firstMessage: "Hello, I am connected."
+          provider: "openai",
+          voiceId: "alloy"
+        }
       }
     });
   } catch (err) {
-    console.error("Error processing Vapi webhook:", err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Webhook error:", err);
+    return NextResponse.json({ error: "Internal Error" }, { status: 500 });
   }
 }
