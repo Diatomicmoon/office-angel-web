@@ -124,9 +124,20 @@ export async function POST(req: Request) {
     const vapiAssistantId = process.env.VAPI_ASSISTANT_ID || process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
 
     
+    
     if (aiEnabled) {
       // ── AI MODE (Auto-Pilot): Forward the call instantly to Vapi via SIP ──
       console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi SIP.');
+      
+      if (!vapiAssistantId) {
+        console.error('[TWILIO VOICE ERROR] Missing vapiAssistantId!');
+        const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say>Configuration error. Missing AI ID.</Say>
+</Response>`;
+        return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
+      }
+
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Dial>
@@ -134,7 +145,8 @@ export async function POST(req: Request) {
   </Dial>
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
-    } else if (forwardPhone) {
+    }
+} else if (forwardPhone) {
       // ── CO-PILOT MODE: Conference with human + AI listening silently ──
       // Conference name is unique per call (use caller phone + timestamp)
       const confName = `copilot_${callerPhone.replace(/\D/g, '')}_${Date.now()}`;
