@@ -145,8 +145,7 @@ export async function POST(req: Request) {
   </Dial>
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
-    }
-} else if (forwardPhone) {
+    } else if (forwardPhone) {
       // ── CO-PILOT MODE: Conference with human + AI listening silently ──
       // Conference name is unique per call (use caller phone + timestamp)
       const confName = `copilot_${callerPhone.replace(/\D/g, '')}_${Date.now()}`;
