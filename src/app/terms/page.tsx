@@ -1,21 +1,84 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
 export default function Terms() {
   return (
-    <div className="max-w-3xl mx-auto p-8 text-gray-900 mt-12">
-      <h1 className="text-3xl font-bold mb-6">Terms and Conditions</h1>
-      <div className="space-y-4 text-gray-700">
-        <p>Last updated: May 2026</p>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 p-8 md:p-12 text-gray-900">
         
-        <h2 className="text-xl font-semibold text-gray-900 mt-8">1. SMS Communications</h2>
-        <p>By initiating a call or submitting a web form to our business, you agree to receive SMS communications regarding your service request, appointment times, and dispatch notifications. Message frequency varies based on your service status.</p>
+        <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 mb-8 transition-colors">
+          <ArrowLeft size={16} /> Back to Home
+        </Link>
+
+        <h1 className="text-4xl font-extrabold mb-4 tracking-tight">Terms and Conditions</h1>
+        <p className="text-gray-500 mb-10">Last updated: May 2026</p>
         
-        <h2 className="text-xl font-semibold text-gray-900 mt-8">2. Carrier Disclaimers</h2>
-        <p>Message and data rates may apply. Carriers are not liable for delayed or undelivered messages.</p>
+        <div className="space-y-8 text-gray-700 leading-relaxed">
+          
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">1. Agreement to Terms</h2>
+            <p>
+              These Terms and Conditions constitute a legally binding agreement made between you and Office Angel ("we," "us," or "our"), concerning your access to and use of the office-angel.com website and our AI telecommunication services. By using our services, you agree that you have read, understood, and agreed to be bound by all of these Terms and Conditions.
+            </p>
+          </section>
 
-        <h2 className="text-xl font-semibold text-gray-900 mt-8">3. Opting Out</h2>
-        <p>You can cancel the SMS service at any time. Just text "STOP" to our number. After you send the SMS message "STOP" to us, we will send you an SMS message to confirm that you have been unsubscribed. After this, you will no longer receive SMS messages from us. If you want to join again, just sign up as you did the first time and we will start sending SMS messages to you again.</p>
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">2. Description of Service</h2>
+            <p>
+              Office Angel provides an AI-powered back-office platform designed for home service contractors. Our services include, but are not limited to, answering inbound phone calls, transcribing messages, booking appointments, routing dispatch data, and sending automated SMS notifications.
+            </p>
+          </section>
 
-        <h2 className="text-xl font-semibold text-gray-900 mt-8">4. Help</h2>
-        <p>If you are experiencing issues with the messaging program you can reply with the keyword HELP for more assistance, or you can get help directly by calling our main business line.</p>
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">3. SMS Communications & Consent</h2>
+            <p className="mb-2">
+              By initiating a call or submitting a web form to our business, you consent to receive SMS communications regarding your service request, appointment times, and dispatch notifications. 
+            </p>
+            <div className="bg-gray-50 border border-gray-200 p-5 rounded-lg mt-4">
+              <ul className="list-disc pl-6 space-y-2">
+                <li><strong>Carrier Disclaimers:</strong> Message and data rates may apply. Message frequency varies based on your service status. Carriers are not liable for delayed or undelivered messages.</li>
+                <li><strong>Opting Out:</strong> You can cancel the SMS service at any time. Just text "STOP" to our number. After you send the SMS message "STOP", we will send you a confirmation message. After this, you will no longer receive SMS messages from us.</li>
+                <li><strong>Help:</strong> If you are experiencing issues with the messaging program, you can reply with the keyword "HELP" for more assistance, or contact our main business line.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">4. Acceptable Use</h2>
+            <p>
+              You agree not to use our services for any unlawful or prohibited purpose. You may not use the AI systems to generate abusive, threatening, or harassing communications. We reserve the right to terminate access to our services if we determine, in our sole discretion, that a user has violated these acceptable use standards.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">5. Intellectual Property Rights</h2>
+            <p>
+              Unless otherwise indicated, the Site and our AI service architecture are our proprietary property. All source code, databases, functionality, software, website designs, audio, video, text, photographs, and graphics on the Site are owned or controlled by us and are protected by copyright and trademark laws.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">6. Limitation of Liability</h2>
+            <p>
+              In no event will we or our directors, employees, or agents be liable to you or any third party for any direct, indirect, consequential, exemplary, incidental, special, or punitive damages, including lost profit, lost revenue, or loss of data arising from your use of the site or our AI dispatch services, even if we have been advised of the possibility of such damages. The AI may occasionally misinterpret audio; users are responsible for verifying critical job details.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">7. Modifications and Interruptions</h2>
+            <p>
+              We reserve the right to change, modify, or remove the contents of the Site or our service features at any time or for any reason at our sole discretion without notice. We will not be liable to you or any third party for any modification, price change, suspension, or discontinuance of the Site.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">8. Governing Law</h2>
+            <p>
+              These Terms shall be governed by and defined following the laws of the State of Minnesota. Office Angel and yourself irrevocably consent that the courts of Minnesota shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these terms.
+            </p>
+          </section>
+
+        </div>
       </div>
     </div>
   );
