@@ -72,9 +72,9 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">8. Governing Law</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">8. Governing Law & Dispute Resolution</h2>
             <p>
-              These Terms shall be governed by and defined following the laws of the State of Minnesota. Office Angel and yourself irrevocably consent that the courts of Minnesota shall have exclusive jurisdiction to resolve any dispute which may arise in connection with these terms.
+              These Terms shall be governed by and defined following the laws of the State of Minnesota. Office Angel and yourself irrevocably consent that the state and federal courts located in Minnesota shall have exclusive jurisdiction to resolve any dispute, controversy, or claim arising from or relating to these Terms or your use of the services. We expressly reject mandatory arbitration clauses; any and all legal disputes will be litigated in a court of competent jurisdiction.
             </p>
           </section>
 
