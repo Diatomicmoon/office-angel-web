@@ -31,13 +31,9 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const callerPhone = formData.get('From') as string;
     const twilioNumber = formData.get('To') as string;
-    const conferenceName = formData.get('ConferenceSid') as string | null;
 
     console.log(`[TWILIO VOICE] Incoming call from ${callerPhone} to ${twilioNumber}`);
 
-    // Resolve company.
-    // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID.
-    // - In auth tenant mode, map by inbound "To" number.
     const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
     let companyId: string | undefined = undefined;
 
@@ -59,78 +55,16 @@ export async function POST(req: Request) {
 
     const aiEnabled = company?.ai_enabled !== false; // default ON
     const rawForwardPhone = company?.forward_to_phone || "";
-    // Clean up user input formatting (e.g. "+1 612 598 6260" -> "+16125986260")
     const cleanDigits = rawForwardPhone.replace(/\D/g, "");
     const forwardPhone = cleanDigits ? (cleanDigits.length === 10 ? `+1${cleanDigits}` : `+${cleanDigits}`) : null;
 
-    // Lookup caller name regardless of mode
-    const lookupName = await twilioLookup(callerPhone);
-    console.log(`[TWILIO VOICE] Lookup: ${lookupName || 'unknown'} | AI enabled: ${aiEnabled}`);
+    const vapiAssistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || process.env.VAPI_ASSISTANT_ID;
 
-    // Find or create customer
-    let customerId: string | null = null;
-    if (companyId && callerPhone) {
-      const { data: existing } = await sb()
-        .from('customers')
-        .select('id, first_name')
-        .eq('company_id', companyId)
-        .eq('phone_number', callerPhone)
-        .single();
-
-      if (existing) {
-        customerId = existing.id;
-        if (lookupName && (!existing.first_name || existing.first_name === 'New')) {
-          const parts = lookupName.split(' ');
-          await sb().from('customers').update({
-            first_name: parts[0],
-            last_name: parts.slice(1).join(' ') || '',
-          }).eq('id', existing.id);
-        }
-      } else if (lookupName || callerPhone) {
-        const parts = (lookupName || '').split(' ');
-        const { data: newCust } = await sb()
-          .from('customers')
-          .insert([{
-            company_id: companyId,
-            phone_number: callerPhone,
-            first_name: parts[0] || 'New',
-            last_name: parts.slice(1).join(' ') || 'Caller',
-          }])
-          .select('id')
-          .single();
-        customerId = newCust?.id || null;
-      }
-
-      // Save incoming call log for the banner
-      if (companyId) {
-        const { data: logData } = await sb().from('call_logs').insert([{
-          company_id: companyId,
-          customer_id: customerId,
-          call_status: 'incoming',
-          meta: {
-            phone: callerPhone,
-            lookup_name: lookupName,
-            provider: aiEnabled ? 'vapi' : 'copilot',
-            ai_enabled: aiEnabled,
-          },
-        }]).select('id').single();
-        if (logData) {
-          // We will pass this to conference dialer if needed
-          (req as any)._callLogId = logData.id;
-        }
-      }
-    }
-
-    const vapiAssistantId = process.env.VAPI_ASSISTANT_ID || process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
-
-    
-    
     if (aiEnabled) {
-      // ── AI MODE (Auto-Pilot): Forward the call instantly to Vapi via SIP ──
       console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi SIP.');
       
       if (!vapiAssistantId) {
-        console.error('[TWILIO VOICE ERROR] Missing vapiAssistantId!');
+        console.error('[TWILIO VOICE ERROR] Missing vapiAssistantId in environment variables!');
         const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say>Configuration error. Missing AI ID.</Say>
@@ -138,36 +72,25 @@ export async function POST(req: Request) {
         return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
       }
 
+      // Format the SIP URI exactly as Vapi expects
+      // Vapi SIP requires the format: sip:ASSISTANT_ID@sip.vapi.ai
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Dial>
-    <Sip>sip:${vapiAssistantId}@sip.vapi.ai;transport=tls</Sip>
+    <Sip>sip:${vapiAssistantId}@sip.vapi.ai</Sip>
   </Dial>
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
+      
     } else if (forwardPhone) {
-      // ── CO-PILOT MODE: Conference with human + AI listening silently ──
-      // Conference name is unique per call (use caller phone + timestamp)
       const confName = `copilot_${callerPhone.replace(/\D/g, '')}_${Date.now()}`;
-
-      // Call the dispatcher's phone and add them to the conference
-      // Also add Vapi as a silent listener via the conference REST API (done async below)
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Dial>
-    <Conference 
-      startConferenceOnEnter="true"
-      endConferenceOnExit="true"
-      record="record-from-start"
-      recordingStatusCallback="/api/call-finished-recording"
-      statusCallback="/api/conference-status"
-      statusCallbackEvent="start end join leave"
-      waitUrl=""
-    >${confName}</Conference>
+    <Conference startConferenceOnEnter="true" endConferenceOnExit="true" record="record-from-start" waitUrl="">${confName}</Conference>
   </Dial>
 </Response>`;
-
-      // Kick off async: dial the dispatcher + add Vapi listener
+      
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.office-angel.com';
       fetch(`${baseUrl}/api/conference-dial`, {
         method: 'POST',
@@ -177,16 +100,12 @@ export async function POST(req: Request) {
           dispatcherPhone: forwardPhone,
           vapiAssistantId,
           callerPhone,
-          companyId,
-          customerId,
-          lookupName,
-          callLogId: (req as any)._callLogId,
+          companyId
         }),
       }).catch((e) => console.error('conference-dial error:', e));
 
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
     } else {
-      // ── CO-PILOT MODE but no forward number set: Play a generic message ──
       console.warn('[TWILIO VOICE] AI disabled but no forward_to_phone set');
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -194,7 +113,6 @@ export async function POST(req: Request) {
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
     }
-
 
   } catch (error) {
     console.error('[TWILIO VOICE ERROR]', error);
