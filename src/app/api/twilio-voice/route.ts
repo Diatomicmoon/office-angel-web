@@ -123,52 +123,17 @@ export async function POST(req: Request) {
 
     const vapiAssistantId = process.env.VAPI_ASSISTANT_ID || process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
 
+    
     if (aiEnabled) {
-      // ── AI MODE: Ask Vapi for provider-bypass TwiML, then return it to Twilio ──
-      // This avoids brittle SIP addressing issues.
-      const vapiKey = process.env.VAPI_PRIVATE_API_KEY;
-      const vapiPhoneNumberId = process.env.VAPI_PHONE_NUMBER_ID;
-
-      if (!vapiAssistantId || !vapiKey || !vapiPhoneNumberId) {
-        console.error('[TWILIO VOICE] Missing Vapi config for AI mode', {
-          hasAssistantId: Boolean(vapiAssistantId),
-          hasKey: Boolean(vapiKey),
-          hasPhoneNumberId: Boolean(vapiPhoneNumberId),
-        });
-        const twiml = `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Office Angel is not configured for AI calls yet. Please try again in a moment.</Say></Response>`;
-        return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
-      }
-
-      const vapiRes = await fetch('https://api.vapi.ai/call', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${vapiKey}`,
-        },
-        body: JSON.stringify({
-          phoneNumberId: vapiPhoneNumberId,
-          assistantId: vapiAssistantId,
-          phoneCallProviderBypassEnabled: true,
-          customer: {
-            number: callerPhone,
-            numberE164CheckEnabled: false,
-          },
-        }),
-      });
-
-      const vapiJson: any = await vapiRes.json().catch(() => null);
-      const twiml = vapiJson?.phoneCallProviderDetails?.twiml;
-      if (!twiml) {
-        console.error('[TWILIO VOICE] Vapi did not return TwiML', {
-          status: vapiRes.status,
-          ok: vapiRes.ok,
-        });
-        const fallback = `<?xml version="1.0" encoding="UTF-8"?><Response><Say>Sorry, we could not connect your call. Please try again.</Say></Response>`;
-        return new NextResponse(fallback, { headers: { 'Content-Type': 'text/xml' } });
-      }
-
+      // ── AI MODE (Auto-Pilot): Forward the call instantly to Vapi via SIP ──
+      console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi SIP.');
+      const twiml = `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Dial>
+    <Sip>sip:${vapiAssistantId}@sip.vapi.ai;transport=tls</Sip>
+  </Dial>
+</Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
-
     } else if (forwardPhone) {
       // ── CO-PILOT MODE: Conference with human + AI listening silently ──
       // Conference name is unique per call (use caller phone + timestamp)
