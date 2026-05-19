@@ -315,9 +315,21 @@ export default function ReceiptsPage() {
                       </span>
                     </div>
                     {r.jobs?.title ? (
-                      <p className="text-sm font-medium text-blue-600 mt-0.5 flex items-center gap-1">
-                        <Briefcase size={14} /> Job: {r.jobs.title}
-                      </p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-sm font-medium text-blue-600 flex items-center gap-1">
+                          <Briefcase size={14} /> Job: {r.jobs.title}
+                        </p>
+                        <select 
+                          className="text-[10px] border border-gray-200 rounded px-1.5 py-0.5 text-gray-500 bg-white opacity-50 hover:opacity-100 transition-opacity"
+                          onChange={(e) => assignJob(r.id, e.target.value)}
+                          value=""
+                        >
+                          <option value="" disabled>Change Job...</option>
+                          {activeJobs.map(j => (
+                            <option key={j.id} value={j.id}>{j.title}</option>
+                          ))}
+                        </select>
+                      </div>
                     ) : (
                       <div className="flex items-center gap-2 mt-0.5">
                         <p className="text-sm font-medium text-gray-400 flex items-center gap-1">

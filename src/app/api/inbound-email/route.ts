@@ -224,6 +224,7 @@ export async function POST(req: Request) {
     
     // Try to auto-link the job if a PO or Job Name was found on the receipt
     let matchedJobId = null;
+    let autoLinked = false;
     if (parsed.job_number_or_po) {
       // Fuzzy search against active jobs
       const { data: possibleJobs } = await supabase
@@ -235,6 +236,7 @@ export async function POST(req: Request) {
       
       if (possibleJobs && possibleJobs.length > 0) {
         matchedJobId = possibleJobs[0].id;
+        autoLinked = true;
       }
     }
 
@@ -243,7 +245,7 @@ export async function POST(req: Request) {
       job_id: matchedJobId,
       supplier_name: parsed.supplier_name || sender,
       total_amount: parsed.total_amount,
-      status: 'Action Required',
+      status: autoLinked ? 'Reviewed' : 'Action Required', // Auto-mark as reviewed if AI confidently linked it
       line_items: parsed.line_items || []
     }]);
 
