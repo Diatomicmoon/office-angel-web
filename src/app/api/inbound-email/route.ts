@@ -121,24 +121,25 @@ export async function POST(req: Request) {
         
         if (isImage) {
           if (file.size > 20 * 1024 * 1024) continue; // Skip files > 20MB (OpenAI limit)
-          images.push(`data:image/jpeg;base64,${base64}`); // Force jpeg to ensure OpenAI accepts it
-        } else if (fileType === 'application/pdf' || /\.pdf$/i.test(fileName)) {
-            images.push(`data:image/jpeg;base64,${base64}`); 
-        } else {
-            images.push(`data:image/jpeg;base64,${base64}`);
+          // Make sure we only send supported formats (jpeg, png, webp, gif). Fallback to jpeg MIME to be safe if unknown.
+          const cleanType = (fileType.includes('png') || fileType.includes('webp') || fileType.includes('gif')) ? fileType : 'image/jpeg';
+          images.push(`data:${cleanType};base64,${base64}`); 
         }
+        // We explicitly ignore PDFs and other documents for Vision API for now, 
+        // to prevent crashing the OpenAI call with invalid image formats.
       }
     }
     
     // Fallback: If SendGrid sends the raw email string, attachments might be hidden in there.
     const rawEmail = (formData.get('email') as string) || '';
     if (images.length === 0 && rawEmail.length > 0) {
-       // Super hacky fallback for multi-part base64 blocks inside raw email text
-       const b64Regex = /Content-Transfer-Encoding:\s*base64\s+([A-Za-z0-9+\/=\s]{500,})/g;
+       // Only extract base64 if it's explicitly an image content type
+       const b64Regex = /Content-Type:\s*image\/(jpeg|png|webp|gif).*?Content-Transfer-Encoding:\s*base64\s+([A-Za-z0-9+\/=\s]{100,})/gs;
        let m2;
        while ((m2 = b64Regex.exec(rawEmail)) !== null) {
-          const rawB64 = m2[1].replace(/\s+/g, '');
-          images.push(`data:image/jpeg;base64,${rawB64}`);
+          const mimeType = m2[1];
+          const rawB64 = m2[2].replace(/\s+/g, '');
+          images.push(`data:image/${mimeType};base64,${rawB64}`);
        }
     }
 
