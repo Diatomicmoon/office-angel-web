@@ -22,6 +22,7 @@ export async function GET(req: Request) {
   const scope = "com.intuit.quickbooks.accounting";
   const state = companyId; // Pass company ID through state to link it when QuickBooks returns
 
+  // We must use the Intuit sandbox environment URL for testing
   const authUrl = `https://appcenter.intuit.com/connect/oauth2?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
 
   return NextResponse.redirect(authUrl);

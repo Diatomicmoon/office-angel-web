@@ -18,8 +18,14 @@ export async function GET(req: Request) {
   try {
     const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
     
+    // For sandbox testing, Intuit requires a different base URL than production
+    const isSandbox = clientId.startsWith("AB"); // Sandbox client IDs often start with AB
+    const tokenEndpoint = isSandbox 
+      ? "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer" // Usually the same for both, but good to note
+      : "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer";
+
     // Exchange the code for an access token
-    const tokenRes = await fetch("https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer", {
+    const tokenRes = await fetch(tokenEndpoint, {
       method: "POST",
       headers: {
         "Accept": "application/json",
