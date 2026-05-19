@@ -22,7 +22,7 @@ export async function GET() {
 
   const { data, error } = await sb()
     .from("companies")
-    .select("id, name, phone_number, ai_enabled, forward_to_phone, schedule_start_minute, schedule_end_minute, webhook_secret, calendar_webhook_url, inbox_token")
+    .select("id, name, phone_number, ai_enabled, forward_to_phone, schedule_start_minute, schedule_end_minute, webhook_secret, calendar_webhook_url, inbox_token, quickbooks_realm_id")
     .eq("id", companyId)
     .single();
 

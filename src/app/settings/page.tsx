@@ -14,6 +14,7 @@ export type Settings = {
   webhook_secret?: string | null;
   calendar_webhook_url?: string | null;
   inbox_token?: string | null;
+  quickbooks_realm_id?: string | null;
 };
 
 export default function SettingsPage() {
@@ -27,8 +28,19 @@ export default function SettingsPage() {
   const [calendarWebhook, setCalendarWebhook] = useState("");
   const [webhookSecret, setWebhookSecret] = useState<string | null>(null);
   const [inboxToken, setInboxToken] = useState<string | null>(null);
+  const [qbMessage, setQbMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
+    // Check URL for QuickBooks OAuth status
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("success") === "quickbooks_connected") {
+      setQbMessage({ type: 'success', text: 'Successfully connected to QuickBooks Online!' });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (params.get("error")) {
+      setQbMessage({ type: 'error', text: `QuickBooks connection failed: ${params.get("error")}` });
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     fetch("/api/settings")
       .then((r) => r.json())
       .then((json) => {
@@ -128,6 +140,16 @@ export default function SettingsPage() {
 
   return (
     <div className="max-w-3xl mx-auto p-8 space-y-8">
+      {qbMessage && (
+        <div className={`p-4 rounded-xl border flex items-start gap-3 ${qbMessage.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
+          {qbMessage.type === 'success' ? <CheckCircle2 className="mt-0.5 shrink-0 text-green-600" size={20} /> : <AlertTriangle className="mt-0.5 shrink-0 text-red-600" size={20} />}
+          <div>
+            <h3 className="font-semibold">{qbMessage.type === 'success' ? 'Connection Successful' : 'Connection Error'}</h3>
+            <p className="text-sm mt-1">{qbMessage.text}</p>
+          </div>
+        </div>
+      )}
+      
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Settings</h1>
         <p className="text-gray-500 mt-2">Control how Office Angel handles your inbound calls.</p>
@@ -254,62 +276,56 @@ export default function SettingsPage() {
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-gray-200 bg-gray-50">
           <h2 className="font-semibold text-gray-900">Website Widget + Calendar</h2>
-          <p className="text-sm text-gray-500 mt-1">Connect your website intake and optionally push booked jobs to a calendar via webhook.</p>
+          <p className="text-sm text-gray-500 mt-1">Configure your site chat widget and external calendar sync.</p>
         </div>
-        <div className="p-6 space-y-5">
-          <div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Inbound Receipt Email Address</p>
-            <div className="flex items-center gap-3">
-              <input
-                value={inboxToken ? `inbox_${inboxToken}@receipts.office-angel.com` : "Loading..."}
-                readOnly
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm text-black font-mono bg-gray-50"
+        <div className="p-6 space-y-6">
+          
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-900">Website Widget Secret</label>
+            <div className="flex gap-3">
+              <input 
+                type="text" 
+                readOnly 
+                value={webhookSecret || 'Not generated'} 
+                className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-mono text-gray-600"
               />
-            </div>
-            <p className="text-xs text-gray-400 mt-2">Forward or auto-forward supply house receipts to this email address to auto-ingest them into Financials.</p>
-          </div>
-
-          <div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Widget Secret (multi-tenant mode)</p>
-            <div className="flex items-center gap-3">
-              <input
-                value={webhookSecret || ''}
-                readOnly
-                placeholder="(not set yet)"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm text-black font-mono bg-gray-50"
-              />
-              <button
+              <button 
                 onClick={rotateWidgetSecret}
                 disabled={saving}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                className="whitespace-nowrap px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
               >
-                Rotate
+                Generate New
               </button>
             </div>
-            <p className="text-xs text-gray-400 mt-2">Only needed when we flip to multi-company auth mode.</p>
+            <p className="text-xs text-gray-500">Use this token to embed the chat widget on your own website.</p>
           </div>
 
-          <div>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Calendar Webhook URL (optional)</p>
-            <input
-              value={calendarWebhook}
-              onChange={(e) => setCalendarWebhook(e.target.value)}
-              placeholder="https://hooks.zapier.com/..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm text-black font-mono"
-            />
-            <p className="text-xs text-gray-400 mt-2">When you Book & Assign, we’ll POST job details here. (Use Zapier/Make → Google Calendar.)</p>
-            <button
-              onClick={saveCalendarWebhook}
-              disabled={saving}
-              className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-60"
-            >
-              {saved ? <><CheckCircle2 size={16} /> Saved!</> : saving ? "Saving..." : <><Save size={16} /> Save Calendar Hook</>}
-            </button>
+          <hr className="border-gray-100" />
+
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-900">Zapier / Make Calendar Webhook</label>
+            <div className="flex gap-3">
+              <input 
+                type="url" 
+                value={calendarWebhook}
+                onChange={(e) => setCalendarWebhook(e.target.value)}
+                placeholder="https://hooks.zapier.com/..." 
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm text-black"
+              />
+              <button 
+                onClick={saveCalendarWebhook}
+                disabled={saving}
+                className="whitespace-nowrap px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-60"
+              >
+                Save URL
+              </button>
+            </div>
+            <p className="text-xs text-gray-500">Office Angel will POST job data to this URL when a job is scheduled.</p>
           </div>
+
         </div>
       </div>
 
-      {/* Co-Pilot info box */}
       {!aiOn && (
         <div className="bg-purple-50 border border-purple-200 rounded-xl p-5 space-y-2">
           <h3 className="font-semibold text-purple-900 flex items-center gap-2">
@@ -324,6 +340,7 @@ export default function SettingsPage() {
           </ul>
         </div>
       )}
+
       {/* QuickBooks Integration */}
       <div id="quickbooks" className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-12">
         <div className="p-5 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
@@ -335,7 +352,7 @@ export default function SettingsPage() {
               Sync material receipts directly to your chart of accounts.
             </p>
           </div>
-          {(settings as any).quickbooks_realm_id ? (
+          {settings.quickbooks_realm_id ? (
             <span className="bg-green-100 text-green-700 border border-green-200 px-3 py-1 text-xs font-bold rounded-full flex items-center gap-1">
               <CheckCircle2 size={12} /> Connected
             </span>
@@ -346,11 +363,11 @@ export default function SettingsPage() {
           )}
         </div>
         <div className="p-6">
-          {(settings as any).quickbooks_realm_id ? (
+          {settings.quickbooks_realm_id ? (
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-900">Active Connection</p>
-                <p className="text-xs text-gray-500 mt-1">Company ID: {(settings as any).quickbooks_realm_id}</p>
+                <p className="text-xs text-gray-500 mt-1">Company ID: {settings.quickbooks_realm_id}</p>
               </div>
               <button 
                 onClick={() => alert("Disconnecting coming soon")}

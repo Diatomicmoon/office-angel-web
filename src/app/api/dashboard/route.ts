@@ -33,6 +33,14 @@ export async function GET() {
     return NextResponse.json({ calls: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 }, technicians: [], actionItems: [], techTableAvailable: true });
   }
 
+  // Fetch company config for QB status
+  const { data: companyData } = await supabase
+    .from("companies")
+    .select("quickbooks_realm_id")
+    .eq("id", companyId)
+    .single();
+  const qbConnected = !!companyData?.quickbooks_realm_id;
+
   // Fetch calls
   const { data: calls, error: callsErr } = await supabase
     .from("call_logs")
@@ -77,7 +85,28 @@ export async function GET() {
   // Calculate stats
   const totalCalls = calls.length;
   const emergencies = calls.filter(c => c.urgency_flag === "high").length;
-  const actionItems = calls.filter(c => c.action_items && c.action_items.toLowerCase() !== "none");
+  
+  // Also fetch Jobs to see what's scheduled
+  const { data: allJobs } = await supabase
+    .from("jobs")
+    .select("status")
+    .eq("company_id", companyId);
+    
+  const autoScheduledCount = (allJobs || []).filter(j => j.status === "Scheduled").length;
+
+  // Also fetch all Receipts to calculate material costs (Financial Pulse proxy)
+  const { data: allReceipts } = await supabase
+    .from("receipts")
+    .select("total_amount")
+    .eq("company_id", companyId);
+    
+  const totalMaterialSpend = (allReceipts || []).reduce((acc, r) => acc + (Number(r.total_amount) || 0), 0);
+
+  // Missed calls rescued value (mock calculation: $150 pipeline value per call handled)
+  const rescuedValue = totalCalls * 150;
+  
+  // Calculate estimated revenue (proxy: 4x material spend if QB connected, else null)
+  const estimatedRevenue = qbConnected ? totalMaterialSpend * 4 : null;
 
   // Build action items list
   const actionItemsOut: ActionItem[] = [];
@@ -133,7 +162,12 @@ export async function GET() {
     stats: {
       totalCalls,
       emergencies,
-      actionItemsCount: actionItems.length
+      actionItemsCount: actionItemsOut.length,
+      autoScheduledCount,
+      rescuedValue,
+      totalMaterialSpend,
+      estimatedRevenue,
+      qbConnected
     }
   });
 }

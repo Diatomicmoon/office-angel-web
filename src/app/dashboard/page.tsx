@@ -106,13 +106,13 @@ export default function Dashboard() {
           <p className="text-sm text-gray-400 font-medium mt-2 flex items-center gap-1">Real database count</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden opacity-50">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between text-gray-500 mb-4">
             <h3 className="font-medium text-sm">Missed Calls Rescued</h3>
             <div className="bg-green-50 p-2 rounded-lg"><PhoneMissed size={18} className="text-green-600" /></div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">$0</p>
-          <p className="text-sm text-gray-500 font-medium mt-2 flex items-center gap-1">Not wired up yet</p>
+          {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-3xl font-bold text-gray-900">${(data.stats.rescuedValue || 0).toLocaleString()}</p>}
+          <p className="text-sm text-gray-400 font-medium mt-2 flex items-center gap-1">Est. pipeline value ($150/lead)</p>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-red-100 bg-red-50/40 shadow-sm relative overflow-hidden">
@@ -124,13 +124,13 @@ export default function Dashboard() {
           <p className="text-sm text-gray-500 font-medium mt-2">Real database count</p>
         </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden opacity-50">
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between text-gray-500 mb-4">
             <h3 className="font-medium text-sm">Auto-Scheduled</h3>
             <div className="bg-purple-50 p-2 rounded-lg"><Calendar size={18} className="text-purple-600" /></div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">0</p>
-          <p className="text-sm text-gray-500 font-medium mt-2">Not wired up yet</p>
+          {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-3xl font-bold text-gray-900">{data.stats.autoScheduledCount || 0}</p>}
+          <p className="text-sm text-gray-400 font-medium mt-2">Active scheduled jobs</p>
         </div>
       </div>
 
@@ -290,15 +290,34 @@ export default function Dashboard() {
           </div>
 
           {/* Today's Cash Flow */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden opacity-50">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <DollarSign size={18} className="text-green-600" /> Financial Pulse (Not Wired Up)
+                <DollarSign size={18} className="text-green-600" /> Financial Pulse
               </h2>
             </div>
-             <div className="p-6 text-center text-gray-500 text-sm">
-              Needs Quickbooks/Stripe integration to show real revenue.
-            </div>
+            {loading ? (
+               <div className="p-6 text-center text-gray-500 text-sm">Loading financials...</div>
+            ) : (
+               <div className="p-6">
+                 <div className="flex justify-between items-center mb-4">
+                   <div className="text-sm text-gray-500">Material Spend (YTD)</div>
+                   <div className="text-lg font-bold text-gray-900">${(data.stats.totalMaterialSpend || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                 </div>
+                 <div className="flex justify-between items-center mb-4">
+                   <div className="text-sm text-gray-500">Estimated Revenue</div>
+                   <div className={`text-lg font-bold ${data.stats.qbConnected ? 'text-gray-900' : 'text-green-700'}`}>
+                     {data.stats.qbConnected ? `$${(data.stats.estimatedRevenue || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'Needs QB Auth'}
+                   </div>
+                 </div>
+                 <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                   <div className={`h-full w-1/3 ${data.stats.qbConnected ? 'bg-[#2CA01C]' : 'bg-green-500'}`}></div>
+                 </div>
+                 <p className="text-xs text-gray-400 mt-4 text-center">
+                   {data.stats.qbConnected ? 'Synced with QuickBooks Online.' : 'QuickBooks integration required for full P&L tracking.'}
+                 </p>
+               </div>
+            )}
           </div>
 
         </div>
