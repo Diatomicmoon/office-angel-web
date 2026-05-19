@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SidebarClientWrapper from "@/components/SidebarClientWrapper";
 import IncomingCallBanner from "@/components/IncomingCallBanner";
+import { HaloWidget } from "@/components/HaloWidget";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,6 +32,7 @@ export default function RootLayout({
 
 
           <IncomingCallBanner />
+          <HaloWidget />
         </div>
       </body>
     </html>
