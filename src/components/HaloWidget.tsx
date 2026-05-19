@@ -50,6 +50,10 @@ export function HaloWidget() {
       
       if (data.message) {
         setMessages([...newMsgs, { role: "assistant", content: data.message.content }]);
+      } else if (data.error) {
+        setMessages([...newMsgs, { role: "assistant", content: `System Error: ${data.error}` }]);
+      } else {
+        setMessages([...newMsgs, { role: "assistant", content: "Sorry, I received an empty response. Please try again." }]);
       }
     } catch (err) {
       setMessages([...newMsgs, { role: "assistant", content: "Sorry, I ran into a system error. Please try again." }]);
