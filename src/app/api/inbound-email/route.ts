@@ -134,7 +134,7 @@ export async function POST(req: Request) {
     const rawEmail = (formData.get('email') as string) || '';
     if (images.length === 0 && rawEmail.length > 0) {
        // Only extract base64 if it's explicitly an image content type
-       const b64Regex = /Content-Type:\s*image\/(jpeg|png|webp|gif).*?Content-Transfer-Encoding:\s*base64\s+([A-Za-z0-9+\/=\s]{100,})/gs;
+       const b64Regex = /Content-Type:\s*image\/(jpeg|png|webp|gif).*?Content-Transfer-Encoding:\s*base64\s+([A-Za-z0-9+\/=\s]{100,})/g;
        let m2;
        while ((m2 = b64Regex.exec(rawEmail)) !== null) {
           const mimeType = m2[1];
