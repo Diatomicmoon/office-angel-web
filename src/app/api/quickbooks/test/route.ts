@@ -124,14 +124,11 @@ export async function GET(req: Request) {
          netIncome,
          accountsReceivable,
          openInvoicesCount: 0, // Would require an Invoice query
-         profitByCrew: [
-           { name: "Alpha Crew (John)", revenue: 8400, cost: 2100, margin: "75.0%" },
-           { name: "Beta Crew (Sarah)", revenue: 5200, cost: 1800, margin: "65.3%" }
-         ], // Mocked for pitch
+         profitByCrew: [],
          topExpenseCategories: topExpenseCategories.slice(0, 4),
-         aiRescued: { calls: 14, value: 3500 },
-         materialBleed: { runs: 8, lostLaborValue: 1200 },
-         permitDrag: { avgDays: 18, adminCost: 850 }
+         aiRescued: { calls: 0, value: 0 },
+         materialBleed: { runs: 0, lostLaborValue: 0 },
+         permitDrag: { avgDays: 0, adminCost: 0 }
        },
        raw: {
          pl: plData,
