@@ -78,8 +78,12 @@ export default function Sidebar() {
           <span>SEO & Marketing</span>
         </Link>
         <Link href="/receipts" className={itemClass('/receipts')}>
+          <FileText size={20} />
+          <span>Receipt Inbox</span>
+        </Link>
+        <Link href="/financials" className={itemClass('/financials')}>
           <DollarSign size={20} />
-          <span>Receipts & Financials</span>
+          <span>Financial Command</span>
         </Link>
       </nav>
 

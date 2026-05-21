@@ -27,26 +27,80 @@ export async function GET(req: Request) {
   // Intuit Sandbox Base URL
   const sandboxBaseUrl = "https://sandbox-quickbooks.api.intuit.com";
   const realmId = company.quickbooks_realm_id;
+  const token = company.quickbooks_access_token;
 
   try {
-    // Let's pull the Profit & Loss report for the current year
-    const url = `${sandboxBaseUrl}/v3/company/${realmId}/reports/ProfitAndLoss?minorversion=70`;
-    
-    const response = await fetch(url, {
+    // 1. Profit & Loss
+    const plUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/ProfitAndLoss?minorversion=70`;
+    const plRes = await fetch(plUrl, {
       method: "GET",
-      headers: {
-        "Authorization": `Bearer ${company.quickbooks_access_token}`,
-        "Accept": "application/json",
-      },
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
     });
+    
+    if (!plRes.ok) {
+       const errText = await plRes.text();
+       return NextResponse.json({ error: "QuickBooks API Error (Token likely expired)", details: errText }, { status: plRes.status });
+    }
+    const plData = await plRes.json();
 
-    if (!response.ok) {
-        const errText = await response.text();
-        return NextResponse.json({ error: "Failed to fetch from QB", details: errText }, { status: response.status });
+    // 2. Aged Receivables (Money Outstanding)
+    const arUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/AgedReceivable?minorversion=70`;
+    const arRes = await fetch(arUrl, {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
+    });
+    const arData = arRes.ok ? await arRes.json() : null;
+
+    // Build the clean payload for the frontend
+    const findTotal = (rows: any[], name: string): number => {
+      if (!rows) return 0;
+      for (const r of rows) {
+        if (r.Summary && r.Summary.ColData && r.Summary.ColData[0] && (r.Summary.ColData[0].value === name || r.Summary.ColData[0].value.includes(name))) {
+           return parseFloat(r.Summary.ColData[1].value) || 0;
+        }
+        if (r.ColData && r.ColData[0] && (r.ColData[0].value === name || r.ColData[0].value.includes(name))) {
+           return parseFloat(r.ColData[1].value) || 0;
+        }
+        if (r.Rows && r.Rows.Row) {
+           const found = findTotal(r.Rows.Row, name);
+           if (found !== 0) return found;
+        }
+      }
+      return 0;
+    };
+
+    let grossProfit = 0;
+    let totalExpenses = 0;
+    let netIncome = 0;
+    let accountsReceivable = 0;
+
+    if (plData.Rows && plData.Rows.Row) {
+       grossProfit = findTotal(plData.Rows.Row, "Gross Profit");
+       totalExpenses = findTotal(plData.Rows.Row, "Total Expenses");
+       netIncome = findTotal(plData.Rows.Row, "Net Income") || findTotal(plData.Rows.Row, "Net Operating Income");
     }
 
-    const reportData = await response.json();
-    return NextResponse.json({ success: true, report: reportData });
+    if (arData && arData.Rows && arData.Rows.Row) {
+       accountsReceivable = findTotal(arData.Rows.Row, "TOTAL");
+    }
+
+    return NextResponse.json({ 
+       success: true, 
+       source: "live_quickbooks", 
+       report: {
+         grossProfit,
+         totalExpenses,
+         netIncome,
+         accountsReceivable,
+         openInvoicesCount: 0, // Would require an Invoice query
+         profitByCrew: [], // Calculated locally in Supabase later
+         topExpenseCategories: [] // Would require parsing the Expenses tree
+       },
+       raw: {
+         pl: plData,
+         ar: arData
+       }
+    });
     
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
