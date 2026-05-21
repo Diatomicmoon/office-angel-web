@@ -31,7 +31,7 @@ export async function GET(req: Request) {
 
   try {
     // 1. Profit & Loss
-    const plUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/ProfitAndLoss?date_macro=This Month-to-date&minorversion=70`; // Adjusted to match the QBO dashboard snapshot timeframe
+    const plUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/ProfitAndLoss?date_macro=This Month-to-date&minorversion=70`;
     const plRes = await fetch(plUrl, {
       method: "GET",
       headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     }
     const plData = await plRes.json();
 
-    // 2. Aged Receivables (Money Outstanding)
+    // 2. Aged Receivables
     const arUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/AgedReceivable?minorversion=70`;
     const arRes = await fetch(arUrl, {
       method: "GET",
@@ -51,7 +51,7 @@ export async function GET(req: Request) {
     });
     const arData = arRes.ok ? await arRes.json() : null;
 
-    // Build the clean payload for the frontend
+    // Parser functions
     const findTotal = (rows: any[], name: string): number => {
       if (!rows) return 0;
       for (const r of rows) {
@@ -84,36 +84,34 @@ export async function GET(req: Request) {
        accountsReceivable = findTotal(arData.Rows.Row, "TOTAL");
     }
 
-    
-    // Extract Expense Categories
     const topExpenseCategories: any[] = [];
     if (plData.Rows && plData.Rows.Row) {
       const expensesRow = plData.Rows.Row.find((r: any) => r.Summary && r.Summary.ColData && r.Summary.ColData[0] && r.Summary.ColData[0].value.includes("Total Expenses"));
-      
-      // If we found the Expenses block, dig into its sub-rows
       if (expensesRow && expensesRow.Rows && expensesRow.Rows.Row) {
          for (const category of expensesRow.Rows.Row) {
             if (category.ColData && category.ColData[0] && category.ColData[1]) {
                const name = category.ColData[0].value;
                const amount = parseFloat(category.ColData[1].value);
-               if (name && amount > 0) {
-                 topExpenseCategories.push({ name, amount });
-               }
+               if (name && amount > 0) topExpenseCategories.push({ name, amount });
             }
-            // Check for sub-categories
             if (category.Summary && category.Summary.ColData && category.Summary.ColData[0] && category.Summary.ColData[1]) {
                const name = category.Summary.ColData[0].value.replace("Total ", "");
                const amount = parseFloat(category.Summary.ColData[1].value);
-               if (name && amount > 0) {
-                 topExpenseCategories.push({ name, amount });
-               }
+               if (name && amount > 0) topExpenseCategories.push({ name, amount });
             }
          }
       }
     }
-    
-    // Sort highest to lowest and take top 4
     topExpenseCategories.sort((a, b) => b.amount - a.amount);
+
+    // Live Operational Data from Supabase
+    const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
+    const rescuedCalls = calls ? calls.length : 0;
+    const rescuedValue = rescuedCalls * 150;
+
+    const { data: receipts } = await supabase.from("receipts").select("id").eq("company_id", companyId).or('supplier_name.ilike.%home depot%,supplier_name.ilike.%lowe%');
+    const materialRuns = receipts ? receipts.length : 0;
+    const lostLaborValue = materialRuns * 150;
 
     return NextResponse.json({ 
        success: true, 
@@ -123,17 +121,14 @@ export async function GET(req: Request) {
          totalExpenses,
          netIncome,
          accountsReceivable,
-         openInvoicesCount: 0, // Would require an Invoice query
-         profitByCrew: [],
+         openInvoicesCount: 0,
+         profitByCrew: [], 
          topExpenseCategories: topExpenseCategories.slice(0, 4),
-         aiRescued: { calls: 0, value: 0 },
-         materialBleed: { runs: 0, lostLaborValue: 0 },
+         aiRescued: { calls: rescuedCalls, value: rescuedValue },
+         materialBleed: { runs: materialRuns, lostLaborValue: lostLaborValue },
          permitDrag: { avgDays: 0, adminCost: 0 }
        },
-       raw: {
-         pl: plData,
-         ar: arData
-       }
+       raw: { pl: plData, ar: arData }
     });
     
   } catch (err: any) {

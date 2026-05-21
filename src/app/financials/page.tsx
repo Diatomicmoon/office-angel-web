@@ -93,7 +93,7 @@ export default function FinancialsPage() {
               </div>
               <p className="text-3xl font-bold text-gray-900">${(data.report?.aiRescued?.value || 0).toLocaleString()}</p>
               <p className="text-sm text-gray-500 font-medium mt-2">
-                From <span className="font-bold text-gray-900">{data.report?.aiRescued?.calls || 0}</span> missed calls answered automatically
+                Based on <span className="font-bold text-gray-900">{data.stats?.emergencies || data.report?.aiRescued?.calls || 0}</span> high-intent calls handled
               </p>
             </div>
 
