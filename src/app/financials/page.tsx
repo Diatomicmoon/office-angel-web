@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DollarSign, TrendingUp, TrendingDown, Users, CreditCard, PieChart, FileText, AlertCircle } from "lucide-react";
+import { DollarSign, TrendingUp, TrendingDown, Users, CreditCard, PieChart, FileText, AlertCircle, PhoneMissed, Truck, Clock } from "lucide-react";
 import Link from "next/link";
 
 export default function FinancialsPage() {
@@ -78,7 +78,51 @@ export default function FinancialsPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Operational ROI & Leaks (The "Owner's View") */}
+          <div className="mt-8 mb-4">
+            <h2 className="text-xl font-bold tracking-tight text-gray-900">Operational ROI & Leaks</h2>
+            <p className="text-sm text-gray-500">Hidden costs and automated revenue generation (Last 30 Days).</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-xl border border-green-200 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-2 h-full bg-green-500"></div>
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm text-green-800">AI Rescued Revenue</h3>
+                <div className="bg-green-50 p-2 rounded-lg"><PhoneMissed size={18} className="text-green-600" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">${(data.report?.aiRescued?.value || 0).toLocaleString()}</p>
+              <p className="text-sm text-gray-500 font-medium mt-2">
+                From <span className="font-bold text-gray-900">{data.report?.aiRescued?.calls || 0}</span> missed calls answered automatically
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-red-200 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-2 h-full bg-red-500"></div>
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm text-red-800">Material Run Bleed</h3>
+                <div className="bg-red-50 p-2 rounded-lg"><Truck size={18} className="text-red-600" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">${(data.report?.materialBleed?.lostLaborValue || 0).toLocaleString()}</p>
+              <p className="text-sm text-gray-500 font-medium mt-2">
+                Lost labor from <span className="font-bold text-gray-900">{data.report?.materialBleed?.runs || 0}</span> mid-day supply house runs
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-yellow-200 shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-2 h-full bg-yellow-500"></div>
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm text-yellow-800">Permit & Admin Drag</h3>
+                <div className="bg-yellow-50 p-2 rounded-lg"><Clock size={18} className="text-yellow-600" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">${(data.report?.permitDrag?.adminCost || 0).toLocaleString()}</p>
+              <p className="text-sm text-gray-500 font-medium mt-2">
+                City waiting average: <span className="font-bold text-gray-900">{data.report?.permitDrag?.avgDays || 0} days</span>
+              </p>
+            </div>
+          </div>
+
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             {/* Profit by Crew Leaderboard */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
