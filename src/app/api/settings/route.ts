@@ -35,7 +35,7 @@ export async function PATCH(req: Request) {
   if (!companyId) return NextResponse.json({ error: "No company" }, { status: 404 });
 
   const body = await req.json();
-  const allowed = ["ai_enabled", "forward_to_phone", "name", "schedule_start_minute", "schedule_end_minute", "calendar_webhook_url"];
+  const allowed = ["ai_enabled", "forward_to_phone", "name", "schedule_start_minute", "schedule_end_minute", "calendar_webhook_url", "quickbooks_realm_id", "quickbooks_access_token", "quickbooks_refresh_token", "quickbooks_token_expires_at"];
   const updates: Record<string, any> = {};
   for (const key of allowed) {
     if (key in body) updates[key] = body[key];

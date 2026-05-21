@@ -133,7 +133,25 @@ export default function SettingsPage() {
     setTimeout(() => setSaved(false), 2500);
   };
 
-  if (loading) return <div className="flex-1 flex items-center justify-center text-gray-400 p-8">Loading settings...</div>;
+  const disconnectQuickBooks = async () => {
+    if (!confirm("Are you sure you want to disconnect QuickBooks? Your financial dashboard will stop syncing.")) return;
+    setSaving(true);
+    await fetch('/api/settings', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        quickbooks_realm_id: null, 
+        quickbooks_access_token: null, 
+        quickbooks_refresh_token: null, 
+        quickbooks_token_expires_at: null 
+      }),
+    });
+    setSettings((s) => s ? { ...s, quickbooks_realm_id: null } : s);
+    setQbMessage({ type: 'success', text: 'QuickBooks disconnected successfully.' });
+    setSaving(false);
+  };
+
+if (loading) return <div className="flex-1 flex items-center justify-center text-gray-400 p-8">Loading settings...</div>;
   if (!settings) return <div className="flex-1 p-8 text-gray-400">Could not load settings.</div>;
 
   const aiOn = settings.ai_enabled !== false;
@@ -370,7 +388,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-gray-500 mt-1">Company ID: {settings.quickbooks_realm_id}</p>
               </div>
               <button 
-                onClick={() => alert("Disconnecting coming soon")}
+                onClick={disconnectQuickBooks} disabled={saving}
                 className="text-sm font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition-colors border border-red-100"
               >
                 Disconnect
