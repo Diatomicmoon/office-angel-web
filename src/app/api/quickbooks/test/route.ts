@@ -31,7 +31,7 @@ export async function GET(req: Request) {
 
   try {
     // 1. Profit & Loss
-    const plUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/ProfitAndLoss?minorversion=70`;
+    const plUrl = `${sandboxBaseUrl}/v3/company/${realmId}/reports/ProfitAndLoss?date_macro=This Month-to-date&minorversion=70`; // Adjusted to match the QBO dashboard snapshot timeframe
     const plRes = await fetch(plUrl, {
       method: "GET",
       headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
@@ -84,6 +84,37 @@ export async function GET(req: Request) {
        accountsReceivable = findTotal(arData.Rows.Row, "TOTAL");
     }
 
+    
+    // Extract Expense Categories
+    const topExpenseCategories: any[] = [];
+    if (plData.Rows && plData.Rows.Row) {
+      const expensesRow = plData.Rows.Row.find((r: any) => r.Summary && r.Summary.ColData && r.Summary.ColData[0] && r.Summary.ColData[0].value.includes("Total Expenses"));
+      
+      // If we found the Expenses block, dig into its sub-rows
+      if (expensesRow && expensesRow.Rows && expensesRow.Rows.Row) {
+         for (const category of expensesRow.Rows.Row) {
+            if (category.ColData && category.ColData[0] && category.ColData[1]) {
+               const name = category.ColData[0].value;
+               const amount = parseFloat(category.ColData[1].value);
+               if (name && amount > 0) {
+                 topExpenseCategories.push({ name, amount });
+               }
+            }
+            // Check for sub-categories
+            if (category.Summary && category.Summary.ColData && category.Summary.ColData[0] && category.Summary.ColData[1]) {
+               const name = category.Summary.ColData[0].value.replace("Total ", "");
+               const amount = parseFloat(category.Summary.ColData[1].value);
+               if (name && amount > 0) {
+                 topExpenseCategories.push({ name, amount });
+               }
+            }
+         }
+      }
+    }
+    
+    // Sort highest to lowest and take top 4
+    topExpenseCategories.sort((a, b) => b.amount - a.amount);
+
     return NextResponse.json({ 
        success: true, 
        source: "live_quickbooks", 
@@ -94,7 +125,7 @@ export async function GET(req: Request) {
          accountsReceivable,
          openInvoicesCount: 0, // Would require an Invoice query
          profitByCrew: [], // Calculated locally in Supabase later
-         topExpenseCategories: [] // Would require parsing the Expenses tree
+         topExpenseCategories: topExpenseCategories.slice(0, 4)
        },
        raw: {
          pl: plData,
