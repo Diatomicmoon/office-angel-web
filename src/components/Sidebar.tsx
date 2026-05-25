@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText } from 'lucide-react';
+import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -40,6 +40,10 @@ export default function Sidebar() {
         <Link href="/crm" className={itemClass('/crm')}>
           <Users size={20} />
           <span>Leads & CRM</span>
+        </Link>
+        <Link href="/canvassing" className={itemClass('/canvassing')}>
+          <Map size={20} />
+          <span>Door-to-Door CRM</span>
         </Link>
         <Link href="/projects" className={itemClass('/projects')}>
           <Archive size={20} />
