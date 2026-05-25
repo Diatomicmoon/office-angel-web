@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle } from "lucide-react";
 
 export default function CanvassingPage() {
@@ -48,8 +47,8 @@ export default function CanvassingPage() {
   const mapData = visits.length > 0 ? visits : mockHeatMap;
 
   return (
-    <DashboardLayout>
-      <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="p-8">
+      <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Door-to-Door CRM</h1>
@@ -192,6 +191,6 @@ export default function CanvassingPage() {
           </div>
         )}
       </div>
-    </DashboardLayout>
+    </div>
   );
 }
