@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle } from "lucide-react";
+
+const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
 export default function CanvassingPage() {
   const [view, setView] = useState<"list" | "map">("list");
@@ -36,15 +39,6 @@ export default function CanvassingPage() {
     setNewVisit({ resident_name: "", address: "", interest_level: "not_interested", notes: "" });
     fetchVisits();
   }
-
-  // Mock data for the heat map when empty
-  const mockHeatMap = [
-    { id: 'm1', address: '123 Main St', interest_level: 'hot', lat: 44.9778, lng: -93.2650 },
-    { id: 'm2', address: '456 Oak Ave', interest_level: 'warm', lat: 44.9785, lng: -93.2640 },
-    { id: 'm3', address: '789 Pine Ln', interest_level: 'do_not_knock', lat: 44.9760, lng: -93.2660 }
-  ];
-
-  const mapData = visits.length > 0 ? visits : mockHeatMap;
 
   return (
     <div className="p-8">
@@ -145,49 +139,8 @@ export default function CanvassingPage() {
             )}
           </div>
         ) : (
-          <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col relative">
-            {visits.length === 0 && (
-              <div className="absolute top-4 right-4 z-10 bg-black/80 text-white text-xs px-3 py-1.5 rounded-full backdrop-blur-md">
-                Displaying Mock Heat Map Data
-              </div>
-            )}
-            <div className="flex-1 bg-blue-50/50 p-4">
-              <div className="w-full h-full rounded-lg border-2 border-dashed border-blue-200 bg-white flex items-center justify-center relative overflow-hidden">
-                {/* Mock Map Background Grid */}
-                <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#e5e7eb 2px, transparent 2px)', backgroundSize: '30px 30px' }}></div>
-                
-                {/* Simulated Map Points */}
-                {mapData.map((point: any, i: number) => (
-                  <div 
-                    key={point.id || i}
-                    className="absolute group"
-                    style={{
-                      left: `${30 + (i * 20)}%`,
-                      top: `${40 + (i % 2 === 0 ? -15 : 15)}%`
-                    }}
-                  >
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center animate-pulse shadow-lg ring-4 ring-white
-                      ${point.interest_level === 'hot' ? 'bg-orange-500' : 
-                        point.interest_level === 'warm' ? 'bg-blue-500' : 
-                        point.interest_level === 'do_not_knock' ? 'bg-red-500' : 'bg-gray-400'}
-                    `}></div>
-                    
-                    {/* Tooltip */}
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-32 bg-popover text-popover-foreground text-xs p-2 rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 text-center border">
-                      <p className="font-semibold truncate">{point.address}</p>
-                      <p className="capitalize text-muted-foreground">{point.interest_level.replace(/_/g, ' ')}</p>
-                    </div>
-                  </div>
-                ))}
-                
-                <div className="absolute bottom-6 bg-white/90 backdrop-blur border px-4 py-2 rounded-full shadow-sm text-sm font-medium flex items-center gap-4">
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-orange-500"></div> Hot</div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-blue-500"></div> Warm</div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-gray-400"></div> Cold</div>
-                  <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500"></div> DND</div>
-                </div>
-              </div>
-            </div>
+          <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col">
+            <MapView visits={visits} />
           </div>
         )}
       </div>

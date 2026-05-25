@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -8,6 +6,20 @@ function sb() {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+}
+
+async function geocodeAddress(address: string): Promise<{ lat: number | null; lng: number | null }> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`;
+    const res = await fetch(url, { headers: { "User-Agent": "OfficeAngelWeb/1.0" } });
+    const data = await res.json();
+    if (data?.[0]) {
+      return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+    }
+    return { lat: null, lng: null };
+  } catch {
+    return { lat: null, lng: null };
+  }
 }
 
 async function resolveCompany() {
@@ -60,6 +72,13 @@ export async function POST(req: Request) {
     if (!companyId) return NextResponse.json({ error: "No company" }, { status: 400 });
 
     const body = await req.json();
+    let lat = body.latitude || null;
+    let lng = body.longitude || null;
+    if (!lat && !lng && body.address) {
+      const geo = await geocodeAddress(body.address);
+      lat = geo.lat;
+      lng = geo.lng;
+    }
     const { data, error } = await sb()
       .from("door_knocking_visits")
       .insert({
@@ -69,8 +88,8 @@ export async function POST(req: Request) {
         city: body.city || null,
         state: body.state || null,
         zip: body.zip || null,
-        latitude: body.latitude || null,
-        longitude: body.longitude || null,
+        latitude: lat,
+        longitude: lng,
         interest_level: body.interest_level || "not_interested",
         notes: body.notes || null,
         phone_number: body.phone_number || null,
@@ -86,6 +105,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+export const dynamic = 'force-dynamic';
 
 export async function PATCH(req: Request) {
   try {
