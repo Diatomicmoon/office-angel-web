@@ -13,7 +13,7 @@ export default function CanvassingPage() {
   // Form State
   const [showAdd, setShowAdd] = useState(false);
   const [newVisit, setNewVisit] = useState({
-    resident_name: "", address: "", interest_level: "not_interested", notes: ""
+    resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null as number | null, longitude: null as number | null
   });
 
   useEffect(() => {
@@ -30,14 +30,22 @@ export default function CanvassingPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const systemInfo = `\n\n--- Property Details ---\nProperty Size: ${newVisit.property_size || 'N/A'}\nExisting System: ${newVisit.existing_system || 'Unknown'}\nWater Hardness: ${newVisit.water_hardness || 'Unknown'}`;
+    const finalNotes = (newVisit.notes || '') + systemInfo;
+
     await fetch("/api/canvassing/visits", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newVisit)
+      body: JSON.stringify({ ...newVisit, notes: finalNotes })
     });
     setShowAdd(false);
-    setNewVisit({ resident_name: "", address: "", interest_level: "not_interested", notes: "" });
+    setNewVisit({ resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null, longitude: null });
     fetchVisits();
+  }
+
+  function handleMapClick(lat: number, lng: number) {
+    setNewVisit({ ...newVisit, latitude: lat, longitude: lng, address: "Dropped Pin (Will Auto-Reverse Geocode)" });
+    setShowAdd(true);
   }
 
   return (
@@ -94,8 +102,22 @@ export default function CanvassingPage() {
                     <option value="do_not_knock">🚫 Do Not Knock</option>
                   </select>
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Existing Water System</label>
+                  <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.existing_system} onChange={e => setNewVisit({...newVisit, existing_system: e.target.value})}>
+                    <option value="">Select...</option>
+                    <option value="None">None / Hard Water</option>
+                    <option value="Old Softener">Old Softener (Needs Replace)</option>
+                    <option value="Iron Filter">Iron Filter Only</option>
+                    <option value="Modern Softener">Modern Softener (Good)</option>
+                  </select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Water Hardness (Test Results)</label>
+                  <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="e.g. 15 GPG or High Iron" value={newVisit.water_hardness} onChange={e => setNewVisit({...newVisit, water_hardness: e.target.value})} />
+                </div>
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Notes</label>
+                  <label className="text-sm font-medium">General Notes / Follow Up Time</label>
                   <textarea className="w-full flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Any details from the conversation..." value={newVisit.notes} onChange={e => setNewVisit({...newVisit, notes: e.target.value})} />
                 </div>
               </div>
@@ -139,8 +161,11 @@ export default function CanvassingPage() {
             )}
           </div>
         ) : (
-          <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col">
-            <MapView visits={visits} />
+          <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col relative">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 px-4 py-2 rounded-full shadow-md text-sm font-medium border text-center pointer-events-none">
+              Click anywhere on the map to drop a pin and log a lead
+            </div>
+            <MapView visits={visits} onMapClick={handleMapClick} />
           </div>
         )}
       </div>

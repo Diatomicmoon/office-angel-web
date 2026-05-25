@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, CircleMarker, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const colorMap: Record<string, string> = {
@@ -32,9 +32,19 @@ interface Props {
   visits: Visit[];
   center?: [number, number];
   zoom?: number;
+  onMapClick?: (lat: number, lng: number) => void;
 }
 
-export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14 }: Props) {
+function MapClickHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
+  useMapEvents({
+    click(e) {
+      if (onMapClick) onMapClick(e.latlng.lat, e.latlng.lng);
+    },
+  });
+  return null;
+}
+
+export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14, onMapClick }: Props) {
   const hasData = visits.length > 0;
 
   return (
@@ -54,6 +64,7 @@ export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapClickHandler onMapClick={onMapClick} />
         {hasData &&
           visits.map((visit) => {
             const lat = visit.latitude ?? visit.lat;
