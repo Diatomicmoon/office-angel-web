@@ -111,7 +111,7 @@ export default function PricingPage() {
 
         {/* The Math */}
         <section className="max-w-4xl mx-auto px-4 md:px-8 pb-10 md:pb-12">
-          <div className="bg-gray-900 text-white rounded-2xl p-6 md:p-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
+          <div className="bg-gray-900 text-white rounded-2xl p-6 md:p-4 md:p-8 grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             <div>
               <p className="text-3xl md:text-4xl font-extrabold text-blue-400">$1,500+</p>
               <p className="text-gray-400 mt-1 text-sm">Estimated value of a typical missed contractor service call*</p>

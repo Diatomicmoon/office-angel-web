@@ -159,7 +159,7 @@ function ProfileContent() {
   const lifetimeCallCount = calls.length;
 
   return (
-    <div className="max-w-7xl mx-auto p-8 flex flex-col min-h-screen overflow-y-auto">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col min-h-screen overflow-y-auto">
       {/* Back */}
       <div className="mb-6">
         <Link href="/projects" className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors w-fit">

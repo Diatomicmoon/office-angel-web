@@ -92,8 +92,8 @@ export default function InboxPage() {
 
   if (!isDemoMode) {
     return (
-      <div className="max-w-7xl mx-auto p-8 pb-24 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
-        <div className="flex justify-between items-end">
+      <div className="max-w-7xl mx-auto p-4 md:p-8 pb-24 flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
+        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Material Cost Engine</h1>
             <p className="text-gray-500 mt-2">Auto-parse supply house receipts and allocate job costs.</p>
@@ -241,7 +241,7 @@ export default function InboxPage() {
                     </div>
                     
                     {isExpanded && r.line_items && r.line_items.length > 0 && (
-                      <div className="bg-gray-50 p-6 border-t border-gray-100">
+                      <div className="bg-gray-50 p-6 border-t border-gray-100 overflow-x-auto">
                         <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Itemized Breakdown</h4>
                         <table className="w-full text-sm text-left">
                           <thead>

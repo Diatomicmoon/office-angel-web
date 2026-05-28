@@ -51,7 +51,7 @@ export default function LandingPage() {
         <section className="bg-white border-t border-b border-gray-200 py-8 px-4 md:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-gray-500 text-sm font-medium uppercase tracking-widest mb-4">Built for home service businesses</p>
-            <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-gray-700 font-semibold text-sm md:text-base">
+            <div className="flex flex-wrap justify-center gap-4 md:gap-4 md:p-8 text-gray-700 font-semibold text-sm md:text-base">
               <span>Electrical Contractors</span>
               <span>HVAC Companies</span>
               <span>Plumbing</span>

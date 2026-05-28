@@ -65,9 +65,9 @@ export default function CoPilot() {
   const customerId = active?.customer?.id;
 
   return (
-    <div className="max-w-7xl mx-auto p-8 h-[calc(100vh-2rem)] flex flex-col">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] flex flex-col">
       {/* Header */}
-      <div className="flex justify-between items-end mb-6">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 flex items-center gap-3">
             Dispatcher Co-Pilot

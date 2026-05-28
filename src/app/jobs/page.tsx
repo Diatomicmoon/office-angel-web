@@ -87,13 +87,13 @@ export default function JobsArchivePage() {
   }, [jobs]);
 
   return (
-    <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)]">
-      <div className="flex justify-between items-end mb-6">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)]">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Job Archive</h1>
           <p className="text-gray-500 mt-2">Every job, status, and customer tied together — in one place.</p>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
@@ -118,7 +118,7 @@ export default function JobsArchivePage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-hidden flex flex-col">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-x-auto flex flex-col">
         <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
           <div className="col-span-4">Job</div>
           <div className="col-span-3">Customer</div>

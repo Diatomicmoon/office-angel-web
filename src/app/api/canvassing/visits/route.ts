@@ -4,15 +4,11 @@ import { NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  // Using the service role key to bypass RLS for this specific data merge route
-  // since this is an internal API route
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
   
-  // For simplicity in this route, we will just fetch the first company ID 
-  // (In a multi-tenant production app, you'd extract the user's company_id from their JWT/session)
   const { data: companies } = await supabase
     .from('companies')
     .select('id')
@@ -38,13 +34,6 @@ export async function GET(request: Request) {
     .eq('company_id', companyId)
     .order('created_at', { ascending: false });
 
-  // Fetch new build permits
-  const { data: newBuilds } = await supabase
-    .from('new_build_permits')
-    .select('*')
-    .eq('company_id', companyId)
-    .order('permit_date', { ascending: false });
-
   // Format scraped leads to match the UI expectations of canvassing_visits
   const formattedLeads = (scrapedLeads || []).map((lead: any) => ({
     id: lead.id,
@@ -58,20 +47,8 @@ export async function GET(request: Request) {
     longitude: lead.longitude || null
   }));
 
-  // Format new builds to show on the map as well
-  const formattedBuilds = (newBuilds || []).map((build: any) => ({
-    id: build.id,
-    address: build.property_address + (build.city ? `, ${build.city}` : ''),
-    resident_name: `Builder: ${build.contractor_name}`,
-    interest_level: 'hot', // Show builds as hot on the map
-    visited_at: build.permit_date || build.created_at,
-    notes: `Source: New Construction Permit\nEst. Completion: ${build.estimated_completion_date || 'Unknown'}\nStatus: ${build.status.toUpperCase()}`,
-    latitude: build.latitude || null,
-    longitude: build.longitude || null
-  }));
-
-  // Combine and sort by date
-  const combined = [...(manualVisits || []), ...formattedLeads, ...formattedBuilds].sort((a, b) => {
+  // Combine and sort by date (We removed formattedBuilds so they stop doubling up in the "New Movers" list)
+  const combined = [...(manualVisits || []), ...formattedLeads].sort((a, b) => {
     return new Date(b.visited_at).getTime() - new Date(a.visited_at).getTime();
   });
 

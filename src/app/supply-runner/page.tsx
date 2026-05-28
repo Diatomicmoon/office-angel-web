@@ -108,7 +108,7 @@ export default function SupplyRunnerPage() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto h-[calc(100vh-2rem)] overflow-y-auto pb-24">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto pb-24">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
@@ -146,7 +146,7 @@ export default function SupplyRunnerPage() {
             <div className="space-y-3">
               {kits.map((kit) => (
                 <div key={kit.id} className="border border-gray-100 rounded-lg p-3 hover:border-purple-200 hover:bg-purple-50 transition-colors group cursor-pointer" onClick={() => loadKit(kit)}>
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
                     <span className="font-medium text-gray-800">{kit.name}</span>
                     <button className="text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Plus className="h-4 w-4" />

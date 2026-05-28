@@ -26,10 +26,10 @@ export default function Marketing() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-8 flex flex-col h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
       
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">SEO & Marketing AI</h1>
           <p className="text-gray-500 mt-2">Google Business Profile analytics, local ranking heatmaps, and auto-generated social posts.</p>

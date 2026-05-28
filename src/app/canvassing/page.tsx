@@ -3,11 +3,14 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat } from "lucide-react";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
+import TerritoriesTab from "./TerritoriesTab";
+import CanvassingMode from "./CanvassingMode";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
 export default function CanvassingPage() {
-  const [view, setView] = useState<"list" | "map" | "builds">("list");
+  const [view, setView] = useState<"list" | "map" | "builds" | "territories">("list");
+  const [canvassingActive, setCanvassingActive] = useState(false);
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +53,13 @@ export default function CanvassingPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
+      {canvassingActive && (
+        <CanvassingMode 
+          onExit={() => setCanvassingActive(false)} 
+          onLogVisit={handleMapClick} 
+        />
+      )}
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
@@ -77,7 +86,19 @@ export default function CanvassingPage() {
               >
                 <Map className="w-4 h-4" /> Heat Map
               </button>
+              <button 
+                onClick={() => setView("territories")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "territories" ? "bg-background shadow-sm text-green-600" : "text-muted-foreground"}`}
+              >
+                <Map className="w-4 h-4" /> Territories
+              </button>
             </div>
+            <button 
+              onClick={() => setCanvassingActive(true)}
+              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm shadow-sm"
+            >
+              Start Canvassing
+            </button>
             <button 
               onClick={() => setShowAdd(!showAdd)}
               className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm"
@@ -138,6 +159,8 @@ export default function CanvassingPage() {
 
         {view === "builds" ? (
           <NewBuildsTab />
+        ) : view === "territories" ? (
+          <TerritoriesTab />
         ) : view === "list" ? (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             {loading ? (

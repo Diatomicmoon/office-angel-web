@@ -38,7 +38,7 @@ export default function SelectCompany() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="max-w-lg w-full bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+      <div className="max-w-lg w-full bg-white p-4 md:p-8 rounded-xl border border-gray-200 shadow-sm">
         <h1 className="text-2xl font-bold text-gray-900">Select Company</h1>
         <p className="text-gray-500 mt-2">Choose which company you’re working in.</p>
 

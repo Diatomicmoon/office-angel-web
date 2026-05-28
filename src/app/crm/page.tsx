@@ -390,13 +390,13 @@ export default function CRM() {
       {/* Detail Panel */}
       {selected && <LeadDetail lead={selected} onClose={() => setSelected(null)} />}
 
-      <div className="max-w-7xl mx-auto p-8 flex flex-col h-screen">
-        <div className="flex justify-between items-end mb-6">
+      <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col h-screen">
+        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4 mb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Leads &amp; CRM</h1>
             <p className="text-gray-500 mt-2">AI-captured leads from every inbound call, auto-sorted by urgency.</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <div className="bg-gray-100 p-1 rounded-lg flex items-center">
               <button
                 onClick={() => setViewMode("board")}

@@ -116,7 +116,7 @@ export default function ReceiptsPage() {
     .slice(0, 15); // Show top 15 items
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 h-[calc(100vh-2rem)] overflow-y-auto">
+    <div className="max-w-7xl mx-auto p-4 md:p-4 md:p-8 space-y-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto">
 
       {/* Breakdown Modal */}
       {showBreakdown && (

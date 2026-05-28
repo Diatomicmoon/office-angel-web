@@ -18,10 +18,10 @@ export default function FinancialsPage() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto p-8 space-y-8 h-[calc(100vh-2rem)] overflow-y-auto">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto">
 
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Financial Command</h1>
           <p className="text-gray-500 mt-2">Accounts Receivable, Profitability, and Cash Flow.</p>
@@ -131,7 +131,7 @@ export default function FinancialsPage() {
                   <Users size={18} className="text-gray-500" /> Profitability by Crew
                 </h2>
               </div>
-              <div className="divide-y divide-gray-100 p-0">
+              <div className="divide-y divide-gray-100 p-0 overflow-x-auto">
                 <table className="w-full text-left text-sm">
                   <thead className="bg-gray-50/50 text-gray-500">
                     <tr>

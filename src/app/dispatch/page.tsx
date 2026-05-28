@@ -652,7 +652,7 @@ export default function Dispatch() {
   }, [techs.length]);
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6 p-8 h-[calc(100vh-2rem)] flex flex-col">
+    <div className="max-w-[1600px] mx-auto space-y-6 p-4 md:p-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] flex flex-col">
       {/* Job Ticket Slide-over */}
       {ticketOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
@@ -810,7 +810,7 @@ export default function Dispatch() {
       )}
 
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
           <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>

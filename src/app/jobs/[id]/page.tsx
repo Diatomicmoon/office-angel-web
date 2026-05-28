@@ -87,7 +87,7 @@ export default function JobDetailsPage() {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-8 flex items-center justify-center min-h-[50vh]">
+      <div className="max-w-4xl mx-auto p-4 md:p-8 flex items-center justify-center min-h-[50vh]">
         <div className="text-gray-400">Loading job details...</div>
       </div>
     );

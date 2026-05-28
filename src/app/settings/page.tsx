@@ -151,7 +151,7 @@ export default function SettingsPage() {
     setSaving(false);
   };
 
-if (loading) return <div className="flex-1 flex items-center justify-center text-gray-400 p-8">Loading settings...</div>;
+if (loading) return <div className="flex-1 flex items-center justify-center text-gray-400 p-4 md:p-8">Loading settings...</div>;
   if (!settings) return <div className="flex-1 p-8 text-gray-400">Could not load settings.</div>;
 
   const aiOn = settings.ai_enabled !== false;
