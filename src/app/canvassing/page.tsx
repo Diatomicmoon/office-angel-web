@@ -48,8 +48,26 @@ export default function CanvassingPage() {
   }
 
   function handleMapClick(lat: number, lng: number) {
-    setNewVisit({ ...newVisit, latitude: lat, longitude: lng, address: "Dropped Pin (Will Auto-Reverse Geocode)" });
+    setNewVisit({ ...newVisit, latitude: lat, longitude: lng, address: "Loading address..." });
     setShowAdd(true);
+
+    // Auto-reverse geocode the dropped pin using Nominatim
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.display_name) {
+          // Keep it short: Street number and name
+          const shortAddress = data.address.house_number && data.address.road 
+            ? `${data.address.house_number} ${data.address.road}, ${data.address.city || data.address.town || data.address.village || ''}`
+            : data.display_name.split(',').slice(0, 2).join(',');
+          
+          setNewVisit(prev => ({ ...prev, address: shortAddress }));
+        }
+      })
+      .catch(err => {
+        console.error("Geocoding error:", err);
+        setNewVisit(prev => ({ ...prev, address: "Manual Address Entry" }));
+      });
   }
 
   return (
@@ -58,6 +76,7 @@ export default function CanvassingPage() {
         <CanvassingMode 
           onExit={() => setCanvassingActive(false)} 
           onLogVisit={handleMapClick} 
+          visits={visits}
         />
       )}
       <div className="max-w-6xl mx-auto space-y-6">
@@ -109,51 +128,59 @@ export default function CanvassingPage() {
         </div>
 
         {showAdd && (
-          <div className="bg-card border rounded-xl p-4 shadow-sm animate-in fade-in slide-in-from-top-4">
-            <h2 className="font-semibold mb-4 text-lg">Log New House Visit</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Address *</label>
-                  <input required className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="123 Example St" value={newVisit.address} onChange={e => setNewVisit({...newVisit, address: e.target.value})} />
+          <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">
+            <div className="bg-white dark:bg-card border rounded-xl p-6 shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 relative">
+              <button 
+                onClick={() => setShowAdd(false)}
+                className="absolute top-4 right-4 text-gray-500 hover:bg-gray-100 p-1 rounded-full"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+              <h2 className="font-semibold mb-4 text-lg">Log House Visit</h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Address *</label>
+                    <input required className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="123 Example St" value={newVisit.address} onChange={e => setNewVisit({...newVisit, address: e.target.value})} />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Resident Name</label>
+                    <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="John Doe" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">Interest Level</label>
+                    <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.interest_level} onChange={e => setNewVisit({...newVisit, interest_level: e.target.value})}>
+                      <option value="hot">🔥 Hot Lead (Ready to buy)</option>
+                      <option value="warm">⭐ Warm (Interested, needs follow up)</option>
+                      <option value="not_interested">❄️ Not Interested</option>
+                      <option value="do_not_knock">🚫 Do Not Knock</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Existing Water System</label>
+                    <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.existing_system} onChange={e => setNewVisit({...newVisit, existing_system: e.target.value})}>
+                      <option value="">Select...</option>
+                      <option value="None">None / Hard Water</option>
+                      <option value="Old Softener">Old Softener (Needs Replace)</option>
+                      <option value="Iron Filter">Iron Filter Only</option>
+                      <option value="Modern Softener">Modern Softener (Good)</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Water Hardness (Test Results)</label>
+                    <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="e.g. 15 GPG or High Iron" value={newVisit.water_hardness} onChange={e => setNewVisit({...newVisit, water_hardness: e.target.value})} />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">General Notes / Follow Up Time</label>
+                    <textarea className="w-full flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Any details from the conversation..." value={newVisit.notes} onChange={e => setNewVisit({...newVisit, notes: e.target.value})} />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Resident Name</label>
-                  <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="John Doe" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
+                <div className="flex justify-end gap-2 pt-4 border-t mt-4">
+                  <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50">Cancel</button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium shadow-sm">Save Visit</button>
                 </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">Interest Level</label>
-                  <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.interest_level} onChange={e => setNewVisit({...newVisit, interest_level: e.target.value})}>
-                    <option value="hot">🔥 Hot Lead (Ready to buy)</option>
-                    <option value="warm">⭐ Warm (Interested, needs follow up)</option>
-                    <option value="not_interested">❄️ Not Interested</option>
-                    <option value="do_not_knock">🚫 Do Not Knock</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Existing Water System</label>
-                  <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.existing_system} onChange={e => setNewVisit({...newVisit, existing_system: e.target.value})}>
-                    <option value="">Select...</option>
-                    <option value="None">None / Hard Water</option>
-                    <option value="Old Softener">Old Softener (Needs Replace)</option>
-                    <option value="Iron Filter">Iron Filter Only</option>
-                    <option value="Modern Softener">Modern Softener (Good)</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Water Hardness (Test Results)</label>
-                  <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="e.g. 15 GPG or High Iron" value={newVisit.water_hardness} onChange={e => setNewVisit({...newVisit, water_hardness: e.target.value})} />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium">General Notes / Follow Up Time</label>
-                  <textarea className="w-full flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Any details from the conversation..." value={newVisit.notes} onChange={e => setNewVisit({...newVisit, notes: e.target.value})} />
-                </div>
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2 border rounded-md text-sm font-medium">Cancel</button>
-                <button type="submit" className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium">Save Visit</button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         )}
 

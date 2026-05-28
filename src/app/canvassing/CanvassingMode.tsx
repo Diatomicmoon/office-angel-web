@@ -6,7 +6,7 @@ import { X, Crosshair, MapPin } from "lucide-react";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-export default function CanvassingMode({ onExit, onLogVisit }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void }) {
+export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void, visits: any[] }) {
   const [center, setCenter] = useState<[number, number]>([44.9778, -93.265]);
   const [zoom, setZoom] = useState(16);
   const [tracking, setTracking] = useState(false);
@@ -42,7 +42,7 @@ export default function CanvassingMode({ onExit, onLogVisit }: { onExit: () => v
       </div>
 
       <div className="flex-1 relative">
-        <MapView visits={[]} center={center} zoom={zoom} onMapClick={onLogVisit} />
+        <MapView visits={visits} center={center} zoom={zoom} onMapClick={onLogVisit} />
         
         <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-3 items-center w-full max-w-sm px-4">
           <button 
