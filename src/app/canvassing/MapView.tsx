@@ -32,6 +32,7 @@ interface Visit {
 interface Props {
   visits: Visit[];
   center?: [number, number];
+  userLocation?: [number, number] | null;
   zoom?: number;
   onMapClick?: (lat: number, lng: number) => void;
 }
@@ -68,7 +69,7 @@ function MapUpdater({ center, zoom }: { center?: [number, number], zoom?: number
   return null;
 }
 
-export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14, onMapClick }: Props) {
+export default function MapView({ visits, center = [44.9778, -93.265], userLocation, zoom = 14, onMapClick }: Props) {
   const hasData = visits.length > 0;
   
   // Map State Persistence
@@ -116,10 +117,10 @@ export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14
         />
         <MapEventsHandler onMapClick={onMapClick} />
         
-        {/* Current user location dot */}
-        {center && (
+        {/* Current user location dot (uses userLocation prop instead of center) */}
+        {(userLocation || center) && (
           <CircleMarker
-            center={center}
+            center={userLocation || center}
             radius={6}
             pathOptions={{
               color: "#ffffff",

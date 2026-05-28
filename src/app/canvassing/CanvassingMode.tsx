@@ -8,8 +8,8 @@ const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
 export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void, visits: any[] }) {
   const [center, setCenter] = useState<[number, number]>([44.9778, -93.265]);
+  const [userLoc, setUserLoc] = useState<[number, number] | null>(null);
   const [zoom, setZoom] = useState(18);
-  const [tracking, setTracking] = useState(false);
   const watchId = useRef<number | null>(null);
 
   useEffect(() => {
@@ -19,15 +19,17 @@ export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit:
 
   const startTracking = () => {
     if (navigator.geolocation) {
-      setTracking(true);
-      
+      // Get initial position quickly and set both map center and user dot
       navigator.geolocation.getCurrentPosition((pos) => {
-        setCenter([pos.coords.latitude, pos.coords.longitude]);
+        const loc: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+        setUserLoc(loc);
+        setCenter(loc);
       }, undefined, { enableHighAccuracy: true });
 
+      // Then set up continuous watch to update the USER DOT, but NOT the map center automatically
       watchId.current = navigator.geolocation.watchPosition(
         (pos) => {
-          setCenter([pos.coords.latitude, pos.coords.longitude]);
+          setUserLoc([pos.coords.latitude, pos.coords.longitude]);
         },
         (err) => console.error(err),
         { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
@@ -36,7 +38,6 @@ export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit:
   };
 
   const stopTracking = () => {
-    setTracking(false);
     if (watchId.current !== null) {
       navigator.geolocation.clearWatch(watchId.current);
       watchId.current = null;
@@ -56,13 +57,15 @@ export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit:
       </div>
 
       <div className="flex-1 relative overflow-hidden bg-gray-100">
-        {/* Render map without pointer-events restriction so they can pan/click freely */}
-        <MapView visits={visits} center={center} zoom={zoom} onMapClick={onLogVisit} />
+        {/* Pass userLoc to MapView so it can render the blue dot without recentering the map */}
+        <MapView visits={visits} center={center} userLocation={userLoc} zoom={zoom} onMapClick={onLogVisit} />
         
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-4 items-center w-full max-w-sm px-6">
           <button 
             onClick={() => {
-              if (navigator.geolocation) {
+              if (userLoc) {
+                onLogVisit(userLoc[0], userLoc[1]);
+              } else if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
                   onLogVisit(pos.coords.latitude, pos.coords.longitude);
                 }, (err) => {
@@ -80,9 +83,14 @@ export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit:
           
           <button 
             onClick={() => {
-              if (navigator.geolocation) {
+              if (userLoc) {
+                // Manually snap the map center back to the user's location
+                setCenter([...userLoc]);
+              } else if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((pos) => {
-                  setCenter([pos.coords.latitude, pos.coords.longitude]);
+                  const loc: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+                  setUserLoc(loc);
+                  setCenter(loc);
                 }, undefined, { enableHighAccuracy: true });
               }
             }} 
@@ -92,7 +100,7 @@ export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit:
           </button>
         </div>
 
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/95 px-5 py-2.5 rounded-full shadow-md text-sm font-semibold border text-center pointer-events-none text-gray-800">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/95 px-5 py-2.5 rounded-full shadow-md text-sm font-semibold border text-center pointer-events-none text-gray-800 shadow-sm">
           Tap the map to drop a pin anywhere
         </div>
       </div>
