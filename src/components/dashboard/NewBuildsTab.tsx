@@ -14,14 +14,26 @@ export default function NewBuildsTab({ companyId: initialCompanyId }: { companyI
   const [companyId, setCompanyId] = useState<string | undefined>(initialCompanyId);
 
   useEffect(() => {
+    let isMounted = true;
+    
     if (!companyId) {
       // Fetch default company if none provided
-      supabase.from('companies').select('id').limit(1).then(({ data }) => {
+      supabase.from('companies').select('id').limit(1).then(({ data, error }) => {
+        if (!isMounted) return;
+        
         if (data && data.length > 0) {
           setCompanyId(data[0].id);
+        } else {
+          console.error("No companies found or error fetching company:", error);
+          setLoading(false); // Stop loading if we fail to get a company
         }
+      }).catch(err => {
+        console.error("Supabase fetch failed:", err);
+        if (isMounted) setLoading(false);
       });
     }
+    
+    return () => { isMounted = false; };
   }, [companyId]);
 
   useEffect(() => {
@@ -31,18 +43,29 @@ export default function NewBuildsTab({ companyId: initialCompanyId }: { companyI
   }, [companyId]);
 
   const fetchLeads = async () => {
-    if (!companyId) return;
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('new_build_permits')
-      .select('*')
-      .eq('company_id', companyId)
-      .order('permit_date', { ascending: false });
-
-    if (!error && data) {
-      setLeads(data);
+    if (!companyId) {
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+    
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('new_build_permits')
+        .select('*')
+        .eq('company_id', companyId)
+        .order('permit_date', { ascending: false });
+
+      if (error) {
+        console.error("Error fetching leads:", error);
+      } else if (data) {
+        setLeads(data);
+      }
+    } catch (err) {
+      console.error("Exception fetching leads:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const calculateTimeline = (permitDate: string, estimatedCompletion: string) => {
