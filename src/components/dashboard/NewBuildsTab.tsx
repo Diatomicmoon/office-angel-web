@@ -18,19 +18,24 @@ export default function NewBuildsTab({ companyId: initialCompanyId }: { companyI
     
     if (!companyId) {
       // Fetch default company if none provided
-      supabase.from('companies').select('id').limit(1).then(({ data, error }) => {
-        if (!isMounted) return;
-        
-        if (data && data.length > 0) {
-          setCompanyId(data[0].id);
-        } else {
-          console.error("No companies found or error fetching company:", error);
-          setLoading(false); // Stop loading if we fail to get a company
+      const fetchCompany = async () => {
+        try {
+          const { data, error } = await supabase.from('companies').select('id').limit(1);
+          if (!isMounted) return;
+          
+          if (data && data.length > 0) {
+            setCompanyId(data[0].id);
+          } else {
+            console.error("No companies found or error fetching company:", error);
+            setLoading(false); // Stop loading if we fail to get a company
+          }
+        } catch (err) {
+          console.error("Supabase fetch failed:", err);
+          if (isMounted) setLoading(false);
         }
-      }).catch(err => {
-        console.error("Supabase fetch failed:", err);
-        if (isMounted) setLoading(false);
-      });
+      };
+      
+      fetchCompany();
     }
     
     return () => { isMounted = false; };
