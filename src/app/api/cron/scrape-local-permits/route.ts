@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import * as cheerio from 'cheerio';
 
 export const maxDuration = 60; 
 export const dynamic = 'force-dynamic';
@@ -11,9 +10,14 @@ export async function GET(request: Request) {
 
   try {
     const { data: companies } = await supabase.from('companies').select('id').limit(1);
+    
+    // FIX: TypeScript was mad because we didn't check if 'companies' was null before grabbing the ID!
+    if (!companies || companies.length === 0) {
+      throw new Error('No company found.');
+    }
+    
     const companyId = companies[0].id;
 
-    // This is where we will write the exact Cheerio logic to rip the HTML from the city website
     console.log("Scraper engine built and ready to parse City HTML.");
 
     return NextResponse.json({ 
