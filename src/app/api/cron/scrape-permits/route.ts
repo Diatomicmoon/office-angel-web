@@ -16,7 +16,7 @@ export async function GET(request: Request) {
   try {
     const { data: companies } = await supabase.from('companies').select('id').limit(1);
     if (!companies || companies.length === 0) throw new Error('No company');
-    const companyId = companies[0].id;
+    const companyId = companies[0]?.id;
 
     const targetZips = ['55344', '55347', '55343', '55441', '55305']; 
     let totalInserted = 0;

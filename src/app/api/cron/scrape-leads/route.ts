@@ -29,7 +29,7 @@ export async function GET(request: Request) {
       throw new Error('Could not find company to assign leads to.');
     }
 
-    const companyId = companies[0].id;
+    const companyId = companies[0]?.id;
     const targetZips = ['55344', '55347', '55343']; 
     let totalInserted = 0;
 

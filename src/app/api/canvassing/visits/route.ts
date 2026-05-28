@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ visits: [] });
   }
 
-  const companyId = companies[0].id;
+  const companyId = companies?.[0]?.id;
 
   // Fetch manually logged visits
   const { data: manualVisits } = await supabase
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     .from('canvassing_visits')
     .insert([{
       ...body,
-      company_id: companies[0].id
+      company_id: companies?.[0]?.id
     }]);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
