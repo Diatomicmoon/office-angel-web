@@ -46,6 +46,7 @@ export async function GET(request: Request) {
     interest_level: lead.status === 'new' ? 'warm' : 'not_interested',
     visited_at: lead.sale_date || lead.created_at,
     notes: `Source: Auto-Scraped Property Sale\nSale Date: ${lead.sale_date || 'Unknown'}\nStatus: ${lead.status.toUpperCase()}`,
+    phone: lead.phone || null,
     latitude: lead.latitude || null,
     longitude: lead.longitude || null
   }));

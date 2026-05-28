@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone } from "lucide-react";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
@@ -143,13 +143,19 @@ export default function CanvassingPage() {
               </div>
             ) : (
               <div className="divide-y">
-                {visits.map((v) => (
+                {visits.slice(0, 5).map((v) => (
                   <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4">
                     <div className="flex-1">
-                      <p className="font-medium text-sm text-foreground">{v.address}</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {v.resident_name || 'Unknown Resident'} • {new Date(v.visited_at).toLocaleDateString()}
-                      </p>
+                      <p className="font-semibold text-sm text-foreground text-blue-600">{v.resident_name !== 'Current Resident' ? v.resident_name : 'Name Unknown'}</p>
+                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-3">
+                        <span className="font-medium text-foreground">{v.address}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1 font-medium bg-secondary px-2 py-0.5 rounded-md">
+                          <Phone className="w-3 h-3" /> {v.phone || 'No Phone Found'}
+                        </span>
+                        <span>•</span>
+                        <span>{new Date(v.visited_at).toLocaleDateString()}</span>
+                      </div>
                       {v.notes && (
                         <div className="mt-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded-md whitespace-pre-line border border-border/50">
                           {v.notes}
