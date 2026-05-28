@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { createClient } from '@supabase/supabase-js';
 import { RefreshCw, MapPin, HardHat, CalendarDays, Home } from 'lucide-react';
+
+// Create a local supabase client since we don't have @/lib/supabaseClient
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+);
 
 export default function NewBuildsTab({ companyId: initialCompanyId }: { companyId?: string }) {
   const [leads, setLeads] = useState<any[]>([]);
@@ -65,14 +68,17 @@ export default function NewBuildsTab({ companyId: initialCompanyId }: { companyI
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight">New Construction Leads</h2>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-gray-500">
             Pre-construction dirt lots and builder permits. Track timelines to intercept new homeowners before they move in.
           </p>
         </div>
-        <Button onClick={fetchLeads} variant="outline" size="sm" className="gap-2">
+        <button 
+          onClick={fetchLeads} 
+          className="border border-gray-300 bg-white hover:bg-gray-50 text-gray-700 px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2"
+        >
           <RefreshCw className="h-4 w-4" />
           Refresh Data
-        </Button>
+        </button>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -84,47 +90,47 @@ export default function NewBuildsTab({ companyId: initialCompanyId }: { companyI
           leads.map((lead) => {
             const phase = calculateTimeline(lead.permit_date, lead.estimated_completion_date);
             return (
-              <Card key={lead.id} className="overflow-hidden">
-                <CardHeader className="bg-gray-50 pb-4 border-b">
+              <div key={lead.id} className="overflow-hidden border border-gray-200 rounded-xl bg-white shadow-sm">
+                <div className="bg-gray-50 p-4 border-b border-gray-100">
                   <div className="flex justify-between items-start">
                     <div className="space-y-1">
-                      <CardTitle className="text-lg flex items-center gap-2">
+                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
                         <Home className="h-4 w-4 text-gray-500" />
                         {lead.property_address}
-                      </CardTitle>
-                      <div className="text-sm text-muted-foreground flex items-center gap-1">
+                      </h3>
+                      <div className="text-sm text-gray-500 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
                         {lead.city}, {lead.state}
                       </div>
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-4 space-y-4">
+                </div>
+                <div className="p-4 space-y-4">
                   <div className="flex items-center gap-2 text-sm">
                     <HardHat className="h-4 w-4 text-blue-600" />
                     <span className="font-medium text-gray-700">Builder:</span>
                     <span className="text-gray-900">{lead.contractor_name}</span>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-3 rounded-lg border">
+                  <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-3 rounded-lg border border-gray-100">
                     <div>
                       <div className="text-gray-500 text-xs mb-1">Permit Issued</div>
-                      <div className="font-medium">{new Date(lead.permit_date).toLocaleDateString()}</div>
+                      <div className="font-medium text-gray-900">{new Date(lead.permit_date).toLocaleDateString()}</div>
                     </div>
                     <div>
                       <div className="text-gray-500 text-xs mb-1">Est. Completion</div>
-                      <div className="font-medium">{new Date(lead.estimated_completion_date).toLocaleDateString()}</div>
+                      <div className="font-medium text-gray-900">{new Date(lead.estimated_completion_date).toLocaleDateString()}</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t">
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-2">
                     <span className="text-xs font-medium text-gray-500 uppercase">Construction Phase</span>
-                    <Badge variant="secondary" className={phase.color}>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${phase.color}`}>
                       {phase.status}
-                    </Badge>
+                    </span>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })
         )}
