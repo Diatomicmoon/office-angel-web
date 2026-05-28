@@ -146,15 +146,14 @@ export default function CanvassingPage() {
                 {visits.slice(0, 5).map((v) => (
                   <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4">
                     <div className="flex-1">
-                      <p className="font-semibold text-sm text-foreground text-blue-600">{v.resident_name !== 'Current Resident' ? v.resident_name : 'Name Unknown'}</p>
-                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-3">
-                        <span className="font-medium text-foreground">{v.address}</span>
-                        <span>•</span>
-                        <span className="flex items-center gap-1 font-medium bg-secondary px-2 py-0.5 rounded-md">
-                          <Phone className="w-3 h-3" /> {v.phone || 'No Phone Found'}
-                        </span>
-                        <span>•</span>
-                        <span>{new Date(v.visited_at).toLocaleDateString()}</span>
+                      <p className="font-semibold text-base text-foreground text-blue-600">
+                        {v.resident_name && v.resident_name !== 'Current Resident' ? v.resident_name : 'Homeowner'}
+                      </p>
+                      <div className="text-sm text-foreground font-medium mt-0.5 flex items-center gap-2">
+                        <span>{v.address}</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                        <span>Visited / Scraped: {new Date(v.visited_at).toLocaleDateString()}</span>
                       </div>
                       {v.notes && (
                         <div className="mt-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded-md whitespace-pre-line border border-border/50">
