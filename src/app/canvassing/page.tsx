@@ -143,7 +143,7 @@ export default function CanvassingPage() {
               </div>
             ) : (
               <div className="divide-y">
-                {visits.slice(0, 5).map((v) => (
+                {visits.slice(0, 50).map((v) => (
                   <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4">
                     <div className="flex-1">
                       <p className="font-semibold text-base text-foreground text-blue-600">
