@@ -1,14 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 
-const envFile = fs.readFileSync('.env.local', 'utf8');
-const urlMatch = envFile.match(/NEXT_PUBLIC_SUPABASE_URL="(.*?)"/);
-const keyMatch = envFile.match(/SUPABASE_SERVICE_ROLE_KEY="(.*?)"/);
-
-const supabase = createClient(urlMatch[1], keyMatch[1]);
-
-async function check() {
-  const { data: users } = await supabase.auth.admin.listUsers();
-  console.log("Users:", JSON.stringify(users.users, null, 2));
-}
-check();
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+const { data } = await supabase.from('new_build_permits').select('*');
+console.log(data);
