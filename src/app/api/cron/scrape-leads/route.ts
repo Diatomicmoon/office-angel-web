@@ -88,7 +88,7 @@ export async function GET(request: Request) {
         city: prop.address?.city || '',
         state: prop.address?.state || '',
         zip_code: prop.address?.zip || zip,
-        new_owner_name: prop.owner1FullName || prop.owner1LastName || prop.ownerName || prop.owner?.name || 'Current Resident',
+        new_owner_name: prop.owner1LastName || 'Current Resident',
         sale_date: prop.lastSaleDate || null,
         sale_price: prop.lastSalePrice || prop.lastSale?.price || null,
         latitude: prop.latitude || null,
