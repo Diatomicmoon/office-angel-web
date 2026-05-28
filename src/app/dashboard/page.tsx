@@ -47,33 +47,35 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto p-8 space-y-8 h-[calc(100vh-2rem)] overflow-y-auto">
+    <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-6 md:space-y-8 h-[calc(100vh-2rem)] overflow-y-auto pb-24">
 
       {/* Header */}
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Command Center</h1>
-          <p className="text-gray-500 mt-2">Live overview of dispatch, AI operations, and daily revenue.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Command Center</h1>
+          <p className="text-sm md:text-base text-gray-500 mt-1 md:mt-2">Live overview of dispatch, AI operations, and daily revenue.</p>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex gap-3 items-center w-full md:w-auto">
           
           {/* AI Mode Toggle */}
-          <div className="bg-gray-100 p-1 rounded-lg flex border border-gray-200">
+          <div className="bg-gray-100 p-1 rounded-lg flex border border-gray-200 flex-1 md:flex-none">
             <button 
               onClick={() => setAiMode("auto")}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${aiMode === 'auto' ? 'bg-white text-blue-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-xs md:text-sm font-medium transition-all ${aiMode === 'auto' ? 'bg-white text-blue-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Auto-Pilot
             </button>
             <button 
               onClick={() => setAiMode("copilot")}
-              className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${aiMode === 'copilot' ? 'bg-white text-purple-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
+              className={`flex-1 md:flex-none px-3 md:px-4 py-1.5 rounded-md text-xs md:text-sm font-medium transition-all ${aiMode === 'copilot' ? 'bg-white text-purple-600 shadow-sm border border-gray-200' : 'text-gray-500 hover:text-gray-700'}`}
             >
               Co-Pilot
             </button>
           </div>
 
-          <VapiCallButton />
+          <div className="hidden md:block">
+            <VapiCallButton />
+          </div>
         </div>
       </div>
 

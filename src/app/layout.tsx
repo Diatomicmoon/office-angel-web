@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Office Angel | Command Center",
   description: "AI automation suite for trade contractors.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -19,13 +20,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="theme-color" content="#000000" />
+      </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900`}>
         <div className="flex min-h-screen">
           <SidebarClientWrapper />
           
           
-          <main className="flex-1 min-w-0 flex flex-col min-h-screen">
-            <div className="flex-1">
+          <main className="flex-1 min-w-0 flex flex-col min-h-screen w-full">
+            <div className="flex-1 mt-14 md:mt-0">
               {children}
             </div>
           </main>

@@ -21,3 +21,7 @@ Source Sheet: https://docs.google.com/spreadsheets/d/1IUN6jvhaIj1H9YO9uMyhd2pGvN
   - `supabase/migrations/2026-05-05_create_technicians.sql`
   - updated `supabase/schema.sql`
   - updated `seed_db.mjs` to optionally seed technicians
+Jakob prompted about RLS. Instructed to click Run and Enable RLS since backend uses service role key.
+Jakob wants to build a new house scraper and asked about real heat maps.
+Asked Jakob to clarify the target for the new house scraper since it wasn't in MEMORY.md.
+Walking Jakob through getting a Mapbox API key for the real heat map.

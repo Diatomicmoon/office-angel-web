@@ -1,6 +1,7 @@
 "use client";
 
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents } from "react-leaflet";
+import { useEffect, useState } from "react";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const colorMap: Record<string, string> = {
@@ -35,17 +36,50 @@ interface Props {
   onMapClick?: (lat: number, lng: number) => void;
 }
 
-function MapClickHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
-  useMapEvents({
+function MapEventsHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
+  const map = useMapEvents({
     click(e) {
       if (onMapClick) onMapClick(e.latlng.lat, e.latlng.lng);
     },
+    moveend() {
+      const center = map.getCenter();
+      localStorage.setItem("oa_map_lat", center.lat.toString());
+      localStorage.setItem("oa_map_lng", center.lng.toString());
+      localStorage.setItem("oa_map_zoom", map.getZoom().toString());
+    },
+    zoomend() {
+      const center = map.getCenter();
+      localStorage.setItem("oa_map_lat", center.lat.toString());
+      localStorage.setItem("oa_map_lng", center.lng.toString());
+      localStorage.setItem("oa_map_zoom", map.getZoom().toString());
+    }
   });
   return null;
 }
 
 export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14, onMapClick }: Props) {
   const hasData = visits.length > 0;
+  
+  // Map State Persistence
+  const [initialCenter, setInitialCenter] = useState<[number, number]>(center);
+  const [initialZoom, setInitialZoom] = useState<number>(zoom);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const savedLat = localStorage.getItem("oa_map_lat");
+    const savedLng = localStorage.getItem("oa_map_lng");
+    const savedZoom = localStorage.getItem("oa_map_zoom");
+
+    if (savedLat && savedLng) {
+      setInitialCenter([parseFloat(savedLat), parseFloat(savedLng)]);
+    }
+    if (savedZoom) {
+      setInitialZoom(parseInt(savedZoom, 10));
+    }
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) return null; // Avoid hydration mismatch on map render
 
   return (
     <div className="flex-1 relative">
@@ -55,16 +89,16 @@ export default function MapView({ visits, center = [44.9778, -93.265], zoom = 14
         </div>
       )}
       <MapContainer
-        center={center}
-        zoom={zoom}
+        center={initialCenter}
+        zoom={initialZoom}
         className="w-full h-full rounded-lg"
         scrollWheelZoom={true}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        <MapClickHandler onMapClick={onMapClick} />
+        <MapEventsHandler onMapClick={onMapClick} />
         {hasData &&
           visits.map((visit) => {
             const lat = visit.latitude ?? visit.lat;

@@ -12,7 +12,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-screen sticky top-0">
+    <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-screen md:sticky md:top-0">
       <div className="p-6">
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
           <Activity className="text-blue-500" />

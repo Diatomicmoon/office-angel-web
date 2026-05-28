@@ -1,5 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs"
+  "crons": [
+    {
+      "path": "/api/cron/scrape-leads",
+      "schedule": "0 8 * * *"
+    }
+  ]
 }
