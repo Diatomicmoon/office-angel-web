@@ -144,16 +144,23 @@ export default function CanvassingPage() {
             ) : (
               <div className="divide-y">
                 {visits.map((v) => (
-                  <div key={v.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                    <div>
-                      <p className="font-medium text-sm">{v.address}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{v.resident_name || 'Unknown Resident'} • {new Date(v.visited_at).toLocaleDateString()}</p>
+                  <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4">
+                    <div className="flex-1">
+                      <p className="font-medium text-sm text-foreground">{v.address}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {v.resident_name || 'Unknown Resident'} • {new Date(v.visited_at).toLocaleDateString()}
+                      </p>
+                      {v.notes && (
+                        <div className="mt-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded-md whitespace-pre-line border border-border/50">
+                          {v.notes}
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3 h-3"/> Hot</span>}
-                      {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3 h-3"/> Warm</span>}
-                      {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3 h-3"/> Cold</span>}
-                      {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3 h-3"/> DND</span>}
+                    <div className="shrink-0 flex items-center gap-2">
+                      {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
+                      {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
+                      {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3.5 h-3.5"/> Cold</span>}
+                      {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3.5 h-3.5"/> DND</span>}
                     </div>
                   </div>
                 ))}

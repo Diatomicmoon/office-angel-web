@@ -91,6 +91,8 @@ export async function GET(request: Request) {
         new_owner_name: prop.ownerName || prop.owner?.name || 'Current Resident',
         sale_date: prop.lastSaleDate || null,
         sale_price: prop.lastSalePrice || prop.lastSale?.price || null,
+        latitude: prop.latitude || null,
+        longitude: prop.longitude || null,
         status: 'new',
         source: 'realestateapi'
       }));
