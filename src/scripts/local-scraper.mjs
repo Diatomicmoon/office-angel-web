@@ -34,8 +34,8 @@ async function runScraper() {
         const formatDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 
         console.log(`Setting date range: ${formatDate(lastMonth)} to ${formatDate(today)}`);
-        await page.fill('input[name$="txtIssuedDateFrom"]', formatDate(lastMonth));
-        await page.fill('input[name$="txtIssuedDateTo"]', formatDate(today));
+        await page.fill('input[id$="dpIssuedDateFrom_dateInput"]', formatDate(lastMonth));
+        await page.fill('input[id$="dpIssuedDateTo_dateInput"]', formatDate(today));
         
         await page.click('input[value="Search"]');
         
