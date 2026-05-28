@@ -27,82 +27,79 @@ export async function GET(request: Request) {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    // Go to Waconia LOGIS permit search
-    console.log("Navigating to Waconia ePermits...");
-    await page.goto('https://epermits.logis.org/search.aspx?city=waconia', { waitUntil: 'networkidle' });
+    // Target Cities using LOGIS
+    const targetCities = ['waconia', 'edenprairie'];
+    const allResults: any[] = [];
 
-    // Calculate dates (Last 7 days for nightly run)
-    const today = new Date();
-    const lastWeek = new Date();
-    lastWeek.setDate(today.getDate() - 7);
-    
-    const formatDate = (d: Date) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+    for (const targetCity of targetCities) {
+      console.log(`Navigating to ${targetCity} ePermits...`);
+      await page.goto(`https://epermits.logis.org/search.aspx?city=${targetCity}`, { waitUntil: 'networkidle' });
 
-    // Fill out the search form
-    console.log(`Setting date range: ${formatDate(lastWeek)} to ${formatDate(today)}`);
-    await page.fill('input[name$="txtIssuedDateFrom"]', formatDate(lastWeek)); // We'll need exact selectors for prod
-    await page.fill('input[name$="txtIssuedDateTo"]', formatDate(today));
-    
-    // Select "New Construction" or equivalent if needed, else just search by date
-    await page.click('input[value="Search"]');
-    
-    console.log("Waiting for results table to load...");
-    // Wait for the results table to appear
-    await page.waitForSelector('table', { timeout: 10000 }).catch(() => console.log("No table found or timeout"));
+      // Calculate dates (Last 7 days for nightly run)
+      const today = new Date();
+      const lastWeek = new Date();
+      lastWeek.setDate(today.getDate() - 7);
+      
+      const formatDate = (d: Date) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
 
-    // Extract the HTML of the page after the search results load
-    const html = await page.content();
+      // Fill out the search form
+      console.log(`Setting date range: ${formatDate(lastWeek)} to ${formatDate(today)}`);
+      await page.fill('input[name$="txtIssuedDateFrom"]', formatDate(lastWeek));
+      await page.fill('input[name$="txtIssuedDateTo"]', formatDate(today));
+      
+      await page.click('input[value="Search"]');
+      
+      console.log(`Waiting for ${targetCity} results table to load...`);
+      await page.waitForSelector('table', { timeout: 10000 }).catch(() => console.log(`No table found for ${targetCity}`));
+
+      const html = await page.content();
+      const $ = cheerio.load(html);
+      
+      $('table tr').each((index, element) => {
+        if (index === 0) return; // Skip header
+        
+        const tds = $(element).find('td');
+        if (tds.length < 10) return;
+        
+        const permitNum = $(tds[0]).text().trim();
+        const subType = $(tds[3]).text().trim();
+        const workType = $(tds[4]).text().trim();
+        const address = $(tds[6]).text().trim();
+        const contractor = $(tds[7]).text().trim();
+        const issuedDate = $(tds[8]).text().trim();
+        
+        if (!subType.toLowerCase().includes('new') && !workType.toLowerCase().includes('new')) {
+           return; 
+        }
+        
+        const issueDateObj = new Date(issuedDate || Date.now());
+        const estimatedCompletion = new Date(issueDateObj);
+        estimatedCompletion.setMonth(estimatedCompletion.getMonth() + 6);
+        
+        allResults.push({
+          company_id: companyId,
+          property_address: address,
+          city: targetCity === 'edenprairie' ? 'Eden Prairie' : 'Waconia',
+          state: 'MN',
+          contractor_name: contractor,
+          permit_date: issueDateObj.toISOString().split('T')[0],
+          estimated_completion_date: estimatedCompletion.toISOString().split('T')[0],
+          status: 'foundation',
+          notes: `Permit: ${permitNum} | Builder: ${contractor}`
+        });
+      });
+    }
+
     await browser.close();
 
-    // --- CHEERIO EXTRACTION ENGINE (from earlier) ---
-    const $ = cheerio.load(html);
-    const results: any[] = [];
-    
-    $('table tr').each((index, element) => {
-      if (index === 0) return; // Skip header
-      
-      const tds = $(element).find('td');
-      if (tds.length < 10) return;
-      
-      const permitNum = $(tds[0]).text().trim();
-      const subType = $(tds[3]).text().trim();
-      const workType = $(tds[4]).text().trim();
-      const address = $(tds[6]).text().trim();
-      const contractor = $(tds[7]).text().trim();
-      const issuedDate = $(tds[8]).text().trim();
-      
-      // Target New Builds only
-      if (!subType.toLowerCase().includes('new') && !workType.toLowerCase().includes('new')) {
-         return; // Skip remodels/repairs
-      }
-      
-      // Calculate estimated completion (approx 6-8 months for a new build)
-      const issueDateObj = new Date(issuedDate || Date.now());
-      const estimatedCompletion = new Date(issueDateObj);
-      estimatedCompletion.setMonth(estimatedCompletion.getMonth() + 6);
-      
-      results.push({
-        company_id: companyId,
-        property_address: address,
-        city: 'Waconia',
-        state: 'MN',
-        contractor_name: contractor,
-        permit_date: issueDateObj.toISOString().split('T')[0],
-        estimated_completion_date: estimatedCompletion.toISOString().split('T')[0],
-        status: 'foundation',
-        notes: `Permit: ${permitNum} | Builder: ${contractor}`
-      });
-    });
+    console.log(`Scraped ${allResults.length} total new build permits across LOGIS cities.`);
 
-    console.log(`Scraped ${results.length} new build permits for Waconia.`);
-
-    // Insert into Supabase
-    if (results.length > 0) {
-      const { error } = await supabase.from('new_build_permits').insert(results);
+    if (allResults.length > 0) {
+      const { error } = await supabase.from('new_build_permits').insert(allResults);
       if (error) throw error;
     }
 
-    return NextResponse.json({ success: true, count: results.length, data: results });
+    return NextResponse.json({ success: true, count: allResults.length, data: allResults });
 
   } catch (error: any) {
     console.error("Scraper failed:", error);

@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat } from "lucide-react";
+import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
 export default function CanvassingPage() {
-  const [view, setView] = useState<"list" | "map">("list");
+  const [view, setView] = useState<"list" | "map" | "builds">("list");
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -62,7 +63,13 @@ export default function CanvassingPage() {
                 onClick={() => setView("list")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "list" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
               >
-                <List className="w-4 h-4" /> List
+                <List className="w-4 h-4" /> New Movers
+              </button>
+              <button 
+                onClick={() => setView("builds")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "builds" ? "bg-background shadow-sm text-blue-600" : "text-muted-foreground"}`}
+              >
+                <HardHat className="w-4 h-4" /> New Builds
               </button>
               <button 
                 onClick={() => setView("map")}
@@ -129,7 +136,9 @@ export default function CanvassingPage() {
           </div>
         )}
 
-        {view === "list" ? (
+        {view === "builds" ? (
+          <NewBuildsTab />
+        ) : view === "list" ? (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading visits...</div>

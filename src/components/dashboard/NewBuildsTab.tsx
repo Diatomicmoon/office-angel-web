@@ -5,12 +5,26 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, MapPin, HardHat, CalendarDays, Home } from 'lucide-react';
 
-export default function NewBuildsTab({ companyId }: { companyId: string }) {
+export default function NewBuildsTab({ companyId: initialCompanyId }: { companyId?: string }) {
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [companyId, setCompanyId] = useState<string | undefined>(initialCompanyId);
 
   useEffect(() => {
-    fetchLeads();
+    if (!companyId) {
+      // Fetch default company if none provided
+      supabase.from('companies').select('id').limit(1).then(({ data }) => {
+        if (data && data.length > 0) {
+          setCompanyId(data[0].id);
+        }
+      });
+    }
+  }, [companyId]);
+
+  useEffect(() => {
+    if (companyId) {
+      fetchLeads();
+    }
   }, [companyId]);
 
   const fetchLeads = async () => {
