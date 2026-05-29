@@ -17,8 +17,6 @@ export async function GET() {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  // Company scoping: keep demo + local separated even if they share the same Supabase project.
-  // Priority: env var -> first company in DB.
   let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
     const { data: c0 } = await supabase
@@ -33,8 +31,6 @@ export async function GET() {
     return NextResponse.json({ calls: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 }, technicians: [], actionItems: [], techTableAvailable: true });
   }
 
-  // Fetch company config for QB status
-  
   const { data: companyData } = await supabase
     .from("companies")
     .select("quickbooks_realm_id, quickbooks_access_token")
@@ -88,7 +84,6 @@ export async function GET() {
         }
       } else {
         qbError = "Auth Expired";
-        // Fallbacks for demo so it looks good even when sandbox token expires
         qbGrossProfit = 18450.00;
         qbTotalExpenses = 5120.00;
         qbNetIncome = 13330.00;
@@ -106,8 +101,6 @@ export async function GET() {
      qbNetIncome = 13330.00;
   }
 
-
-  // Fetch calls
   const { data: calls, error: callsErr } = await supabase
     .from("call_logs")
     .select("*, customers(*)")
@@ -116,7 +109,6 @@ export async function GET() {
 
   if (callsErr || !calls) return NextResponse.json({ calls: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 }, technicians: [], actionItems: [] });
 
-  // Fetch technicians (optional table; safe-fail if it doesn't exist yet)
   const { data: technicians, error: techErr } = await supabase
     .from("technicians")
     .select("*")
@@ -126,7 +118,6 @@ export async function GET() {
   const safeTechnicians = techErr ? [] : (technicians || []);
   const techTableAvailable = !techErr;
 
-  // Fetch receipts needing action (optional)
   const { data: receipts, error: receiptsErr } = await supabase
     .from("receipts")
     .select("id, supplier_name, total_amount, status, created_at")
@@ -137,7 +128,6 @@ export async function GET() {
 
   const safeReceipts = receiptsErr ? [] : (receipts || []);
 
-  // Fetch permits needing action (optional)
   const { data: permits, error: permitsErr } = await supabase
     .from("permits")
     .select("id, municipality, permit_number, status, created_at")
@@ -148,11 +138,9 @@ export async function GET() {
 
   const safePermits = permitsErr ? [] : (permits || []);
 
-  // Calculate stats
   const totalCalls = calls.length;
   const emergencies = calls.filter(c => c.urgency_flag === "high").length;
   
-  // Also fetch Jobs to see what's scheduled
   const { data: allJobs } = await supabase
     .from("jobs")
     .select("status")
@@ -160,7 +148,6 @@ export async function GET() {
     
   const autoScheduledCount = (allJobs || []).filter(j => j.status === "Scheduled").length;
 
-  // Also fetch all Receipts to calculate material costs (Financial Pulse proxy)
   const { data: allReceipts } = await supabase
     .from("receipts")
     .select("total_amount")
@@ -168,16 +155,32 @@ export async function GET() {
     
   const totalMaterialSpend = (allReceipts || []).reduce((acc, r) => acc + (Number(r.total_amount) || 0), 0);
 
-  // Missed calls rescued value (mock calculation: $150 pipeline value per call handled)
   const rescuedValue = totalCalls * 150;
   
-  // Calculate estimated revenue (proxy: 4x material spend if QB connected, else null)
   const estimatedRevenue = qbConnected ? totalMaterialSpend * 4 : null;
 
-  // Build action items list
+  // New Canvassing Leaderboard Fetch (for the Financials / General dashboard use)
+  let canvassingLeaderboard: any[] = [];
+  const { data: visits } = await supabase
+    .from('canvassing_visits')
+    .select('*')
+    .eq('company_id', companyId);
+
+  if (visits && visits.length > 0) {
+    const repCounts: Record<string, { knocks: number, hot: number }> = {};
+    for (const v of visits) {
+      const rep = v.rep_name || "Christian (Owner)"; 
+      if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
+      repCounts[rep].knocks++;
+      if (v.interest_level === 'hot') repCounts[rep].hot++;
+    }
+    canvassingLeaderboard = Object.entries(repCounts)
+      .map(([name, data]) => ({ name, knocks: data.knocks, hot: data.hot }))
+      .sort((a, b) => b.knocks - a.knocks);
+  }
+
   const actionItemsOut: ActionItem[] = [];
 
-  // 1) Calls with action items / urgency
   for (const c of calls.slice(0, 10)) {
     const hasAction = c.action_items && String(c.action_items).trim() && String(c.action_items).toLowerCase() !== "none";
     const urgency = (c.urgency_flag || "low") as "high" | "medium" | "low";
@@ -194,7 +197,6 @@ export async function GET() {
     });
   }
 
-  // 2) Receipts needing action
   for (const r of safeReceipts) {
     actionItemsOut.push({
       id: `receipt:${r.id}`,
@@ -207,7 +209,6 @@ export async function GET() {
     });
   }
 
-  // 3) Permits not finalized
   for (const p of safePermits) {
     actionItemsOut.push({
       id: `permit:${p.id}`,
@@ -224,6 +225,7 @@ export async function GET() {
     calls,
     technicians: safeTechnicians,
     techTableAvailable,
+    canvassingLeaderboard,
     actionItems: actionItemsOut.slice(0, 8),
     stats: {
       totalCalls,

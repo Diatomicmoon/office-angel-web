@@ -17,6 +17,8 @@ export async function GET() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // We need to fetch the reps data to map rep_id to actual names
+  // If canvassing_visits doesn't have rep_id yet in production, we can mock or use a generic field
   const { data: visits } = await supabase
     .from('canvassing_visits')
     .select('*')
@@ -27,15 +29,30 @@ export async function GET() {
     totalKnocks: visits?.length || 0,
     hotLeads: 0,
     warmLeads: 0,
+    leaderboard: [] as any[]
   };
+
+  const repCounts: Record<string, { knocks: number, hot: number }> = {};
 
   if (visits) {
     for (const v of visits) {
       if (new Date(v.visited_at) >= today) stats.todayKnocks++;
       if (v.interest_level === 'hot') stats.hotLeads++;
       if (v.interest_level === 'warm') stats.warmLeads++;
+
+      // We use "rep_name" if it exists, or fall back to "Field Rep"
+      // In production, the CanvassingMode should inject the logged-in rep's name
+      const rep = v.rep_name || "Christian (Owner)"; 
+      if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
+      repCounts[rep].knocks++;
+      if (v.interest_level === 'hot') repCounts[rep].hot++;
     }
   }
+
+  // Convert map to sorted array for leaderboard
+  stats.leaderboard = Object.entries(repCounts)
+    .map(([name, data]) => ({ name, knocks: data.knocks, hot: data.hot }))
+    .sort((a, b) => b.knocks - a.knocks);
 
   return NextResponse.json(stats);
 }

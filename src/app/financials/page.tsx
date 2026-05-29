@@ -124,7 +124,46 @@ export default function FinancialsPage() {
 
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            {/* Profit by Crew Leaderboard */}
+            {/* Canvassing Leaderboard */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Users size={18} className="text-gray-500" /> Door-to-Door Leaderboard
+              </h2>
+            </div>
+            <div className="divide-y divide-gray-100 p-0 overflow-x-auto">
+              {data.canvassingLeaderboard && data.canvassingLeaderboard.length > 0 ? (
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-gray-50/50 text-gray-500">
+                    <tr>
+                      <th className="px-6 py-3 font-medium">Sales Rep</th>
+                      <th className="px-6 py-3 font-medium">Total Doors Knocked</th>
+                      <th className="px-6 py-3 font-medium text-right">Hot Leads Generated</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {data.canvassingLeaderboard.map((rep: any, idx: number) => (
+                      <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 font-semibold text-gray-900 flex items-center gap-2">
+                          {idx === 0 ? "🥇" : idx === 1 ? "🥈" : idx === 2 ? "🥉" : ""} {rep.name}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 font-medium">{rep.knocks} doors</td>
+                        <td className="px-6 py-4 text-right">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${rep.hot > 0 ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-600'}`}>
+                            🔥 {rep.hot} Hot
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="p-8 text-center text-gray-500">No field reps have logged visits yet.</div>
+              )}
+            </div>
+          </div>
+          
+          {/* Profit by Crew Leaderboard */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
                 <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">

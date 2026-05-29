@@ -20,8 +20,28 @@ export async function GET(req: Request) {
     .eq("id", companyId)
     .single();
 
+  // Fetch Canvassing Leaderboard here as well to inject into the Financials page
+  let canvassingLeaderboard: any[] = [];
+  const { data: visits } = await supabase
+    .from('canvassing_visits')
+    .select('*')
+    .eq('company_id', companyId);
+
+  if (visits && visits.length > 0) {
+    const repCounts: Record<string, { knocks: number, hot: number }> = {};
+    for (const v of visits) {
+      const rep = v.rep_name || "Christian (Owner)"; 
+      if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
+      repCounts[rep].knocks++;
+      if (v.interest_level === 'hot') repCounts[rep].hot++;
+    }
+    canvassingLeaderboard = Object.entries(repCounts)
+      .map(([name, data]) => ({ name, knocks: data.knocks, hot: data.hot }))
+      .sort((a, b) => b.knocks - a.knocks);
+  }
+
   if (error || !company || !company.quickbooks_access_token) {
-    return NextResponse.json({ error: "QuickBooks is not connected for this company" }, { status: 400 });
+    return NextResponse.json({ error: "QuickBooks is not connected for this company", canvassingLeaderboard }, { status: 400 });
   }
 
   // Intuit Sandbox Base URL
@@ -39,7 +59,7 @@ export async function GET(req: Request) {
     
     if (!plRes.ok) {
        const errText = await plRes.text();
-       return NextResponse.json({ error: "QuickBooks API Error (Token likely expired)", details: errText }, { status: plRes.status });
+       return NextResponse.json({ error: "QuickBooks API Error (Token likely expired)", details: errText, canvassingLeaderboard }, { status: plRes.status });
     }
     const plData = await plRes.json();
 
@@ -104,7 +124,6 @@ export async function GET(req: Request) {
     }
     topExpenseCategories.sort((a, b) => b.amount - a.amount);
 
-    // Live Operational Data from Supabase
     const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
     const rescuedCalls = calls ? calls.length : 0;
     const rescuedValue = rescuedCalls * 150;
@@ -116,6 +135,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ 
        success: true, 
        source: "live_quickbooks", 
+       canvassingLeaderboard,
        report: {
          grossProfit,
          totalExpenses,
