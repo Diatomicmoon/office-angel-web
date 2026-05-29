@@ -10,6 +10,10 @@
     {
       "path": "/api/cron/cross-reference-builds",
       "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-permits",
+      "schedule": "0 3 * * *"
     }
   ]
 }
