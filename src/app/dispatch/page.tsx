@@ -810,33 +810,33 @@ export default function Dispatch() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
+      <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
-          <p className="text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
+          <p className="text-sm md:text-base text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
         </div>
-        <div className="flex gap-4 items-center">
-          <div className="bg-blue-50 border border-blue-100 px-4 py-2 rounded-lg flex items-center gap-3">
-            <Sun size={20} className="text-yellow-500" />
+        <div className="flex flex-wrap gap-2 lg:gap-4 items-center w-full lg:w-auto">
+          <div className="bg-blue-50 border border-blue-100 px-3 py-2 md:px-4 md:py-2 rounded-lg flex items-center gap-2 md:gap-3 flex-1 lg:flex-none">
+            <Sun size={20} className="text-yellow-500 flex-shrink-0" />
             <div>
-              <p className="text-xs font-bold text-blue-900">72° Clear</p>
-              <p className="text-[10px] text-blue-700">Perfect for roof/solar work</p>
+              <p className="text-[10px] md:text-xs font-bold text-blue-900">72° Clear</p>
+              <p className="text-[9px] md:text-[10px] text-blue-700 leading-tight hidden sm:block">Perfect for roof/solar work</p>
             </div>
           </div>
-          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
-            <Users size={18} />
-            Filter Crews
+          <button className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-3 py-2.5 md:px-4 md:py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 justify-center flex-1 lg:flex-none whitespace-nowrap">
+            <Users size={16} />
+            Filter
           </button>
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
-            <Plus size={18} />
-            Manual Book
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2.5 md:px-5 md:py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 justify-center flex-1 lg:flex-none whitespace-nowrap">
+            <Plus size={16} />
+            Manual
           </button>
         </div>
       </div>
 
       {/* Calendar Controls */}
-      <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-        <div className="flex items-center gap-4">
+      <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+        <div className="flex items-center justify-between md:justify-start gap-2 w-full md:w-auto">
           <button
             onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -844,7 +844,7 @@ export default function Dispatch() {
           >
             <ChevronLeft size={20} className="text-gray-600" />
           </button>
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-base md:text-lg font-semibold text-gray-900 min-w-[110px] text-center">
             {selectedDate.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}
           </h2>
           <button
@@ -859,29 +859,29 @@ export default function Dispatch() {
               setSelectedDate(new Date());
               setTimeout(() => jumpToNow(), 0);
             }}
-            className="ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+            className="ml-1 md:ml-2 px-3 py-1.5 rounded-lg text-sm font-semibold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
           >
             Today
           </button>
 
           {viewMode === 'day' ? (
-            <div className="ml-2 flex items-center gap-2">
-              <button onClick={panLeft} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
-              <button onClick={panRight} className="px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
+            <div className="ml-1 md:ml-2 flex items-center gap-1 md:gap-2">
+              <button onClick={panLeft} className="hidden sm:block px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">◀</button>
+              <button onClick={panRight} className="hidden sm:block px-2 py-1.5 rounded-lg text-sm font-bold border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">▶</button>
             </div>
           ) : null}
         </div>
-        <div className="flex bg-gray-100 p-1 rounded-lg">
-          <button onClick={() => setViewMode('day')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
-          <button onClick={() => setViewMode('map')} className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
+        <div className="flex bg-gray-100 p-1 rounded-lg w-full md:w-auto">
+          <button onClick={() => setViewMode('day')} className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
+          <button onClick={() => setViewMode('map')} className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
         </div>
       </div>
 
-      <div className="flex-1 flex gap-6 min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0 overflow-hidden">
         {/* Left Sidebar: AI Parking Lot */}
-        <div className="w-80 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0 min-h-0">
-          <div className="p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">AI Parking Lot</h3>
+        <div className="w-full lg:w-80 h-[350px] lg:h-auto lg:min-h-0 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0">
+          <div className="p-3 lg:p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2 text-sm lg:text-base">AI Parking Lot</h3>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
@@ -1039,7 +1039,7 @@ export default function Dispatch() {
         <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
           {viewMode === 'map' ? (
             <div className="flex-1 relative overflow-hidden bg-gray-100">
-              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-72">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-[90%] max-w-sm md:w-72">
                 <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
                 {!techTableAvailable ? (
                   <p className="text-xs text-gray-500">Technician table not set up yet.</p>
@@ -1059,7 +1059,20 @@ export default function Dispatch() {
                   </div>
                 )}
 
-                <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-semibold text-gray-800 flex items-center gap-1.5">
+                      <MapPin size={14} className="text-red-500" /> Sales Territories
+                    </span>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input type="checkbox" className="sr-only peer" defaultChecked />
+                      <div className="w-8 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3.5 after:w-3.5 after:transition-all peer-checked:bg-red-500"></div>
+                    </label>
+                  </div>
+                  <p className="text-[10px] text-gray-500 leading-tight">Showing predictive heat maps and scraped new mover leads for D2D canvassing.</p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-200 space-y-2">
                   <button
                     onClick={async () => {
                       await geocodeDemo();
@@ -1081,7 +1094,7 @@ export default function Dispatch() {
                 </div>
               </div>
               {!apiKey ? (
-                <div className="flex items-center justify-center h-full text-sm text-gray-500">
+                <div className="flex items-center justify-center h-full text-sm text-gray-500 p-6 text-center">
                   Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
                 </div>
               ) : (
