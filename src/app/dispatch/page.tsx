@@ -652,7 +652,7 @@ export default function Dispatch() {
   }, [techs.length]);
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6 p-4 md:p-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] flex flex-col">
+    <div className="max-w-[1600px] mx-auto space-y-6 p-4 md:p-8 min-h-[calc(100dvh-3.5rem)] lg:h-[calc(100vh-2rem)] flex flex-col">
       {/* Job Ticket Slide-over */}
       {ticketOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
@@ -877,7 +877,7 @@ export default function Dispatch() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0 lg:overflow-hidden">
         {/* Left Sidebar: AI Parking Lot */}
         <div className="w-full lg:w-80 h-[350px] lg:h-auto lg:min-h-0 bg-gray-50 rounded-xl border border-gray-200 flex flex-col flex-shrink-0">
           <div className="p-3 lg:p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
@@ -1038,7 +1038,7 @@ export default function Dispatch() {
         {/* Right Side: Board or Map */}
         <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
           {viewMode === 'map' ? (
-            <div className="flex-1 relative overflow-hidden bg-gray-100">
+            <div className="flex-1 relative overflow-hidden bg-gray-100 rounded-xl min-h-[500px] lg:min-h-0 border border-gray-200">
               <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-[90%] max-w-sm md:w-72">
                 <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
                 {!techTableAvailable ? (
@@ -1115,7 +1115,7 @@ export default function Dispatch() {
           ) : (
             <div
               ref={dayScrollRef}
-              className="flex-1 overflow-x-scroll overflow-y-scroll relative"
+              className="flex-1 overflow-x-scroll overflow-y-scroll relative bg-white rounded-xl border border-gray-200 min-h-[600px] lg:min-h-0"
               style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch', scrollbarGutter: 'stable both-edges', cursor: 'grab' as any }}
               onPointerDown={(e) => {
                 // Click+drag to pan (helps trackpads/mice when horizontal scroll is finicky)
