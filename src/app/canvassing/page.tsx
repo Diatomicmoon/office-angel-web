@@ -8,6 +8,38 @@ import CanvassingMode from "./CanvassingMode";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
+function CanvassingStats() {
+  const [stats, setStats] = useState({ todayKnocks: 0, totalKnocks: 0, hotLeads: 0, warmLeads: 0 });
+
+  useEffect(() => {
+    fetch("/api/canvassing/stats")
+      .then(res => res.json())
+      .then(data => setStats(data))
+      .catch(console.error);
+  }, []);
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="bg-card border rounded-xl p-4 shadow-sm">
+        <div className="text-sm text-muted-foreground font-medium mb-1">Knocked Today</div>
+        <div className="text-2xl font-bold">{stats.todayKnocks}</div>
+      </div>
+      <div className="bg-card border rounded-xl p-4 shadow-sm">
+        <div className="text-sm text-muted-foreground font-medium mb-1">Total Knocks</div>
+        <div className="text-2xl font-bold">{stats.totalKnocks}</div>
+      </div>
+      <div className="bg-card border rounded-xl p-4 shadow-sm bg-orange-50/50">
+        <div className="text-sm text-orange-600 font-medium mb-1 flex items-center gap-1"><Flame className="w-4 h-4"/> Hot Leads</div>
+        <div className="text-2xl font-bold text-orange-700">{stats.hotLeads}</div>
+      </div>
+      <div className="bg-card border rounded-xl p-4 shadow-sm bg-blue-50/50">
+        <div className="text-sm text-blue-600 font-medium mb-1 flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Warm Pipeline</div>
+        <div className="text-2xl font-bold text-blue-700">{stats.warmLeads}</div>
+      </div>
+    </div>
+  );
+}
+
 export default function CanvassingPage() {
   const [view, setView] = useState<"list" | "map" | "builds" | "territories">("list");
   const [canvassingActive, setCanvassingActive] = useState(false);
@@ -74,7 +106,7 @@ export default function CanvassingPage() {
     <div className="p-4 md:p-8">
       {canvassingActive && (
         <CanvassingMode 
-          onExit={() => setCanvassingActive(false)} 
+          onExit={() => { setCanvassingActive(false); fetchVisits(); }} 
           onLogVisit={handleMapClick} 
           visits={visits}
         />
@@ -126,6 +158,8 @@ export default function CanvassingPage() {
             </button>
           </div>
         </div>
+
+        <CanvassingStats />
 
         {showAdd && (
           <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">

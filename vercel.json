@@ -4,8 +4,12 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/cron/scrape-leads",
-      "schedule": "0 8 * * *"
+      "path": "/api/cron/scrape-waconia",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/cross-reference-builds",
+      "schedule": "30 2 * * *"
     }
   ]
 }
