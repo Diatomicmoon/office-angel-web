@@ -9,22 +9,15 @@ export default function PermitsPage() {
 
   useEffect(() => {
     async function fetchPermits() {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-      
-      // Get the current company ID from local storage or context if possible, 
-      // otherwise fetch all for now in this demo view
-      const { data, error } = await supabase
-        .from('permits')
-        .select(`
-          *,
-          jobs ( title )
-        `)
-        .order('created_at', { ascending: false });
-
-      if (data) setPermits(data);
+      try {
+        const res = await fetch('/api/permits');
+        const json = await res.json();
+        if (json.data) {
+          setPermits(json.data);
+        }
+      } catch (err) {
+        console.error(err);
+      }
       setLoading(false);
     }
     fetchPermits();
