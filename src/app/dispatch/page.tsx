@@ -2,7 +2,9 @@
 
 import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { APIProvider, Map as GMap, Marker } from '@vis.gl/react-google-maps';
+import dynamic from "next/dynamic";
+
+const DispatchMap = dynamic(() => import("@/components/DispatchMap"), { ssr: false });
 
 type Technician = {
   id: string;
@@ -1039,7 +1041,7 @@ export default function Dispatch() {
         <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
           {viewMode === 'map' ? (
             <div className="flex-1 relative overflow-hidden bg-gray-100 rounded-xl min-h-[500px] lg:min-h-0 border border-gray-200">
-              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-10 w-[90%] max-w-sm md:w-72">
+              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-[999] w-[90%] max-w-sm md:w-72">
                 <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
                 {!techTableAvailable ? (
                   <p className="text-xs text-gray-500">Technician table not set up yet.</p>
@@ -1093,24 +1095,10 @@ export default function Dispatch() {
                   {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
                 </div>
               </div>
-              {!apiKey ? (
-                <div className="flex items-center justify-center h-full text-sm text-gray-500 p-6 text-center">
-                  Missing Google Maps API key. Set <span className="font-mono mx-1">NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</span> in Vercel.
-                </div>
-              ) : (
-                <APIProvider apiKey={apiKey}>
-                  <div style={{ width: '100%', height: '100%' }}>
-                    <GMap defaultCenter={center} defaultZoom={11} disableDefaultUI={true} gestureHandling={'greedy'}>
-                      {techs
-                        .map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) }))
-                        .filter((x) => x.pos)
-                        .map(({ tech, pos }: any) => (
-                          <Marker key={tech.id} position={pos} title={tech.name || 'Technician'} />
-                        ))}
-                    </GMap>
-                  </div>
-                </APIProvider>
-              )}
+              <DispatchMap 
+                center={center} 
+                techsData={techs.map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) })).filter((x) => x.pos) as any} 
+              />
             </div>
           ) : (
             <div
