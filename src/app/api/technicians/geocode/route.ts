@@ -127,8 +127,8 @@ export async function POST() {
       .filter((c: any) => {
         if (!c.address) return false;
         const tags = Array.isArray(c.tags) ? c.tags : [];
-        const hasLat = tags.some(t => t.startsWith('lat:'));
-        const hasLng = tags.some(t => t.startsWith('lng:'));
+        const hasLat = tags.some((t: string) => t.startsWith('lat:'));
+        const hasLng = tags.some((t: string) => t.startsWith('lng:'));
         return !(hasLat && hasLng);
       })
       .slice(0, 20);

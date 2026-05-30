@@ -190,6 +190,23 @@ function ceilToSlot(min: number, slot = 30) {
   return Math.ceil(min / slot) * slot;
 }
 
+
+const getJobLatLng = (job: Job) => {
+  const tags = (job as any).customer?.tags;
+  if (!tags || !Array.isArray(tags)) return null;
+  let lat = null;
+  let lng = null;
+  for (const tag of tags) {
+    if (typeof tag !== 'string') continue;
+    if (tag.startsWith('lat:')) lat = Number(tag.slice(4));
+    if (tag.startsWith('lng:')) lng = Number(tag.slice(4));
+  }
+  if (lat && lng && !Number.isNaN(lat) && !Number.isNaN(lng)) {
+    return { lat, lng };
+  }
+  return null;
+};
+
 export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
