@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       // Pulling the latest 100 properties in the zip
       const payload = {
         zip: zip,
-        limit: 100 
+        limit: 10 // Reduced to 10 to save API credits 
       };
 
       const response = await fetch(apiUrl, {
