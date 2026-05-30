@@ -5,6 +5,11 @@ export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
+  // CRON IS TEMPORARILY PAUSED TO SAVE API CREDITS
+  // Uncomment the rest of the function when Christian is ready to use it
+  console.log('Cron paused to save credits.');
+  return NextResponse.json({ success: true, message: "Scraper paused to save API credits." });
+
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     // For local testing without headers, we can bypass this if needed, but keeping it secure
