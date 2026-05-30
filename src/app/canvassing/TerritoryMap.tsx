@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, FeatureGroup, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, FeatureGroup, GeoJSON, Tooltip } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
@@ -9,9 +9,10 @@ import "leaflet-draw/dist/leaflet.draw.css";
 interface Props {
   onCreated: (layer: any) => void;
   territories: any[];
+  techs?: any[];
 }
 
-export default function TerritoryMap({ onCreated, territories }: Props) {
+export default function TerritoryMap({ onCreated, territories, techs = [] }: Props) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -22,11 +23,17 @@ export default function TerritoryMap({ onCreated, territories }: Props) {
     const { layerType, layer } = e;
     if (layerType === 'polygon' || layerType === 'rectangle') {
       onCreated(layer);
-      // Remove it from the drawing layer so it doesn't double-render, we'll render it via GeoJSON
-      // Actually EditControl handles it, but we can clear and let GeoJSON handle
-      layer.remove();
+      layer.remove(); // Remove drawn layer so GeoJSON can take over
     }
   };
+
+  const getRepName = (repId: string) => {
+    if (!repId) return "Unassigned";
+    const rep = techs.find(t => t.id === repId);
+    return rep ? rep.name : "Unassigned";
+  };
+
+  const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
 
   if (!isReady) return null;
 
@@ -34,8 +41,8 @@ export default function TerritoryMap({ onCreated, territories }: Props) {
     <div className="w-full h-full relative">
       <MapContainer
         center={[44.9778, -93.265]}
-        zoom={14}
-        className="w-full h-full rounded-lg"
+        zoom={13}
+        className="w-full h-full"
         scrollWheelZoom={true}
       >
         <TileLayer
@@ -57,13 +64,22 @@ export default function TerritoryMap({ onCreated, territories }: Props) {
           />
         </FeatureGroup>
 
-        {territories.map(t => (
-          <GeoJSON 
-            key={t.id} 
-            data={t.geoJSON} 
-            style={() => ({ color: '#3b82f6', weight: 3, opacity: 0.6, fillOpacity: 0.2 })} 
-          />
-        ))}
+        {territories.map((t, i) => {
+          const repName = getRepName(t.assignedRep);
+          const color = colors[i % colors.length];
+          return (
+            <GeoJSON 
+              key={t.id} 
+              data={t.geoJSON} 
+              style={() => ({ color: color, weight: 3, opacity: 0.8, fillOpacity: 0.2 })}
+            >
+              <Tooltip direction="center" permanent className="bg-white/90 border-none shadow-sm rounded px-2 py-1 text-xs font-bold text-center">
+                <span className="block text-gray-900">{t.name}</span>
+                <span className="block text-gray-500 font-medium">{repName}</span>
+              </Tooltip>
+            </GeoJSON>
+          );
+        })}
       </MapContainer>
     </div>
   );

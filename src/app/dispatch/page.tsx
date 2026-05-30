@@ -1098,6 +1098,7 @@ export default function Dispatch() {
               <DispatchMap 
                 center={center} 
                 techsData={techs.map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) })).filter((x) => x.pos) as any} 
+                jobsData={[...unassignedJobs, ...assignedJobs].map((j) => ({ job: j, pos: getJobLatLng(j) })).filter(x => x.pos) as any}
               />
             </div>
           ) : (

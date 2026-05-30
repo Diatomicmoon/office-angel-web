@@ -83,17 +83,19 @@ export async function POST() {
 
     if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 400 });
 
-    const targets = (techs || [])
+        // 1. Geocode Techs
+    const techTargets = (techs || [])
       .filter((t: any) => !t.last_location && t.last_location_address)
       .slice(0, 20);
 
     let updated = 0;
+    let attempted = techTargets.length;
     const results: any[] = [];
 
-    for (const t of targets) {
+    for (const t of techTargets) {
       const loc = await geocode(String(t.last_location_address), apiKey);
       if (!loc.ok) {
-        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: false, status: loc.status, error: loc.error_message || null });
+        results.push({ type: 'tech', id: t.id, name: t.name, address: t.last_location_address, ok: false, status: loc.status, error: loc.error_message || null });
         continue;
       }
 
@@ -107,14 +109,57 @@ export async function POST() {
         .eq("company_id", companyId);
 
       if (uErr) {
-        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: false, error: uErr.message });
+        results.push({ type: 'tech', id: t.id, name: t.name, address: t.last_location_address, ok: false, error: uErr.message });
       } else {
         updated++;
-        results.push({ id: t.id, name: t.name, address: t.last_location_address, ok: true, lat: loc.lat, lng: loc.lng });
+        results.push({ type: 'tech', id: t.id, name: t.name, address: t.last_location_address, ok: true, lat: loc.lat, lng: loc.lng });
       }
     }
 
-    return NextResponse.json({ ok: true, updated, attempted: targets.length, results });
+    // 2. Geocode Customers missing lat/lng in tags
+    const { data: custs } = await sb()
+      .from("customers")
+      .select("id, address, tags, first_name, last_name")
+      .eq("company_id", companyId)
+      .not("address", "is", null);
+
+    const custTargets = (custs || [])
+      .filter((c: any) => {
+        if (!c.address) return false;
+        const tags = Array.isArray(c.tags) ? c.tags : [];
+        const hasLat = tags.some(t => t.startsWith('lat:'));
+        const hasLng = tags.some(t => t.startsWith('lng:'));
+        return !(hasLat && hasLng);
+      })
+      .slice(0, 20);
+
+    attempted += custTargets.length;
+
+    for (const c of custTargets) {
+      const loc = await geocode(String(c.address), apiKey);
+      if (!loc.ok) {
+        results.push({ type: 'cust', id: c.id, name: c.first_name, address: c.address, ok: false, status: loc.status, error: loc.error_message || null });
+        continue;
+      }
+
+      const oldTags = Array.isArray(c.tags) ? c.tags : [];
+      const newTags = Array.from(new Set([...oldTags.filter(t => !t.startsWith('lat:') && !t.startsWith('lng:')), `lat:${loc.lat}`, `lng:${loc.lng}`]));
+
+      const { error: uErr } = await sb()
+        .from("customers")
+        .update({ tags: newTags })
+        .eq("id", c.id)
+        .eq("company_id", companyId);
+
+      if (uErr) {
+        results.push({ type: 'cust', id: c.id, name: c.first_name, address: c.address, ok: false, error: uErr.message });
+      } else {
+        updated++;
+        results.push({ type: 'cust', id: c.id, name: c.first_name, address: c.address, ok: true, lat: loc.lat, lng: loc.lng });
+      }
+    }
+
+    return NextResponse.json({ ok: true, updated, attempted, results });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message || String(e) }, { status: 500 });
   }

@@ -80,24 +80,25 @@ export default function CanvassingPage() {
   }
 
   function handleMapClick(lat: number, lng: number) {
-    setNewVisit({ ...newVisit, latitude: lat, longitude: lng, address: "Loading address..." });
+    setNewVisit({ ...newVisit, latitude: lat, longitude: lng, address: "Loading details..." });
     setShowAdd(true);
 
-    // Auto-reverse geocode the dropped pin using Nominatim
-    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+    fetch(`/api/property?lat=${lat}&lng=${lng}`)
       .then(res => res.json())
       .then(data => {
-        if (data && data.display_name) {
-          // Keep it short: Street number and name
-          const shortAddress = data.address.house_number && data.address.road 
-            ? `${data.address.house_number} ${data.address.road}, ${data.address.city || data.address.town || data.address.village || ''}`
-            : data.display_name.split(',').slice(0, 2).join(',');
-          
-          setNewVisit(prev => ({ ...prev, address: shortAddress }));
-        }
+        setNewVisit(prev => ({ 
+            ...prev, 
+            address: data.address || prev.address || "Unknown Address",
+            resident_name: data.owner_name || prev.resident_name,
+            notes: (data.year_built ? `Year Built: ${data.year_built}\n` : '') + 
+                   (data.beds ? `Beds/Baths: ${data.beds}/${data.baths || '-'}\n` : '') +
+                   (data.sqft ? `SqFt: ${data.sqft}\n` : '') +
+                   (data.last_sale_price ? `Last Sale: ${data.last_sale_price.toLocaleString()} (${data.last_sale_date || 'Unknown Date'})\n\n` : '') + 
+                   prev.notes
+        }));
       })
       .catch(err => {
-        console.error("Geocoding error:", err);
+        console.error("Property error:", err);
         setNewVisit(prev => ({ ...prev, address: "Manual Address Entry" }));
       });
   }
@@ -179,7 +180,7 @@ export default function CanvassingPage() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Resident Name</label>
-                    <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="John Doe" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
+                    <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Current Resident" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Interest Level</label>

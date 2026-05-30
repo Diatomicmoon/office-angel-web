@@ -2,6 +2,29 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
+async function geocodeOnce(address: string, apiKey: string) {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url);
+  const json: any = await res.json().catch(() => null);
+  const loc = json?.results?.[0]?.geometry?.location;
+  if (!loc) return null;
+  const lat = Number(loc.lat);
+  const lng = Number(loc.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
+
+async function geocode(address: string, apiKey: string) {
+  const a = String(address || '').trim();
+  if (!a) return null;
+  const r1 = await geocodeOnce(a, apiKey);
+  if (r1) return r1;
+  const hasState = /\b(MN|Minnesota)\b/i.test(a);
+  if (!hasState) return await geocodeOnce(`${a}, MN`, apiKey);
+  return null;
+}
+
+
 function cleanCallerName(input: unknown): string | null {
   if (!input) return null;
   let s = String(input).trim();
@@ -289,6 +312,18 @@ export async function POST(req: Request) {
       const parsedJobType = structuredOutputs?.job_type || null;
       const parsedJobDetails = structuredOutputs?.job_details || null;
       console.log('📍 Parsed address:', parsedAddress, '| 👤 Name:', parsedName);
+
+      // GEOCODE!
+      let tagsToUpdate: string[] | undefined = undefined;
+      const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+      if (parsedAddress && GOOGLE_MAPS_API_KEY) {
+        const coords = await geocode(parsedAddress, GOOGLE_MAPS_API_KEY);
+        if (coords) {
+          tagsToUpdate = [`lat:${coords.lat}`, `lng:${coords.lng}`];
+          console.log('🌍 Geocoded Address to:', coords);
+        }
+      }
+
       
       console.log(`📞 Caller ID: ${phoneNumber}`);
       console.log(`⏱️ Duration: ${durationSeconds} seconds`);
@@ -374,13 +409,20 @@ export async function POST(req: Request) {
         if (existingCustomer) {
           customerId = existingCustomer.id;
           const isUnnamed = !existingCustomer.first_name || existingCustomer.first_name === 'New';
-          if ((resolvedName && isUnnamed) || parsedAddress) {
+          
+          if ((resolvedName && isUnnamed) || parsedAddress || tagsToUpdate) {
             const nameParts = (resolvedName || '').trim().split(' ');
+            const { data: currentCust } = await supabase.from('customers').select('tags').eq('id', existingCustomer.id).single();
+            const oldTags = Array.isArray(currentCust?.tags) ? currentCust.tags : [];
+            const mergedTags = tagsToUpdate ? Array.from(new Set([...oldTags.filter(t => !t.startsWith('lat:') && !t.startsWith('lng:')), ...tagsToUpdate])) : undefined;
+            
             await supabase.from('customers').update({
               ...(resolvedName && isUnnamed ? { first_name: nameParts[0], last_name: nameParts.slice(1).join(' ') || '' } : {}),
               ...(parsedAddress ? { address: parsedAddress } : {}),
+              ...(mergedTags ? { tags: mergedTags } : {})
             }).eq('id', existingCustomer.id);
           }
+
         } else {
           const nameParts = (resolvedName || '').trim().split(' ');
           const firstName = nameParts[0] || 'New';
@@ -393,7 +435,10 @@ export async function POST(req: Request) {
               phone_number: phoneNumber,
               first_name: firstName,
               last_name: lastName,
+              
               address: parsedAddress || null,
+              ...(tagsToUpdate ? { tags: tagsToUpdate } : {})
+
             }])
             .select()
             .single();
