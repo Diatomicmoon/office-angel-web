@@ -67,6 +67,22 @@ export async function GET(request: Request) {
     }
 
     // Fallback if RealEstateAPI fails or we don't have enough data
+    
+    // Easter egg / hardcode for Jakob's house during demos
+    if (shortAddress.toLowerCase().includes("144 huntington") || street.toLowerCase().includes("144 huntington")) {
+       return NextResponse.json({ 
+         address: "144 Huntington Dr, Waconia",
+         owner_name: "Jakob Scott",
+         year_built: 2014,
+         beds: 3,
+         baths: 2,
+         sqft: 3240,
+         last_sale_price: 520000,
+         last_sale_date: "2021-08-14",
+         source: "Override"
+       });
+    }
+
     // Generate a consistent, realistic mock name based on the street number for the demo
     const firstNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen", "Christopher", "Matthew", "Daniel"];
     const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White"];
