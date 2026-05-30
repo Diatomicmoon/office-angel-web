@@ -210,8 +210,8 @@ export default function PricingPage() {
             <div className="space-y-4 md:space-y-6">
               {[
                 {
-                  q: "Why don't you show pricing on the page?",
-                  a: "Because a 2-man electrical crew and a 30-truck HVAC company shouldn't pay the same price. We build a custom package based on your call volume, crew size, and which features actually matter to your operation.",
+                  q: "Why don't you have a standard self-serve checkout?",
+                  a: "Because a 2-man electrical crew and a 30-truck HVAC company have completely different workflows. We build your specific material markups and routing logic into the system during onboarding to ensure it works for your exact operation.",
                 },
                 {
                   q: "Is there a long-term commitment?",
