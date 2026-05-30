@@ -73,7 +73,7 @@ export async function GET(request: Request) {
        return NextResponse.json({ 
          address: "144 Huntington Dr, Waconia",
          owner_name: "Jakob Scott",
-         year_built: 2014,
+         year_built: 2025,
          beds: 3,
          baths: 2,
          sqft: 3240,
