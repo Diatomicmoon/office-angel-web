@@ -33,23 +33,20 @@ export async function POST(req: Request) {
       .eq('phone_number', systemPhoneNumber)
       .single();
 
+    const vapiAssistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
+
     if (error || !company) {
       console.error(`[VAPI] Company not found for phone number: ${systemPhoneNumber}`);
       return NextResponse.json({
-         assistant: {
+         assistantId: vapiAssistantId,
+         assistantOverrides: {
            model: {
-             provider: "openai",
-             model: "gpt-4o",
              messages: [
                {
                  role: "system",
                  content: "You are an answering service. Please take a message and let them know someone will call them back."
                }
              ]
-           },
-           voice: {
-             provider: "openai",
-             voiceId: "alloy"
            },
            firstMessage: "Thanks for calling. How can I help you today?"
          }
@@ -74,10 +71,9 @@ INSTRUCTIONS:
     const serverUrl = "https://www.office-angel.com/api/vapi/tools";
 
     return NextResponse.json({
-      assistant: {
+      assistantId: vapiAssistantId,
+      assistantOverrides: {
         model: {
-          provider: "openai",
-          model: "gpt-4o",
           messages: [
             {
               role: "system",
@@ -127,10 +123,6 @@ INSTRUCTIONS:
               }
             }
           ]
-        },
-        voice: {
-          provider: "openai",
-          voiceId: "alloy"
         },
         firstMessage: `Thanks for calling ${company.name}, how can I help you today?`
       }
