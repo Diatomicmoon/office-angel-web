@@ -36,14 +36,16 @@ export async function POST(req: Request) {
     
     
     
+    
     if (aiEnabled) {
       console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi SIP.');
-      // Vapi explicitly requires 'sip.vapi.ai' without the assistant ID for the new 'assistant-request' inbound logic.
-      // Twilio passes the called number implicitly in the SIP headers.
+      // Dialing the Vapi Phone Number via SIP properly authenticates the call to your Org's wallet
+      // and triggers the Phone Number's server.url (the assistant-request webhook).
+      const sipTarget = toPhone || '+16123245110';
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Dial>
-    <Sip>sip:sip.vapi.ai</Sip>
+    <Sip>sip:${sipTarget}@sip.vapi.ai</Sip>
   </Dial>
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
