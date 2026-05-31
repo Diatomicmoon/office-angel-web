@@ -34,17 +34,16 @@ export async function POST(req: Request) {
 
     
     
+    
     if (aiEnabled) {
       const vapiAssistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
-      console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi Media Stream.');
+      console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi SIP.');
+      // Vapi SIP routing: format is sip:assistantId@sip.vapi.ai
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Connect>
-    <Stream url="wss://streams.vapi.ai/inbound">
-      <Parameter name="assistantId" value="${vapiAssistantId}" />
-    </Stream>
-  </Connect>
-  <Pause length="3600" />
+  <Dial>
+    <Sip>sip:${vapiAssistantId}@sip.vapi.ai</Sip>
+  </Dial>
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
     } else if (forwardPhone) {
