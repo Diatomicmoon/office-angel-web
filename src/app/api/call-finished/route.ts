@@ -565,10 +565,37 @@ export async function POST(req: Request) {
         const suggestedStart = suggestStartTime({ urgencyFlag, scheduleStartMin, scheduleEndMin });
         const suggestedEnd = new Date(suggestedStart.getTime() + estimatedMinutes * 60000);
 
-        // Some Supabase projects may not have the dispatch columns migrated yet.
-        // Try insert with priority; if the column doesn't exist, retry without it.
-        let job: any = null;
-        let jobErr: any = null;
+        // Check if the Vapi tool 'book_appointment' was already called mid-call
+        const toolCalls = payload.message?.artifact?.toolCalls || payload.message?.toolCalls || [];
+        const wasJobBookedByTool = toolCalls.some((tc: any) => tc?.function?.name === 'book_appointment');
+
+        if (wasJobBookedByTool) {
+          console.log('[CALL FINISHED] Job was already booked by Vapi tool mid-call. Skipping duplicate job creation.');
+          // Still link the call log to the most recently created job for this company
+          const { data: latestJob } = await supabase
+            .from('jobs')
+            .select('id')
+            .eq('company_id', companyId)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+            
+          if (latestJob && callLogId) {
+            await supabase.from('call_logs').update({
+              meta: {
+                ...(baseRow.meta || {}),
+                structured: {
+                  ...((baseRow.meta || {}).structured || {}),
+                  job_id: latestJob.id,
+                },
+              },
+            }).eq('id', callLogId);
+          }
+        } else {
+          // Some Supabase projects may not have the dispatch columns migrated yet.
+          // Try insert with priority; if the column doesn't exist, retry without it.
+          let job: any = null;
+          let jobErr: any = null;
 
         {
           const res = await supabase
@@ -631,6 +658,7 @@ export async function POST(req: Request) {
               .eq('id', callLogId);
           }
         }
+        } // End of !wasJobBookedByTool block
       } catch (e) {
         console.error('Job creation/linking failed (non-fatal):', e);
       }
