@@ -16,11 +16,11 @@ export async function POST(req: Request) {
     }
 
     const callDetails = message.call;
-    const customerPhoneNumber = callDetails.customer?.number;
-    const systemPhoneNumber = callDetails.system?.number;
+    const customerPhoneNumber = callDetails?.customer?.number || message.customer?.number;
+    const systemPhoneNumber = callDetails?.system?.number || message.phoneNumber?.number;
 
     if (!systemPhoneNumber) {
-       console.error("[VAPI] No system phone number found in Vapi payload");
+       console.error("[VAPI] No system phone number found in Vapi payload. Full payload:", JSON.stringify(body, null, 2));
        return NextResponse.json({ error: 'Missing system phone number' }, { status: 400 });
     }
 
