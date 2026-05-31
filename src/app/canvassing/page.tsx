@@ -41,6 +41,7 @@ function CanvassingStats() {
 }
 
 export default function CanvassingPage() {
+  const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
   const [view, setView] = useState<"list" | "map" | "builds" | "expected" | "territories">("list");
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [visits, setVisits] = useState<any[]>([]);
@@ -127,7 +128,12 @@ export default function CanvassingPage() {
         <CanvassingMode 
           onExit={() => { setCanvassingActive(false); fetchVisits(); }} 
           onLogVisit={handleMapClick} 
-          visits={visits}
+          visits={visits.filter(v => {
+              if (mapFilter === 'all') return true;
+              const isKnocked = ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level);
+              if (mapFilter === 'knocked') return isKnocked;
+              return !isKnocked;
+            })}
         />
       )}
       <div className="max-w-6xl mx-auto space-y-6">
@@ -285,8 +291,10 @@ export default function CanvassingPage() {
           </div>
         ) : (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col relative">
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 px-4 py-2 rounded-full shadow-md text-sm font-medium border text-center pointer-events-none">
-              Click anywhere on the map to drop a pin and log a lead
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex gap-2">
+              <button onClick={() => setMapFilter('all')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>All Pins</button>
+              <button onClick={() => setMapFilter('unknocked')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'unknocked' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>Unknocked Only</button>
+              <button onClick={() => setMapFilter('knocked')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'knocked' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>Knocked Only</button>
             </div>
             <MapView visits={visits} onMapClick={handleMapClick} onPinClick={handlePinClick} />
           </div>

@@ -188,7 +188,7 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }:
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="flex flex-col gap-3">
         {loading ? (
           <div className="col-span-full py-12 text-center text-gray-500">Loading new builds...</div>
         ) : filteredLeads.length === 0 ? (
@@ -203,7 +203,7 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }:
             
             return (
               <div key={lead.id} className={`overflow-hidden border rounded-xl shadow-sm transition-all ${isKnocked ? 'border-gray-200 bg-gray-50 opacity-70' : 'border-gray-200 bg-white'}`}>
-                <div className={`p-4 border-b ${isKnocked ? 'border-gray-200 bg-gray-100' : 'border-gray-100 bg-gray-50'}`}>
+                <div className={`p-3 border-b ${isKnocked ? 'border-gray-200 bg-gray-100' : 'border-gray-100 bg-gray-50'}`}>
                   <div className="flex justify-between items-start gap-2">
                     <div className="space-y-1">
                       <h3 className={`text-lg font-semibold flex items-start gap-2 ${isKnocked ? 'text-gray-600' : 'text-gray-900'}`}>
@@ -217,7 +217,7 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }:
                     </div>
                   </div>
                 </div>
-                <div className="p-4 space-y-4">
+                <div className="p-3 space-y-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm">
                       <HardHat className="h-4 w-4 text-blue-600 shrink-0" />

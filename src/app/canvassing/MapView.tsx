@@ -5,11 +5,12 @@ import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, L
 import "leaflet/dist/leaflet.css";
 
 const colorMap: Record<string, string> = {
-  hot: "#f97316",
-  warm: "#3b82f6",
+  hot: "#f97316", // Orange
+  warm: "#3b82f6", // Blue (Knocked/Warm)
+  unknocked_lead: "#a855f7", // Purple for unknocked movers
   new_build: "#ef4444", // Red for New Builds
-  not_interested: "#9ca3af",
-  do_not_knock: "#ef4444",
+  not_interested: "#9ca3af", // Gray
+  do_not_knock: "#000000", // Black
 };
 
 const radiusMap: Record<string, number> = {
