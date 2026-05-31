@@ -44,6 +44,9 @@ interface Props {
 
 function MapEventsHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
   const map = useMapEvents({
+    baselayerchange(e) {
+      localStorage.setItem("oa_map_layer", e.name);
+    },
     click(e) {
       if (onMapClick) onMapClick(e.latlng.lat, e.latlng.lng);
     },
@@ -117,13 +120,13 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
       >
         <MapUpdater center={center} zoom={zoom} />
         <LayersControl position="topright">
-          <LayersControl.BaseLayer checked name="Street View">
+          <LayersControl.BaseLayer checked={typeof window !== 'undefined' ? localStorage.getItem('oa_map_layer') !== 'Satellite View' : true} name="Street View">
             <TileLayer
               attribution='&copy; CARTO'
               url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
             />
           </LayersControl.BaseLayer>
-          <LayersControl.BaseLayer name="Satellite View">
+          <LayersControl.BaseLayer checked={typeof window !== 'undefined' ? localStorage.getItem('oa_map_layer') === 'Satellite View' : false} name="Satellite View">
             <TileLayer
               attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
