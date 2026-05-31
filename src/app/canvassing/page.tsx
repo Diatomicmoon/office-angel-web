@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home } from "lucide-react";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
@@ -41,7 +41,7 @@ function CanvassingStats() {
 }
 
 export default function CanvassingPage() {
-  const [view, setView] = useState<"list" | "map" | "builds" | "territories">("list");
+  const [view, setView] = useState<"list" | "map" | "builds" | "expected" | "territories">("list");
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,6 +49,7 @@ export default function CanvassingPage() {
   // Form State
   const [showAdd, setShowAdd] = useState(false);
   const [newVisit, setNewVisit] = useState({
+    id: "" as string | undefined,
     resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null as number | null, longitude: null as number | null
   });
 
@@ -66,7 +67,7 @@ export default function CanvassingPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const systemInfo = `\n\n--- Property Details ---\nProperty Size: ${newVisit.property_size || 'N/A'}\nExisting System: ${newVisit.existing_system || 'Unknown'}\nWater Hardness: ${newVisit.water_hardness || 'Unknown'}`;
+    const systemInfo = `\n\n--- Property Details ---\nProperty Status: ${newVisit.existing_system || 'Unknown'}`;
     const finalNotes = (newVisit.notes || '') + systemInfo;
 
     await fetch("/api/canvassing/visits", {
@@ -75,8 +76,25 @@ export default function CanvassingPage() {
       body: JSON.stringify({ ...newVisit, notes: finalNotes })
     });
     setShowAdd(false);
-    setNewVisit({ resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null, longitude: null });
+    setNewVisit({ id: undefined, resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null, longitude: null });
     fetchVisits();
+  }
+
+  
+  function handlePinClick(visit: any) {
+    setNewVisit({
+      id: visit.id,
+      resident_name: visit.resident_name || "",
+      address: visit.address || "",
+      interest_level: visit.interest_level || "not_interested",
+      notes: visit.notes || "",
+      latitude: visit.latitude || visit.lat,
+      longitude: visit.longitude || visit.lng,
+      property_size: "",
+      existing_system: "",
+      water_hardness: ""
+    });
+    setShowAdd(true);
   }
 
   function handleMapClick(lat: number, lng: number) {
@@ -119,7 +137,7 @@ export default function CanvassingPage() {
             <p className="text-muted-foreground">Track field visits and predictive heat maps.</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="bg-muted p-1 rounded-lg flex items-center">
+            <div className="bg-muted p-1 rounded-lg flex flex-wrap items-center">
               <button 
                 onClick={() => setView("list")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "list" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
@@ -127,26 +145,25 @@ export default function CanvassingPage() {
                 <List className="w-4 h-4" /> New Movers
               </button>
               <button 
-                onClick={() => setView("builds")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "builds" ? "bg-background shadow-sm text-blue-600" : "text-muted-foreground"}`}
+                onClick={() => setView("expected")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "expected" ? "bg-background shadow-sm text-blue-600" : "text-muted-foreground"}`}
               >
-                <HardHat className="w-4 h-4" /> New Builds
+                <HardHat className="w-4 h-4" /> Expected Builds
+              </button>
+              <button 
+                onClick={() => setView("builds")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "builds" ? "bg-background shadow-sm text-green-600" : "text-muted-foreground"}`}
+              >
+                <Home className="w-4 h-4" /> New Builds
               </button>
               <button 
                 onClick={() => setView("map")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "map" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "map" ? "bg-background shadow-sm text-orange-600" : "text-muted-foreground"}`}
               >
-                <Map className="w-4 h-4" /> Heat Map
-              </button>
-              <button 
-                onClick={() => setView("territories")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "territories" ? "bg-background shadow-sm text-green-600" : "text-muted-foreground"}`}
-              >
-                <Map className="w-4 h-4" /> Territories
+                <Map className="w-4 h-4" /> D2D Map
               </button>
             </div>
-            <button 
-              onClick={() => setCanvassingActive(true)}
+            <button onClick={() => setCanvassingActive(true)}
               className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm shadow-sm"
             >
               Start Canvassing
@@ -192,13 +209,13 @@ export default function CanvassingPage() {
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Existing Water System</label>
+                    <label className="text-sm font-medium">Property Status</label>
                     <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.existing_system} onChange={e => setNewVisit({...newVisit, existing_system: e.target.value})}>
                       <option value="">Select...</option>
-                      <option value="None">None / Hard Water</option>
-                      <option value="Old Softener">Old Softener (Needs Replace)</option>
-                      <option value="Iron Filter">Iron Filter Only</option>
-                      <option value="Modern Softener">Modern Softener (Good)</option>
+                      <option value="Unknown">Unknown</option>
+                      <option value="Older Home">Older Home (Likely needs updates)</option>
+                      <option value="Remodeling">Actively Remodeling</option>
+                      <option value="New Build">New Construction</option>
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -271,7 +288,7 @@ export default function CanvassingPage() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 px-4 py-2 rounded-full shadow-md text-sm font-medium border text-center pointer-events-none">
               Click anywhere on the map to drop a pin and log a lead
             </div>
-            <MapView visits={visits} onMapClick={handleMapClick} />
+            <MapView visits={visits} onMapClick={handleMapClick} onPinClick={handlePinClick} />
           </div>
         )}
       </div>

@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const colorMap: Record<string, string> = {
   hot: "#f97316",
   warm: "#3b82f6",
+  new_build: "#ef4444", // Red for New Builds
   not_interested: "#9ca3af",
   do_not_knock: "#ef4444",
 };
@@ -14,6 +15,7 @@ const colorMap: Record<string, string> = {
 const radiusMap: Record<string, number> = {
   hot: 14,
   warm: 11,
+  new_build: 12,
   not_interested: 8,
   do_not_knock: 10,
 };
@@ -26,6 +28,7 @@ interface Visit {
   latitude?: number;
   longitude?: number;
   lat?: number;
+  notes?: string;
   lng?: number;
 }
 
@@ -35,6 +38,7 @@ interface Props {
   userLocation?: [number, number] | null;
   zoom?: number;
   onMapClick?: (lat: number, lng: number) => void;
+  onPinClick?: (visit: Visit) => void;
 }
 
 function MapEventsHandler({ onMapClick }: { onMapClick?: (lat: number, lng: number) => void }) {
@@ -69,7 +73,7 @@ function MapUpdater({ center, zoom }: { center?: [number, number], zoom?: number
   return null;
 }
 
-export default function MapView({ visits, center = [44.9778, -93.265], userLocation, zoom = 14, onMapClick }: Props) {
+export default function MapView({ visits, center = [44.9778, -93.265], userLocation, zoom = 14, onMapClick, onPinClick }: Props) {
   const hasData = visits.length > 0;
   
   // Map State Persistence
@@ -111,10 +115,20 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
         scrollWheelZoom={true}
       >
         <MapUpdater center={center} zoom={zoom} />
-        <TileLayer
-          attribution='&copy; CARTO'
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-        />
+        <LayersControl position="topright">
+          <LayersControl.BaseLayer checked name="Street View">
+            <TileLayer
+              attribution='&copy; CARTO'
+              url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+            />
+          </LayersControl.BaseLayer>
+          <LayersControl.BaseLayer name="Satellite View">
+            <TileLayer
+              attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            />
+          </LayersControl.BaseLayer>
+        </LayersControl>
         <MapEventsHandler onMapClick={onMapClick} />
         
         {/* Current user location dot (uses userLocation prop instead of center) */}
@@ -144,6 +158,7 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
             return (
               <CircleMarker
                 key={visit.id}
+                eventHandlers={{ click: () => { if (onPinClick) onPinClick(visit); } }}
                 center={[lat, lng]}
                 radius={radiusMap[level] ?? 8}
                 pathOptions={{
@@ -160,6 +175,11 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
                     <p className="capitalize text-muted-foreground">
                       {level.replace(/_/g, " ")}
                     </p>
+                    {visit.notes && (
+                      <p className="mt-1 border-t pt-1 text-[10px] text-muted-foreground whitespace-pre-wrap max-w-[200px]">
+                        {visit.notes}
+                      </p>
+                    )}
                   </div>
                 </Tooltip>
               </CircleMarker>
