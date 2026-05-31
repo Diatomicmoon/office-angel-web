@@ -73,6 +73,9 @@ INSTRUCTIONS:
     return NextResponse.json({
       assistantId: vapiAssistantId,
       assistantOverrides: {
+        variableValues: {
+          company_name: company.name
+        },
         model: {
           messages: [
             {
