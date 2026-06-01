@@ -20,7 +20,7 @@ export async function GET() {
   // We need to fetch the reps data to map rep_id to actual names
   // If canvassing_visits doesn't have rep_id yet in production, we can mock or use a generic field
   const { data: visits } = await supabase
-    .from('canvassing_visits')
+    .from('door_knocking_visits')
     .select('*')
     .eq('company_id', companyId);
 

@@ -7,11 +7,19 @@ export const dynamic = 'force-dynamic';
 
 // Configuration for local city portals (e.g., LOGIS and similar ePermit systems)
 const TARGET_CITIES = [
-  { name: 'Eden Prairie', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=edenprairie' },
+  // Carver County
+  { name: 'Chaska', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=chaska' },
+  { name: 'Victoria', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=victoria' },
+  { name: 'Waconia', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=waconia' },
+  { name: 'Carver', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=carver' },
   { name: 'Chanhassen', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=chanhassen' },
+  // Hennepin County
+  { name: 'Eden Prairie', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=edenprairie' },
   { name: 'Minnetonka', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=minnetonka' },
   { name: 'Edina', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=edina' },
-  { name: 'Bloomington', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=bloomington' }
+  { name: 'Bloomington', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=bloomington' },
+  { name: 'Plymouth', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=plymouth' },
+  { name: 'Maple Grove', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=maplegrove' }
 ];
 
 export async function GET(request: Request) {

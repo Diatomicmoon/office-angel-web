@@ -23,3 +23,10 @@ body {
 .animate-slide-in {
   animation: slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+
+/* Mobile App WebView Fixes */
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}

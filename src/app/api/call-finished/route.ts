@@ -14,7 +14,7 @@ async function geocodeOnce(address: string) {
   return { lat, lng };
 }
 
-async function geocode(address: string, apiKey: string) {
+async function geocode(address: string) {
   const a = String(address || '').trim();
   if (!a) return null;
   const r1 = await geocodeOnce(a);
