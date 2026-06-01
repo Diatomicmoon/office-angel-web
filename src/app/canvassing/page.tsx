@@ -48,6 +48,8 @@ export default function CanvassingPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mapCenter, setMapCenter] = useState<[number, number] | undefined>(undefined);
+  const [mapZoom, setMapZoom] = useState<number>(14);
 
   // Form State
   const [showAdd, setShowAdd] = useState(false);
@@ -96,7 +98,19 @@ export default function CanvassingPage() {
     localStorage.setItem("oa_map_lng", lng.toString());
     localStorage.setItem("oa_map_zoom", "18");
     
+    setMapCenter([lat, lng]);
+    setMapZoom(18);
     handleMapClick(lat, lng);
+  }
+
+  function handleLocateOnMap(lat: number, lng: number) {
+    localStorage.setItem("oa_map_lat", lat.toString());
+    localStorage.setItem("oa_map_lng", lng.toString());
+    localStorage.setItem("oa_map_zoom", "18");
+    
+    setMapCenter([lat, lng]);
+    setMapZoom(18);
+    setView("map");
   }
 
   function handlePinClick(visit: any) {
@@ -273,7 +287,7 @@ export default function CanvassingPage() {
         )}
 
         {view === "builds" ? (
-          <NewBuildsTab />
+          <NewBuildsTab onLocateOnMap={handleLocateOnMap} />
         ) : view === "territories" ? (
           <TerritoriesTab />
         ) : view === "list" ? (
@@ -302,10 +316,17 @@ export default function CanvassingPage() {
                       </p>
                       <div className="text-sm text-foreground font-medium mt-0.5 flex items-center gap-2">
                         <span>{v.address}</span>
-                        {v.latitude == null && (
+                        {v.latitude == null ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                             Not on Map
                           </span>
+                        ) : (
+                          <button 
+                            onClick={() => handleLocateOnMap(v.latitude, v.longitude)}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors ml-2"
+                          >
+                            View on Map
+                          </button>
                         )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
@@ -368,12 +389,18 @@ export default function CanvassingPage() {
               <button onClick={() => setMapFilter('unknocked')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'unknocked' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>Unknocked</button>
               <button onClick={() => setMapFilter('knocked')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'knocked' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>Knocked</button>
             </div>
-            <MapView visits={visits.filter(v => {
-              if (mapFilter === 'all') return true;
-              const isKnocked = ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level);
-              if (mapFilter === 'knocked') return isKnocked;
-              return !isKnocked;
-            })} onMapClick={handleMapClick} onPinClick={handlePinClick} />
+            <MapView 
+              center={mapCenter}
+              zoom={mapZoom}
+              visits={visits.filter(v => {
+                if (mapFilter === 'all') return true;
+                const isKnocked = ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level);
+                if (mapFilter === 'knocked') return isKnocked;
+                return !isKnocked;
+              })} 
+              onMapClick={handleMapClick} 
+              onPinClick={handlePinClick} 
+            />
           </div>
         )}
       </div>

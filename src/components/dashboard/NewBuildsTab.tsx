@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 );
 
-export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }: { companyId?: string, fixedMode?: 'csv' | 'permits' | null }) {
+export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode, onLocateOnMap }: { companyId?: string, fixedMode?: 'csv' | 'permits' | null, onLocateOnMap?: (lat: number, lng: number) => void }) {
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [companyId, setCompanyId] = useState<string | undefined>(initialCompanyId);
@@ -221,10 +221,17 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }:
                       <div className="text-sm text-gray-500 flex items-center gap-2">
                         <MapPin className="h-3 w-3 shrink-0" />
                         {lead.city}, {lead.state} {lead.zip_code}
-                        {lead.latitude == null && (
+                        {lead.latitude == null ? (
                           <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                             Not on Map
                           </span>
+                        ) : (
+                          <button 
+                            onClick={() => onLocateOnMap && onLocateOnMap(lead.latitude, lead.longitude)}
+                            className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+                          >
+                            View on Map
+                          </button>
                         )}
                       </div>
                     </div>
