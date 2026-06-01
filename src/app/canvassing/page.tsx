@@ -154,12 +154,7 @@ export default function CanvassingPage() {
         <CanvassingMode 
           onExit={() => { setCanvassingActive(false); fetchVisits(); }} 
           onLogVisit={handleMapClick} 
-          visits={visits.filter(v => {
-              if (mapFilter === 'all') return true;
-              const isKnocked = ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level);
-              if (mapFilter === 'knocked') return isKnocked;
-              return !isKnocked;
-            })}
+          visits={visits}
         />
       )}
       <div className="max-w-6xl mx-auto space-y-6">
@@ -334,7 +329,12 @@ export default function CanvassingPage() {
               <button onClick={() => setMapFilter('knocked')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'knocked' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>Knocked Only</button>
               </div>
             </div>
-            <MapView visits={visits} onMapClick={handleMapClick} onPinClick={handlePinClick} />
+            <MapView visits={visits.filter(v => {
+              if (mapFilter === 'all') return true;
+              const isKnocked = ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level);
+              if (mapFilter === 'knocked') return isKnocked;
+              return !isKnocked;
+            })} onMapClick={handleMapClick} onPinClick={handlePinClick} />
           </div>
         )}
       </div>
