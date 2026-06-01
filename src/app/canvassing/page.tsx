@@ -124,7 +124,7 @@ export default function CanvassingPage() {
     }
     
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val + ', MN')}&addressdetails=1&limit=5`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val)}&countrycodes=us&addressdetails=1&limit=5`);
       const data = await res.json();
       setSearchResults(data || []);
     } catch (err) {
