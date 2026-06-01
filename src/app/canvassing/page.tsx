@@ -116,24 +116,17 @@ export default function CanvassingPage() {
   }
 
   
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (!searchAddress) return;
+  async function handleSearch(val: string) {
+    setSearchAddress(val);
+    if (val.length < 4) {
+      setSearchResults([]);
+      return;
+    }
     
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchAddress)}`);
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val + ', MN')}&addressdetails=1&limit=5`);
       const data = await res.json();
-      if (data && data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lng = parseFloat(data[0].lon);
-        // Force the map to move by tricking the browser center state (or handle natively in MapView later)
-        localStorage.setItem("oa_map_lat", lat.toString());
-        localStorage.setItem("oa_map_lng", lng.toString());
-        localStorage.setItem("oa_map_zoom", "18");
-        window.location.reload(); // Hacky but works for instant zoom
-      } else {
-        alert("Address not found.");
-      }
+      setSearchResults(data || []);
     } catch (err) {
       console.error(err);
     }
@@ -337,7 +330,7 @@ export default function CanvassingPage() {
                     placeholder="Search address to log visit..." 
                     value={searchAddress}
                     onChange={(e: any) => handleSearch(e.target.value)}
-                    className="w-full h-12 px-3 text-sm focus:outline-none bg-transparent"
+                    className="w-full h-12 px-3 text-sm focus:outline-none bg-transparent text-gray-900 placeholder:text-gray-400"
                   />
                   {searchAddress.length > 0 && (
                      <button onClick={() => {setSearchAddress(''); setSearchResults([]);}}><XCircle className="w-4 h-4 text-gray-400" /></button>
