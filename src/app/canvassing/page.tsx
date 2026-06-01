@@ -384,20 +384,10 @@ export default function CanvassingPage() {
               </div>
             </div>
 
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] flex gap-2">
-              <button onClick={() => setMapFilter('all')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'all' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>All Pins</button>
-              <button onClick={() => setMapFilter('unknocked')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'unknocked' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>Unknocked</button>
-              <button onClick={() => setMapFilter('knocked')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'knocked' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>Knocked</button>
-            </div>
             <MapView 
               center={mapCenter}
               zoom={mapZoom}
-              visits={visits.filter(v => {
-                if (mapFilter === 'all') return true;
-                const isKnocked = ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level);
-                if (mapFilter === 'knocked') return isKnocked;
-                return !isKnocked;
-              })} 
+              visits={visits} 
               onMapClick={handleMapClick} 
               onPinClick={handlePinClick} 
             />

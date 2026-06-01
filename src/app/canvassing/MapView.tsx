@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl, ZoomControl } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl, ZoomControl, LayerGroup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const colorMap: Record<string, string> = {
@@ -134,6 +134,130 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
             />
           </LayersControl.BaseLayer>
+
+          {/* Group: New Builds (Red) */}
+          <LayersControl.Overlay checked name="🔴 New Builds">
+            <LayerGroup>
+              {hasData && visits.filter(v => v.interest_level === 'new_build').map((visit) => {
+                const lat = visit.latitude ?? visit.lat;
+                const lng = visit.longitude ?? visit.lng;
+                if (lat == null || lng == null) return null;
+                const level = visit.interest_level || "not_interested";
+                return (
+                  <CircleMarker
+                    key={visit.id}
+                    eventHandlers={{ click: () => { if (onPinClick) onPinClick(visit); } }}
+                    center={[lat, lng]}
+                    radius={radiusMap[level] ?? 8}
+                    pathOptions={{
+                      color: colorMap[level] ?? "#9ca3af",
+                      fillColor: colorMap[level] ?? "#9ca3af",
+                      fillOpacity: 0.6,
+                      weight: 2,
+                    }}
+                  >
+                    <Tooltip>
+                      <div className="text-xs space-y-0.5">
+                        {visit.address && <p className="font-semibold">{visit.address}</p>}
+                        {visit.resident_name && <p className="text-muted-foreground">{visit.resident_name}</p>}
+                        <p className="capitalize text-muted-foreground">
+                          {level.replace(/_/g, " ")}
+                        </p>
+                        {visit.notes && (
+                          <p className="mt-1 border-t pt-1 text-[10px] text-muted-foreground whitespace-pre-wrap max-w-[200px]">
+                            {visit.notes}
+                          </p>
+                        )}
+                      </div>
+                    </Tooltip>
+                  </CircleMarker>
+                );
+              })}
+            </LayerGroup>
+          </LayersControl.Overlay>
+          
+          {/* Group: New Movers (Purple) */}
+          <LayersControl.Overlay checked name="🟣 New Movers (Unknocked)">
+            <LayerGroup>
+              {hasData && visits.filter(v => v.interest_level === 'unknocked_lead').map((visit) => {
+                const lat = visit.latitude ?? visit.lat;
+                const lng = visit.longitude ?? visit.lng;
+                if (lat == null || lng == null) return null;
+                const level = visit.interest_level || "not_interested";
+                return (
+                  <CircleMarker
+                    key={visit.id}
+                    eventHandlers={{ click: () => { if (onPinClick) onPinClick(visit); } }}
+                    center={[lat, lng]}
+                    radius={radiusMap[level] ?? 8}
+                    pathOptions={{
+                      color: colorMap[level] ?? "#9ca3af",
+                      fillColor: colorMap[level] ?? "#9ca3af",
+                      fillOpacity: 0.6,
+                      weight: 2,
+                    }}
+                  >
+                    <Tooltip>
+                      <div className="text-xs space-y-0.5">
+                        {visit.address && <p className="font-semibold">{visit.address}</p>}
+                        {visit.resident_name && <p className="text-muted-foreground">{visit.resident_name}</p>}
+                        <p className="capitalize text-muted-foreground">
+                          {level.replace(/_/g, " ")}
+                        </p>
+                        {visit.notes && (
+                          <p className="mt-1 border-t pt-1 text-[10px] text-muted-foreground whitespace-pre-wrap max-w-[200px]">
+                            {visit.notes}
+                          </p>
+                        )}
+                      </div>
+                    </Tooltip>
+                  </CircleMarker>
+                );
+              })}
+            </LayerGroup>
+          </LayersControl.Overlay>
+
+          {/* Group: Knocked / Contacted */}
+          <LayersControl.Overlay checked name="🟢 Contacted / Knocked">
+            <LayerGroup>
+              {hasData && visits.filter(v => ['hot', 'warm', 'not_interested', 'do_not_knock'].includes(v.interest_level || '')).map((visit) => {
+                const lat = visit.latitude ?? visit.lat;
+                const lng = visit.longitude ?? visit.lng;
+                if (lat == null || lng == null) return null;
+                const level = visit.interest_level || "not_interested";
+                return (
+                  <CircleMarker
+                    key={visit.id}
+                    eventHandlers={{ click: () => { if (onPinClick) onPinClick(visit); } }}
+                    center={[lat, lng]}
+                    radius={radiusMap[level] ?? 8}
+                    pathOptions={{
+                      color: colorMap[level] ?? "#9ca3af",
+                      fillColor: colorMap[level] ?? "#9ca3af",
+                      fillOpacity: 0.6,
+                      weight: 2,
+                    }}
+                  >
+                    <Tooltip>
+                      <div className="text-xs space-y-0.5">
+                        {visit.address && <p className="font-semibold">{visit.address}</p>}
+                        {visit.resident_name && <p className="text-muted-foreground">{visit.resident_name}</p>}
+                        <p className="capitalize text-muted-foreground">
+                          {level.replace(/_/g, " ")}
+                        </p>
+                        {visit.notes && (
+                          <p className="mt-1 border-t pt-1 text-[10px] text-muted-foreground whitespace-pre-wrap max-w-[200px]">
+                            {visit.notes}
+                          </p>
+                        )}
+                      </div>
+                    </Tooltip>
+                  </CircleMarker>
+                );
+              })}
+            </LayerGroup>
+          </LayersControl.Overlay>
+
         </LayersControl>
         <MapEventsHandler onMapClick={onMapClick} />
         
@@ -154,43 +278,6 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
             </Tooltip>
           </CircleMarker>
         )}
-
-        {hasData &&
-          visits.map((visit) => {
-            const lat = visit.latitude ?? visit.lat;
-            const lng = visit.longitude ?? visit.lng;
-            if (lat == null || lng == null) return null;
-            const level = visit.interest_level || "not_interested";
-            return (
-              <CircleMarker
-                key={visit.id}
-                eventHandlers={{ click: () => { if (onPinClick) onPinClick(visit); } }}
-                center={[lat, lng]}
-                radius={radiusMap[level] ?? 8}
-                pathOptions={{
-                  color: colorMap[level] ?? "#9ca3af",
-                  fillColor: colorMap[level] ?? "#9ca3af",
-                  fillOpacity: 0.6,
-                  weight: 2,
-                }}
-              >
-                <Tooltip>
-                  <div className="text-xs space-y-0.5">
-                    {visit.address && <p className="font-semibold">{visit.address}</p>}
-                    {visit.resident_name && <p className="text-muted-foreground">{visit.resident_name}</p>}
-                    <p className="capitalize text-muted-foreground">
-                      {level.replace(/_/g, " ")}
-                    </p>
-                    {visit.notes && (
-                      <p className="mt-1 border-t pt-1 text-[10px] text-muted-foreground whitespace-pre-wrap max-w-[200px]">
-                        {visit.notes}
-                      </p>
-                    )}
-                  </div>
-                </Tooltip>
-              </CircleMarker>
-            );
-          })}
       </MapContainer>
     </div>
   );
