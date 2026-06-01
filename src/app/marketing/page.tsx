@@ -2,7 +2,6 @@
 
 import { MapPin, Search, BarChart3, TrendingUp, TrendingDown, Star, Globe, Smartphone, Camera, CalendarCheck, Send, CheckCircle2, AlertCircle, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { NotWired } from "@/components/NotWired";
 
 export default function Marketing() {
@@ -96,16 +95,8 @@ export default function Marketing() {
           </div>
           
           <div className="flex-1 relative bg-gray-100 flex items-center justify-center p-8 overflow-hidden">
-            {/* Live Google Map Background */}
-            <div className="absolute inset-0 z-0 opacity-80">
-              <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}>
-                <Map 
-                  defaultZoom={12} 
-                  defaultCenter={{ lat: 45.0934, lng: -93.4601 }} // Maple Grove, MN
-                  disableDefaultUI={true}
-                  gestureHandling="greedy"
-                />
-              </APIProvider>
+            {/* Map Background (Mocked static image style via CSS) */}
+            <div className="absolute inset-0 z-0 opacity-40 bg-[url('https://maps.wikimedia.org/osm-intl/12/983/1472.png')] bg-cover bg-center">
             </div>
             
             {/* 3x3 SEO Grid Overlay */}

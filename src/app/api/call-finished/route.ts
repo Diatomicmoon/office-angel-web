@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-async function geocodeOnce(address: string, apiKey: string) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${encodeURIComponent(apiKey)}`;
-  const res = await fetch(url);
+async function geocodeOnce(address: string) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
+  const res = await fetch(url, { headers: { 'User-Agent': 'OfficeAngel/1.0' } });
   const json: any = await res.json().catch(() => null);
-  const loc = json?.results?.[0]?.geometry?.location;
-  if (!loc) return null;
+  if (!json || json.length === 0) return null;
+  const loc = json[0];
   const lat = Number(loc.lat);
-  const lng = Number(loc.lng);
+  const lng = Number(loc.lon);
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
   return { lat, lng };
 }
@@ -17,10 +17,10 @@ async function geocodeOnce(address: string, apiKey: string) {
 async function geocode(address: string, apiKey: string) {
   const a = String(address || '').trim();
   if (!a) return null;
-  const r1 = await geocodeOnce(a, apiKey);
+  const r1 = await geocodeOnce(a);
   if (r1) return r1;
   const hasState = /\b(MN|Minnesota)\b/i.test(a);
-  if (!hasState) return await geocodeOnce(`${a}, MN`, apiKey);
+  if (!hasState) return await geocodeOnce(`${a}, MN`);
   return null;
 }
 

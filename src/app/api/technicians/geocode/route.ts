@@ -17,17 +17,15 @@ async function getCompanyId() {
 }
 
 async function geocodeOnce(address: string, apiKey: string) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${encodeURIComponent(apiKey)}`;
-  const res = await fetch(url);
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
+  const res = await fetch(url, { headers: { 'User-Agent': 'OfficeAngel/1.0' } });
   const json: any = await res.json().catch(() => null);
-  const status = json?.status;
-  const error_message = json?.error_message;
-  const loc = json?.results?.[0]?.geometry?.location;
-  if (!loc) return { ok: false as const, status, error_message };
+  if (!json || json.length === 0) return { ok: false as const, status: 'ZERO_RESULTS', error_message: 'No results found' };
+  const loc = json[0];
   const lat = Number(loc.lat);
-  const lng = Number(loc.lng);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { ok: false as const, status, error_message };
-  return { ok: true as const, lat, lng, status, error_message };
+  const lng = Number(loc.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return { ok: false as const, status: 'INVALID_REQUEST', error_message: 'Invalid coordinates returned' };
+  return { ok: true as const, lat, lng, status: 'OK', error_message: null };
 }
 
 async function geocode(address: string, apiKey: string) {
