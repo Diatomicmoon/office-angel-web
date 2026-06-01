@@ -115,7 +115,7 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
         center={initialCenter}
         zoom={initialZoom}
         className="w-full h-full"
-        style={{ height: "100%", width: "100%", position: "absolute", inset: 0, zIndex: 0 }}
+        style={{ height: "100%", width: "100%", position: "absolute", inset: 0, zIndex: 10 }}
         scrollWheelZoom={true}
         zoomControl={false}
       >
