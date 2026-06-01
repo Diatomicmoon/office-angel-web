@@ -216,7 +216,6 @@ const getJobLatLng = (job: Job) => {
 export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   

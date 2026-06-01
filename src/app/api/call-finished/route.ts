@@ -315,9 +315,8 @@ export async function POST(req: Request) {
 
       // GEOCODE!
       let tagsToUpdate: string[] | undefined = undefined;
-      const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-      if (parsedAddress && GOOGLE_MAPS_API_KEY) {
-        const coords = await geocode(parsedAddress, GOOGLE_MAPS_API_KEY);
+      if (parsedAddress) {
+        const coords = await geocode(parsedAddress);
         if (coords) {
           tagsToUpdate = [`lat:${coords.lat}`, `lng:${coords.lng}`];
           console.log('🌍 Geocoded Address to:', coords);

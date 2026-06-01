@@ -58,18 +58,6 @@ async function geocode(address: string, apiKey: string) {
 // POST /api/technicians/geocode
 export async function POST() {
   try {
-    const apiKey =
-      process.env.GOOGLE_MAPS_API_KEY ||
-      process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ||
-      "";
-
-    if (!apiKey) {
-      return NextResponse.json(
-        { ok: false, error: "Missing Google Maps API key. Set GOOGLE_MAPS_API_KEY (preferred) or NEXT_PUBLIC_GOOGLE_MAPS_API_KEY." },
-        { status: 400 }
-      );
-    }
-
     const companyId = await getCompanyId();
     if (!companyId) return NextResponse.json({ ok: false, error: "No company configured." }, { status: 400 });
 
@@ -91,7 +79,7 @@ export async function POST() {
     const results: any[] = [];
 
     for (const t of techTargets) {
-      const loc = await geocode(String(t.last_location_address), apiKey);
+      const loc = await geocode(String(t.last_location_address), "");
       if (!loc.ok) {
         results.push({ type: 'tech', id: t.id, name: t.name, address: t.last_location_address, ok: false, status: loc.status, error: loc.error_message || null });
         continue;
@@ -134,7 +122,7 @@ export async function POST() {
     attempted += custTargets.length;
 
     for (const c of custTargets) {
-      const loc = await geocode(String(c.address), apiKey);
+      const loc = await geocode(String(c.address), "");
       if (!loc.ok) {
         results.push({ type: 'cust', id: c.id, name: c.first_name, address: c.address, ok: false, status: loc.status, error: loc.error_message || null });
         continue;
