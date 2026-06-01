@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = () => createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+);
 
 export async function POST(req: Request) {
   try {
@@ -21,7 +22,7 @@ export async function POST(req: Request) {
     // Get company id securely
     let companyId = null;
     if (systemPhoneNumber) {
-      const { data: company } = await supabase
+      const { data: company } = await supabase()
         .from('companies')
         .select('id')
         .eq('phone_number', systemPhoneNumber)
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
         }
 
         // Create job
-        const { data: job, error } = await supabase
+        const { data: job, error } = await supabase()
           .from('jobs')
           .insert([
             {

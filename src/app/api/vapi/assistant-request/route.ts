@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = () => createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.SUPABASE_SERVICE_ROLE_KEY || ""
+);
 
 export async function POST(req: Request) {
   try {
@@ -27,12 +28,26 @@ export async function POST(req: Request) {
     console.log(`[VAPI] Incoming call to: ${systemPhoneNumber} from ${customerPhoneNumber}`);
 
     // Lookup the company
-    const { data: company, error } = await supabase
+    const { data: company, error } = await supabase()
       .from('companies')
       .select('*')
       .eq('phone_number', systemPhoneNumber)
       .single();
 
+    
+    // Log the incoming call so the dashboard "Active Call" banner works
+    if (company) {
+      await supabase().from('call_logs').insert([{
+        company_id: company.id,
+        call_status: 'incoming',
+        meta: {
+          phone: customerPhoneNumber,
+          provider: 'vapi',
+          lookup_name: 'Unknown Caller'
+        }
+      }]);
+    }
+  
     const vapiAssistantId = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID;
 
     if (error || !company) {
