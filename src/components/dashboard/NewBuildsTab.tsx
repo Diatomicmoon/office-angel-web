@@ -119,6 +119,14 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }:
       }
       
       return true;
+    }).sort((a, b) => {
+      // Sort unmapped leads (null latitude) to the top
+      const aUnmapped = a.latitude == null ? 1 : 0;
+      const bUnmapped = b.latitude == null ? 1 : 0;
+      if (aUnmapped !== bUnmapped) return bUnmapped - aUnmapped;
+      
+      // Secondary sort: newest created first
+      return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
     });
   }, [leads, searchQuery, showKnocked, viewMode]);
 
@@ -213,6 +221,11 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode }:
                       <div className="text-sm text-gray-500 flex items-center gap-2">
                         <MapPin className="h-3 w-3 shrink-0" />
                         {lead.city}, {lead.state} {lead.zip_code}
+                        {lead.latitude == null && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                            Not on Map
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

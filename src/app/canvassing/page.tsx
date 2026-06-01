@@ -290,7 +290,11 @@ export default function CanvassingPage() {
               </div>
             ) : (
               <div className="divide-y">
-                {visits.slice(0, 50).map((v) => (
+                {[...visits].sort((a, b) => {
+                  const aUnmapped = a.latitude == null ? 1 : 0;
+                  const bUnmapped = b.latitude == null ? 1 : 0;
+                  return bUnmapped - aUnmapped;
+                }).slice(0, 50).map((v) => (
                   <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4">
                     <div className="flex-1">
                       <p className="font-semibold text-base text-foreground text-blue-600">
@@ -298,6 +302,11 @@ export default function CanvassingPage() {
                       </p>
                       <div className="text-sm text-foreground font-medium mt-0.5 flex items-center gap-2">
                         <span>{v.address}</span>
+                        {v.latitude == null && (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                            Not on Map
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
                         <span>Visited / Scraped: {new Date(v.visited_at).toLocaleDateString()}</span>
