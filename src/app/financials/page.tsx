@@ -37,8 +37,11 @@ export default function FinancialsPage() {
              </div>
           )}
           <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">
-            Manage QuickBooks
+            Manage Accounting
           </Link>
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
+            <DollarSign className="w-4 h-4" /> Create Invoice
+          </button>
         </div>
       </div>
 
@@ -119,6 +122,57 @@ export default function FinancialsPage() {
               <p className="text-sm text-gray-500 font-medium mt-2">
                 City waiting average: <span className="font-bold text-gray-900">{data.report?.permitDrag?.avgDays || 0} days</span>
               </p>
+            </div>
+          </div>
+
+          {/* Billing & Invoices Tab */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <CreditCard size={18} className="text-gray-500" /> Recent Invoices
+              </h2>
+              <button className="text-blue-600 text-sm font-medium hover:underline">View All in Stripe ↗</button>
+            </div>
+            <div className="divide-y divide-gray-100 p-0 overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-gray-50/50 text-gray-500">
+                  <tr>
+                    <th className="px-6 py-3 font-medium">Customer</th>
+                    <th className="px-6 py-3 font-medium">Amount</th>
+                    <th className="px-6 py-3 font-medium">Status</th>
+                    <th className="px-6 py-3 font-medium">Sent Via</th>
+                    <th className="px-6 py-3 font-medium text-right">Payment Link</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-gray-900">John Smith</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">$450.00</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        Paid
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">Office Angel (SMS)</td>
+                    <td className="px-6 py-4 text-right">
+                      <span className="text-gray-400 text-xs">Closed</span>
+                    </td>
+                  </tr>
+                  <tr className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-gray-900">Sarah Johnson</td>
+                    <td className="px-6 py-4 font-medium text-gray-900">$1,200.00</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                        Pending
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">Office Angel (SMS)</td>
+                    <td className="px-6 py-4 text-right">
+                      <button className="text-blue-600 font-medium hover:underline">Copy Link</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
