@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl, ZoomControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 const colorMap: Record<string, string> = {
@@ -115,11 +115,13 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
         center={initialCenter}
         zoom={initialZoom}
         className="w-full h-full"
-        style={{ height: "100%", width: "100%", position: "absolute", inset: 0 }}
+        style={{ height: "100%", width: "100%", position: "absolute", inset: 0, zIndex: 0 }}
         scrollWheelZoom={true}
+        zoomControl={false}
       >
+        <ZoomControl position="bottomright" />
         <MapUpdater center={center} zoom={zoom} />
-        <LayersControl position="topright">
+        <LayersControl position="bottomright">
           <LayersControl.BaseLayer checked={typeof window !== 'undefined' ? localStorage.getItem('oa_map_layer') !== 'Satellite View' : true} name="Street View">
             <TileLayer
               attribution='&copy; CARTO'
