@@ -3,6 +3,12 @@
 import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+);
 
 const DispatchMap = dynamic(() => import("@/components/DispatchMap"), { ssr: false });
 
@@ -607,8 +613,36 @@ export default function Dispatch() {
     };
 
     load();
-    const t = setInterval(load, 15000);
-    return () => clearInterval(t);
+    const t = setInterval(load, 30000); // reduced frequency since we have realtime now
+    
+    // Subscribe to Fleet Radar Realtime Pings
+    const channel = supabase.channel('fleet_tracking')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'fleet_locations' }, (payload) => {
+        const ping = payload.new;
+        setTechs((currentTechs) => {
+          return currentTechs.map(tech => {
+            if (tech.id === ping.technician_id) {
+              return {
+                ...tech,
+                last_location: {
+                  lat: ping.latitude,
+                  lng: ping.longitude,
+                  heading: ping.heading,
+                  speed: ping.speed,
+                  timestamp: ping.timestamp
+                }
+              };
+            }
+            return tech;
+          });
+        });
+      })
+      .subscribe();
+
+    return () => {
+      clearInterval(t);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {

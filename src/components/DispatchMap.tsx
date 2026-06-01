@@ -23,14 +23,20 @@ type JobMapData = {
 };
 
 // Custom icons
-const techIcon = new L.Icon({
-  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+const getTechIcon = (speed?: number) => {
+  // If moving faster than 3 mph, turn the icon green (Active Driving)
+  const isDriving = speed && speed > 3;
+  return new L.Icon({
+    iconUrl: isDriving 
+      ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png'
+      : 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+};
 
 const jobIcon = new L.Icon({
   iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -63,16 +69,19 @@ export default function DispatchMap({
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         
-        {techsData.map(({ tech, pos }) => (
-          <Marker key={`tech-${tech.id}`} position={[pos.lat, pos.lng]} icon={techIcon}>
-            <Popup>
-              <div className="text-xs">
-                <strong className="text-blue-700">{tech.name || 'Technician'}</strong><br/>
-                <span className="text-gray-600">Status: {tech.status || 'Active'}</span>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+        {techsData.map(({ tech, pos }) => {
+          const speed = tech.last_location?.speed || 0;
+          return (
+            <Marker key={`tech-${tech.id}`} position={[pos.lat, pos.lng]} icon={getTechIcon(speed)}>
+              <Popup>
+                <div className="text-xs">
+                  <strong className={speed > 3 ? "text-green-700" : "text-blue-700"}>{tech.name || 'Technician'}</strong><br/>
+                  <span className="text-gray-600">Status: {speed > 3 ? `Driving (${Math.round(speed)} mph)` : 'Parked / On Site'}</span>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
 
         {jobsData.map(({ job, pos }) => (
           <Marker key={`job-${job.id}`} position={[pos.lat, pos.lng]} icon={jobIcon}>
