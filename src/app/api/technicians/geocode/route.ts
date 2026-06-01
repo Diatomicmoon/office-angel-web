@@ -16,7 +16,7 @@ async function getCompanyId() {
   return companyId;
 }
 
-async function geocodeOnce(address: string, apiKey: string) {
+async function geocodeOnce(address: string) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
   const res = await fetch(url, { headers: { 'User-Agent': 'OfficeAngel/1.0' } });
   const json: any = await res.json().catch(() => null);
@@ -28,24 +28,24 @@ async function geocodeOnce(address: string, apiKey: string) {
   return { ok: true as const, lat, lng, status: 'OK', error_message: null };
 }
 
-async function geocode(address: string, apiKey: string) {
+async function geocode(address: string) {
   const a = String(address || '').trim();
   if (!a) return { ok: false as const, status: 'EMPTY', error_message: 'Empty address' };
 
   // Attempt 1: raw address
-  const r1 = await geocodeOnce(a, apiKey);
+  const r1 = await geocodeOnce(a);
   if (r1.ok) return r1;
 
   // Attempt 2: if no state present, try adding MN (demo is Twin Cities)
   const hasState = /\b(MN|Minnesota)\b/i.test(a);
-  const r2 = !hasState ? await geocodeOnce(`${a}, MN`, apiKey) : r1;
+  const r2 = !hasState ? await geocodeOnce(`${a}, MN`) : r1;
   if ((r2 as any).ok) return r2 as any;
 
   // Attempt 3: handle "Shop - City" style labels
   if (a.includes('-')) {
     const tail = a.split('-').slice(1).join('-').trim();
     if (tail) {
-      const r3 = await geocodeOnce(`${tail}, MN`, apiKey);
+      const r3 = await geocodeOnce(`${tail}, MN`);
       if (r3.ok) return r3;
       return { ok: false as const, status: r3.status || r2.status || r1.status, error_message: r3.error_message || r2.error_message || r1.error_message };
     }
@@ -79,7 +79,7 @@ export async function POST() {
     const results: any[] = [];
 
     for (const t of techTargets) {
-      const loc = await geocode(String(t.last_location_address), "");
+      const loc = await geocode(String(t.last_location_address));
       if (!loc.ok) {
         results.push({ type: 'tech', id: t.id, name: t.name, address: t.last_location_address, ok: false, status: loc.status, error: loc.error_message || null });
         continue;
@@ -122,7 +122,7 @@ export async function POST() {
     attempted += custTargets.length;
 
     for (const c of custTargets) {
-      const loc = await geocode(String(c.address), "");
+      const loc = await geocode(String(c.address));
       if (!loc.ok) {
         results.push({ type: 'cust', id: c.id, name: c.first_name, address: c.address, ok: false, status: loc.status, error: loc.error_message || null });
         continue;
