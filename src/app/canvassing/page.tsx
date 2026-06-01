@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search } from "lucide-react";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
@@ -45,6 +45,7 @@ export default function CanvassingPage() {
   const [view, setView] = useState<"list" | "map" | "builds" | "expected" | "territories">("list");
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [searchAddress, setSearchAddress] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [visits, setVisits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -83,6 +84,21 @@ export default function CanvassingPage() {
   }
 
   
+  
+  function selectSearchResult(result: any) {
+    const lat = parseFloat(result.lat);
+    const lng = parseFloat(result.lon);
+    
+    setSearchAddress(result.display_name.split(',')[0]);
+    setSearchResults([]);
+    
+    localStorage.setItem("oa_map_lat", lat.toString());
+    localStorage.setItem("oa_map_lng", lng.toString());
+    localStorage.setItem("oa_map_zoom", "18");
+    
+    handleMapClick(lat, lng);
+  }
+
   function handlePinClick(visit: any) {
     setNewVisit({
       id: visit.id,
@@ -312,22 +328,43 @@ export default function CanvassingPage() {
           </div>
         ) : (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col relative">
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex flex-col items-center gap-2 w-full max-w-md px-4">
-              <form onSubmit={handleSearch} className="w-full flex shadow-lg">
-                <input 
-                  type="text" 
-                  placeholder="Search Address..." 
-                  value={searchAddress}
-                  onChange={(e) => setSearchAddress(e.target.value)}
-                  className="w-full h-10 px-4 rounded-l-full border border-r-0 text-sm focus:outline-none"
-                />
-                <button type="submit" className="bg-blue-600 text-white px-4 rounded-r-full font-medium text-sm">Find</button>
-              </form>
-              <div className="flex gap-2">
-              <button onClick={() => setMapFilter('all')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>All Pins</button>
-              <button onClick={() => setMapFilter('unknocked')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'unknocked' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>Unknocked Only</button>
-              <button onClick={() => setMapFilter('knocked')} className={`px-3 py-1.5 rounded-full shadow-md text-xs font-medium border ${mapFilter === 'knocked' ? 'bg-blue-600 text-white' : 'bg-white/90 text-gray-700'}`}>Knocked Only</button>
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] w-full max-w-md px-4 flex flex-col gap-2">
+              <div className="relative w-full shadow-lg rounded-xl bg-white">
+                <div className="flex items-center px-3 border-b border-gray-100">
+                  <Search className="w-5 h-5 text-gray-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search address to log visit..." 
+                    value={searchAddress}
+                    onChange={(e: any) => handleSearch(e.target.value)}
+                    className="w-full h-12 px-3 text-sm focus:outline-none bg-transparent"
+                  />
+                  {searchAddress.length > 0 && (
+                     <button onClick={() => {setSearchAddress(''); setSearchResults([]);}}><XCircle className="w-4 h-4 text-gray-400" /></button>
+                  )}
+                </div>
+                
+                {searchResults.length > 0 && (
+                  <div className="max-h-60 overflow-y-auto bg-white rounded-b-xl border-t border-gray-100 shadow-xl">
+                    {searchResults.map((res: any, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => selectSearchResult(res)}
+                        className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-gray-50 last:border-0 flex flex-col"
+                      >
+                        <span className="text-sm font-medium text-gray-900 truncate">{res.display_name.split(',')[0]}</span>
+                        <span className="text-xs text-gray-500 truncate">{res.display_name.split(',').slice(1).join(',')}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
+            </div>
+
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] flex gap-2">
+              <button onClick={() => setMapFilter('all')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'all' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>All Pins</button>
+              <button onClick={() => setMapFilter('unknocked')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'unknocked' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>Unknocked</button>
+              <button onClick={() => setMapFilter('knocked')} className={`px-4 py-2 rounded-full shadow-lg text-xs font-semibold border ${mapFilter === 'knocked' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700'}`}>Knocked</button>
             </div>
             <MapView visits={visits.filter(v => {
               if (mapFilter === 'all') return true;
