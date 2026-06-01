@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
   // Fetch manually logged visits
   const { data: manualVisits } = await supabase
-    .from('canvassing_visits')
+    .from('door_knocking_visits')
     .select('*')
     .eq('company_id', companyId)
     .order('visited_at', { ascending: false });
@@ -99,12 +99,22 @@ export async function POST(request: Request) {
     await supabase.from('new_build_permits').update({ status: visitData.interest_level === 'hot' ? 'contacted' : 'knocked' }).eq('id', id);
   }
 
+  
+  const dbVisit = {
+    company_id: companies?.[0]?.id,
+    resident_name: visitData.resident_name,
+    address: visitData.address,
+    latitude: visitData.latitude,
+    longitude: visitData.longitude,
+    interest_level: visitData.interest_level,
+    notes: visitData.notes,
+    visited_at: new Date().toISOString()
+  };
+
   const { error } = await supabase
-    .from('canvassing_visits')
-    .insert([{
-      ...visitData,
-      company_id: companies?.[0]?.id
-    }]);
+    .from('door_knocking_visits')
+    .insert([dbVisit]);
+
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ success: true });
