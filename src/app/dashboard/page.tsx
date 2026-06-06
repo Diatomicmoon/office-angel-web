@@ -240,6 +240,58 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Pending Close-Outs (Send Invoice & Review) */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <CheckCircle2 size={18} className="text-blue-600" /> Pending Close-Outs
+            </h2>
+          </div>
+          <div className="p-5 space-y-4">
+            {/* Mock Job 1 */}
+            <div className="border border-gray-100 rounded-lg p-4 bg-gray-50 hover:bg-white hover:border-gray-300 transition-colors">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h4 className="font-semibold text-gray-900">Smith Residence - Panel Swap</h4>
+                  <p className="text-sm text-gray-500 mt-1">123 Main St, Maple Grove</p>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700">
+                  Ready to Bill
+                </span>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <button className="flex-1 bg-gray-900 text-white text-sm font-medium py-2 rounded-md hover:bg-gray-800 transition-colors shadow-sm">
+                  Send Invoice
+                </button>
+                <button className="flex-1 bg-white text-green-700 border border-green-200 text-sm font-medium py-2 rounded-md hover:bg-green-50 transition-colors flex items-center justify-center gap-1 shadow-sm">
+                  <TrendingUp size={14} /> Request Review
+                </button>
+              </div>
+            </div>
+
+            {/* Mock Job 2 */}
+            <div className="border border-gray-100 rounded-lg p-4 bg-gray-50 hover:bg-white hover:border-gray-300 transition-colors">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h4 className="font-semibold text-gray-900">Target Commercial - Wire Pull</h4>
+                  <p className="text-sm text-gray-500 mt-1">456 Retail Pkwy, Edina</p>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700">
+                  Ready to Bill
+                </span>
+              </div>
+              <div className="flex gap-2 mt-4">
+                <button className="flex-1 bg-gray-900 text-white text-sm font-medium py-2 rounded-md hover:bg-gray-800 transition-colors shadow-sm">
+                  Send Invoice
+                </button>
+                <button className="flex-1 bg-white text-green-700 border border-green-200 text-sm font-medium py-2 rounded-md hover:bg-green-50 transition-colors flex items-center justify-center gap-1 shadow-sm">
+                  <TrendingUp size={14} /> Request Review
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Right Column (Span 1): AI Action Items & Pulse */}
         <div className="space-y-8">
           

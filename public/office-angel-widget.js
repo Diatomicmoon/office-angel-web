@@ -1,6 +1,6 @@
 (function () {
   const SCRIPT = document.currentScript;
-  const apiBase = (SCRIPT && SCRIPT.getAttribute('data-api-base')) || 'https://www.office-angel.com';
+  const apiBase = (SCRIPT && SCRIPT.getAttribute('data-api-base')) || 'https://www.hardhat-solutions.com';
   const companyId = (SCRIPT && SCRIPT.getAttribute('data-company-id')) || '';
   const secret = (SCRIPT && SCRIPT.getAttribute('data-secret')) || '';
 
@@ -25,7 +25,7 @@
 
   const btn = document.createElement('button');
   btn.className = 'oa-btn';
-  btn.textContent = 'Schedule with Office Angel';
+  btn.textContent = 'Schedule with Hard Hat Solutions';
   document.body.appendChild(btn);
 
   const modal = document.createElement('div');

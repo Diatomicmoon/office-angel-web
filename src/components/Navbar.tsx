@@ -24,7 +24,7 @@ export default function Navbar({ activePage }: NavbarProps) {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <Bot className="text-blue-600" size={28} />
-          <span className="text-xl font-bold tracking-tight">Office Angel</span>
+          <span className="text-xl font-bold tracking-tight">Hard Hat Solutions</span>
         </Link>
 
         {/* Desktop links */}

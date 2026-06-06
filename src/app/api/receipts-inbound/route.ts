@@ -1,0 +1,138 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+import OpenAI from 'openai';
+
+// This endpoint receives the parsed email payload from Make.com 
+// (which bypassed the 4.5MB Vercel limit by uploading the image to Supabase first)
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { from: sender, subject, text, html, to: toEmail, imageUrl } = body;
+    
+    const emailText = `${text || ''}\n${html || ''}`.slice(0, 2000);
+
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    
+    const prompt = `You are parsing an inbound email for an electrical contractor. 
+It could either be a "receipt" from a supply house, a "lead" (a new work order or customer inquiry from a website form or direct email), or a "permit" (from a city, state inspector, or AHJ).
+
+CRITICAL CLASSIFICATION RULES:
+1. If the email is from a city, municipality, state inspector, ePermits system, or AHJ (or contains words like "permit", "inspection", "building code"), you MUST classify it as "permit". Even if the email includes a fee payment confirmation or invoice for the permit, it is a "permit", NOT a "receipt".
+2. If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip (from places like Home Depot, JH Larson, CED, Viking Electric), you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
+3. If the email is a customer asking for work, an online form submission, or a new work order, classify it as "lead". DO NOT classify emails from supply houses (JH Larson, CED, etc.) as leads.
+
+FOR JOB NUMBER OR PO (Receipts only): Carefully scan the receipt/invoice for a "PO Number", "Job Name", "Ship To", "Project", or handwritten notes indicating which job this material was purchased for. If you find one, extract it into 'job_number_or_po'. CRITICAL: Do NOT extract the supplier/store name (like "JH Larson", "CED", "Home Depot", "Viking Electric") as the Job/PO Name! The job name is usually an address, a person's name, or a specific project name, not the wholesale house you bought it from.
+
+FOR SUPPLIER NAME (Receipts only): Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). Ensure "JH Larson" and similar companies are ALWAYS placed here in 'supplier_name', never in 'job_number_or_po'. If the receipt was forwarded, look at the original sender's email address domain.
+
+Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
+
+{
+  "type": "receipt" | "lead" | "permit",
+  
+  "supplier_name": "string or null",
+  "total_amount": number or null,
+  "invoice_number": "string or null",
+  "job_number_or_po": "string or null",
+  "invoice_date": "string or null",
+  "line_items": [
+    { "description": "string", "quantity": number or null, "unit_price": number or null, "total": number or null }
+  ],
+  
+  "customer_name": "string or null",
+  "customer_phone": "string or null",
+  "customer_email": "string or null",
+  "address": "string or null",
+  "issue_description": "string or null",
+  "urgency": "high" | "medium" | "low",
+
+  "permit_number": "string or null",
+  "city_ahj": "string or null",
+  "permit_type": "string or null",
+  "issue_date": "string or null",
+  "expiration_date": "string or null",
+  "fee_amount": number or null
+}
+
+Email From: ${sender || 'Unknown'}
+Subject: ${subject || 'No Subject'}
+Body:
+${emailText}`;
+
+    const contentArray: any[] = [{ type: 'text', text: prompt }];
+    
+    // Add the Supabase URL instead of a base64 string
+    if (imageUrl) {
+      contentArray.push({
+        type: 'image_url',
+        image_url: { url: imageUrl, detail: "high" }
+      });
+    }
+
+    const res = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [{ role: 'user', content: contentArray }],
+      temperature: 0,
+      max_tokens: 1500,
+    });
+
+    let raw = res.choices[0]?.message?.content?.trim() || '{}';
+    let cleaned = raw.replace(/^\`\`\`json\s*/i, '').replace(/^\`\`\`\s*/i, '').replace(/\`\`\`\s*$/i, '').trim();
+    
+    let parsed;
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (e) {
+      return NextResponse.json({ success: false, error: 'JSON Parse Error' }, { status: 400 });
+    }
+
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co', process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder');
+    
+    let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+    if (!companyId && toEmail) {
+      const uuidMatch = toEmail.match(/inbox_([a-f0-9-]{36})@/i);
+      if (uuidMatch) {
+        const { data: co } = await supabase.from('companies').select('id').eq('inbox_token', uuidMatch[1]).single();
+        companyId = co?.id;
+      }
+    }
+
+    if (!companyId) return NextResponse.json({ success: false, error: 'No company found' }, { status: 400 });
+
+    if (parsed.type === 'receipt') {
+      let matchedJobId = null;
+      let autoLinked = false;
+      if (parsed.job_number_or_po) {
+        const { data: possibleJobs } = await supabase
+          .from('jobs')
+          .select('id, title')
+          .eq('company_id', companyId)
+          .ilike('title', `%${parsed.job_number_or_po.substring(0, 10)}%`)
+          .limit(1);
+        
+        if (possibleJobs && possibleJobs.length > 0) {
+          matchedJobId = possibleJobs[0].id;
+          autoLinked = true;
+        }
+      }
+
+      await supabase.from('receipts').insert([{
+        company_id: companyId,
+        job_id: matchedJobId,
+        supplier_name: parsed.supplier_name || sender,
+        total_amount: parsed.total_amount,
+        status: autoLinked ? 'Reviewed' : 'Action Required',
+        line_items: parsed.line_items || []
+      }]);
+
+      await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender || 'Unknown', body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (via Make.com webhook)` }]);
+    }
+
+    return NextResponse.json({ success: true, type: parsed.type, parsed });
+
+  } catch (err) {
+    console.error('Make webhook receiver error:', err);
+    return NextResponse.json({ success: false, error: (err as Error).message }, { status: 500 });
+  }
+}

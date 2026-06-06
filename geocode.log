@@ -1,0 +1,1004 @@
+◇ injected env (15) from .env.local // tip: ⌘ enable debugging { debug: true }
+Fetching all new build permits to fix their coordinates...
+[OK] Moved 7680 MARTIN Drive, San Francisco Township to 44.7000208, -93.7167308
+[OK] Moved 17185 KOEPP Drive, San Francisco Township to 44.6921004, -93.7471728
+[OK] Moved 17775 COUNTY ROAD 40, San Francisco Township to 44.6824957, -93.7312594
+[OK] Moved 1023 Lakeview Ter, Waconia to 44.8582794, -93.7974689
+[FAIL] Could not find exact map coordinates for: 405 Timber Creek Dr, Waconia
+[OK] Moved 16072 Baywood La, Eden Prairie to 44.8805969, -93.4823134
+[OK] Moved 16550 COUNTY ROAD 40, San Francisco Township to 44.7033576, -93.7052544
+[OK] Moved 10595 150TH Street, Benton Township to 44.7312574, -93.7925927
+[OK] Moved 5752 COUNTY ROAD 50, Dahlgren Township to 44.717854, -93.667831
+[FAIL] Could not find exact map coordinates for: 16017 HAYES Lane, San Francisco Township
+[OK] Moved 14385 JACOB Street, Young America Township to 44.7450181, -93.9701459
+[OK] Moved 7695 MAPLEWOOD Road, Dahlgren Township to 44.7357299, -93.7146172
+[OK] Moved 11855 COUNTY ROAD 152, Benton Township to 44.745916, -93.825705
+[OK] Moved 216 CARVER CREEK Place, Carver to 44.7478522, -93.6405506
+[OK] Moved 11025 134TH Street, Benton Township to 44.7603505, -93.8048097
+[OK] Moved 425 EMMA Street, Norwood Young America to 44.7633472, -93.9391039
+[OK] Moved 445 EMMA Street, Norwood Young America to 44.762651, -93.9390259
+[OK] Moved 455 EMMA Street, Norwood Young America to 44.7623101, -93.9389459
+[OK] Moved 475 EMMA Street, Norwood Young America to 44.7616124, -93.938883
+[OK] Moved 461 EMMA Street, Norwood Young America to 44.7621016, -93.9389192
+[OK] Moved 465 EMMA Street, Norwood Young America to 44.7619615, -93.9389125
+[OK] Moved 495 OAK Lane, Norwood Young America to 44.7708698, -93.9112509
+[OK] Moved 485 OAK Lane, Norwood Young America to 44.7708698, -93.9112509
+[OK] Moved 1135 PRESERVE Boulevard, Norwood Young America to 44.7782211, -93.9015241
+[OK] Moved 14725 118TH Street, Young America Township to 44.7898188, -93.8975123
+[OK] Moved 11790 HIGHWAY 284, Benton Township to 44.7896967, -93.788186
+[OK] Moved 11755 POST Avenue, Benton Township to 44.7902928, -93.839012
+[OK] Moved 725 CASCADE Drive, Chaska to 44.7905153, -93.6117436
+[OK] Moved 737 CASCADE Drive, Chaska to 44.7905272, -93.6122673
+[OK] Moved 4405 SAVANNA Trail, Chaska to 44.7917155, -93.6239211
+[OK] Moved 4544 SAVANNA Trail, Chaska to 44.792152, -93.622734
+[OK] Moved 6332 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 6324 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 5114 BOULDER Lane, Chaska to 44.8005735, -93.6219201
+[OK] Moved 11125 SALEM Avenue, Benton Township to 44.7996701, -93.8882528
+[OK] Moved 2878 IRONWOOD Boulevard, Chaska to 44.8282427, -93.5748268
+[OK] Moved 9360 COUNTY ROAD 135, Camden Township to 44.8341817, -93.9293755
+[OK] Moved 9052 LAKESIDE Drive, Victoria to 44.83449, -93.6702679
+[OK] Moved 9070 LAKESIDE Drive, Victoria to 44.8346293, -93.6708594
+[OK] Moved 524 ROANOKE Court, Waconia to 44.8343578, -93.7767968
+[FAIL] Could not find exact map coordinates for: 6875 ABBYWOOD Lane, Laketown Township
+[OK] Moved 1149 POND Curve, Waconia to 44.837679, -93.8172665
+[OK] Moved 1445 BAVARIAN SHORES Drive, Chaska to 44.840901, -93.6357881
+[OK] Moved 772 SOMERWOOD Lane, Waconia to 44.8395941, -93.7692969
+[OK] Moved 8575 HILLPOINTE Lane, Victoria to 44.8500592, -93.636377
+[OK] Moved 25 LAKE Street East, Waconia to 44.8514471, -93.7855987
+[OK] Moved 834 BEACH Road, Waconia to 44.8515291, -93.7714627
+[OK] Moved 483 LAKEVIEW TERRACE Boulevard, Waconia to 44.8562721, -93.8031399
+[OK] Moved 8001 PETUNIA, Victoria to 44.858287, -93.658938
+[OK] Moved 381 LAKEVIEW TERRACE Boulevard, Waconia to 44.8579293, -93.799509
+[FAIL] Could not find exact map coordinates for: 1240 78TH Street West, Victoria
+[OK] Moved 7607 FRONTIER Trail, Chanhassen to 44.8653201, -93.5290509
+[OK] Moved 7450 CHANHASSEN Road, Chanhassen to 44.8715853, -93.520666
+[OK] Moved 834 CREE Drive, Chanhassen to 44.8807116, -93.5414828
+[OK] Moved 180 MORNING Drive, Mayer to 44.8859839, -93.8925963
+[OK] Moved 190 MORNING Drive, Mayer to 44.8860599, -93.8925979
+[OK] Moved 450 INDIAN HILL Road, Chanhassen to 44.8853286, -93.5327753
+[OK] Moved 2575 COLDWATER Crossing, Mayer to 44.886238, -93.9045781
+[OK] Moved 6550 GOOSE LAKE Drive, Waconia Township to 44.8839253, -93.8393332
+[OK] Moved 6315 SMITHTOWN Road, Victoria to 44.8903396, -93.6348018
+[OK] Moved 2631 ORCHARD Lane, Chanhassen to 44.889964, -93.587816
+[OK] Moved 6407 VIRGINIA, Victoria to 44.8898479, -93.6489927
+[OK] Moved 6326 SMITHTOWN Road, Victoria to 44.8904408, -93.6350305
+[OK] Moved 5180 PRAIRIE Point, Mayer to 44.8930163, -93.8753676
+[OK] Moved 5190 PRAIRIE Point, Mayer to 44.8931311, -93.8753078
+[FAIL] Could not find exact map coordinates for: 5152 HARVEST Curve, Mayer
+[OK] Moved 10480 SWEDE LAKE Road, Watertown Township to 44.9343343, -93.7898696
+[OK] Moved 4410 HIGHWAY 25, Watertown Township to 44.9236149, -93.8695025
+[OK] Moved 805 SOUTHVIEW Street Southeast, Watertown to 44.9530679, -93.8435605
+[OK] Moved 11015 OAK SHORE Trail, Watertown Township to 44.9600765, -93.8034495
+[OK] Moved 413 FRANKLIN Avenue Northwest, Watertown to 44.9683308, -93.8484717
+[OK] Moved 1409 PENN Avenue, Watertown Township to 44.9772145, -93.8395809
+[OK] Moved 17350 16TH Street, Hollywood Township to 44.9749903, -93.9667655
+[OK] Moved 15075 COUNTY ROAD 31, Young America Township to 44.7680281, -93.9542888
+[OK] Moved 13885 COUNTY ROAD 41, Dahlgren Township to 44.7510839, -93.7346546
+[OK] Moved 6625 AUGUSTA Road, Dahlgren Township to 44.8047893, -93.7094381
+[OK] Moved 9790 LAKEWOOD Circle, Laketown Township to 44.8265506, -93.7032994
+[OK] Moved 6524 SMITHTOWN Road, Victoria to 44.8866524, -93.6355646
+[FAIL] Could not find exact map coordinates for: 2980 WASHTA BAY Court, Chanhassen
+[FAIL] Could not find exact map coordinates for: 3632 HICKORY Road, Chanhassen
+[OK] Moved 1934 DELLA Drive, Chanhassen to 44.8773984, -93.5712249
+[OK] Moved 1910 DELLA Drive, Chanhassen to 44.8773984, -93.5712249
+[OK] Moved 1824 LUCY RIDGE Circle, Chanhassen to 44.8781243, -93.5668998
+[OK] Moved 6540 HARVEST Way, Chaska to 44.795034, -93.6303163
+[OK] Moved 6538 HARVEST Way, Chaska to 44.795034, -93.6303163
+[OK] Moved 6534 HARVEST Way, Chaska to 44.795034, -93.6303163
+[OK] Moved 6514 HARVEST Way, Chaska to 44.795034, -93.6303163
+[OK] Moved 1944 WOODS Point, Waconia to 44.8237453, -93.7858281
+[OK] Moved 1952 CAMPFIRE Drive East, Waconia to 44.8243893, -93.7856377
+[OK] Moved 934 GOLDFINCH Street, Chaska to 44.7957447, -93.6086223
+[FAIL] Could not find exact map coordinates for: 351 JOANNA Drive, Chanhassen
+[OK] Moved 5590 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5596 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[FAIL] Could not find exact map coordinates for: 648 HAWTHORNE Lane, Watertown
+[FAIL] Could not find exact map coordinates for: 613 HAWTHORNE Lane, Watertown
+[FAIL] Could not find exact map coordinates for: 633 HAWTHORNE Lane, Watertown
+[OK] Moved 1376 BALSAM Lane, Watertown to 44.9638911, -93.8326525
+[OK] Moved 7830 JOYCE Road, San Francisco Township to 44.7099436, -93.7260162
+[FAIL] Could not find exact map coordinates for: 6444 YOSEMITE Lane, Chanhassen
+[FAIL] Could not find exact map coordinates for: 6456 YOSEMITE Lane, Chanhassen
+[OK] Moved 9532 TIMBER Terrace, Victoria to 44.8309079, -93.6605601
+[OK] Moved 2130 RIVER BEND Trail, Mayer to 44.8857085, -93.8942221
+[OK] Moved 2114 RIVER BEND Trail, Mayer to 44.8856459, -93.8952612
+[OK] Moved 2110 RIVER BEND Trail, Mayer to 44.8856459, -93.8952612
+[OK] Moved 2094 RIVER BEND Trail, Mayer to 44.8882292, -93.8945273
+[OK] Moved 2126 RIVER BEND Trail, Mayer to 44.8856459, -93.8952612
+[OK] Moved 2123 RIVER BEND Trail, Mayer to 44.8856459, -93.8952612
+[OK] Moved 2127 RIVER BEND Trail, Mayer to 44.8856459, -93.8952612
+[OK] Moved 2074 RIVER BEND Trail, Mayer to 44.8885077, -93.8949215
+[OK] Moved 2301 HICKORY Lane, Mayer to 44.8884776, -93.8993872
+[OK] Moved 2138 RIVER BEND Trail, Mayer to 44.885644, -93.8943672
+[OK] Moved 2146 RIVER BEND Trail, Mayer to 44.8855976, -93.8945183
+[FAIL] Could not find exact map coordinates for: 5417 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5375 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5412 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5467 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5378 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5310 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5296 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5400 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5440 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5425 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5435 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5460 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5463 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5467 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5495 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5379 SCENIC LOOP Run, Victoria
+[OK] Moved 3186 MARKET Avenue, Watertown Township to 44.9455632, -93.7677678
+[FAIL] Could not find exact map coordinates for: 4310 DEERE Trail, Chaska
+[FAIL] Could not find exact map coordinates for: 4328 DEERE Trail, Chaska
+[FAIL] Could not find exact map coordinates for: 4323 DEERE Trail, Chaska
+[FAIL] Could not find exact map coordinates for: 4305 DEERE Trail, Chaska
+[OK] Moved 17825 COUNTY ROAD 151, Hancock Township to 44.6801473, -93.8495855
+[OK] Moved 112 FOREST Court, Waconia to 44.8253512, -93.7845378
+[OK] Moved 116 FOREST Court, Waconia to 44.8252887, -93.7842586
+[OK] Moved 120 FOREST Court, Waconia to 44.8252478, -93.7840058
+[OK] Moved 109 FOREST Court, Waconia to 44.8249417, -93.7847242
+[OK] Moved 124 FOREST Court, Waconia to 44.8251889, -93.7837366
+[OK] Moved 101 FOREST Court, Waconia to 44.8249257, -93.7850291
+[OK] Moved 1956 CAMPFIRE Drive East, Waconia to 44.8248117, -93.785597
+[OK] Moved 1847 CAMPFIRE Drive East, Waconia to 44.8228101, -93.7851124
+[OK] Moved 222 SNOWDROP Trail, Waconia to 44.8423693, -93.8109395
+[OK] Moved 248 SNOWDROP Trail, Waconia to 44.8414175, -93.8132008
+[OK] Moved 201 SNOWDROP Trail, Waconia to 44.8430128, -93.8088336
+[OK] Moved 203 SNOWDROP Trail, Waconia to 44.8428754, -93.8089648
+[OK] Moved 205 SNOWDROP Trail, Waconia to 44.8427423, -93.8091308
+[OK] Moved 520 GOLDENROD Trail, Waconia to 44.8425808, -93.8123067
+[OK] Moved 207 SNOWDROP Trail, Waconia to 44.8426454, -93.8093071
+[OK] Moved 209 SNOWDROP Trail, Waconia to 44.8425563, -93.809476
+[OK] Moved 220 SNOWDROP Trail, Waconia to 44.8424707, -93.8107551
+[OK] Moved 211 SNOWDROP Trail, Waconia to 44.842481, -93.8096587
+[OK] Moved 213 SNOWDROP Trail, Waconia to 44.8423996, -93.8098508
+[OK] Moved 215 SNOWDROP Trail, Waconia to 44.8423343, -93.8100432
+[OK] Moved 524 GOLDENROD Trail, Waconia to 44.8423283, -93.8127342
+[OK] Moved 241 SNOWDROP Trail, Waconia to 44.8410825, -93.8121417
+[OK] Moved 243 SNOWDROP Trail, Waconia to 44.8410334, -93.8123571
+[OK] Moved 245 SNOWDROP Trail, Waconia to 44.841023, -93.8125874
+[OK] Moved 525 WATERFORD Place, Waconia to 44.8289743, -93.7913823
+[OK] Moved 529 WATERFORD Place, Waconia to 44.8288618, -93.7911876
+[OK] Moved 624 SIERRA Parkway, Waconia to 44.8286861, -93.7917822
+[OK] Moved 533 WATERFORD Place, Waconia to 44.8287042, -93.7910262
+[OK] Moved 528 WATERFORD Place, Waconia to 44.8293195, -93.7909686
+[OK] Moved 532 WATERFORD Place, Waconia to 44.8291785, -93.7908219
+[OK] Moved 536 WATERFORD Place, Waconia to 44.8290347, -93.7906603
+[OK] Moved 632 SIERRA Parkway, Waconia to 44.8283943, -93.791437
+[OK] Moved 629 SIERRA Parkway, Waconia to 44.8282275, -93.7920713
+[OK] Moved 633 SIERRA Parkway, Waconia to 44.8280962, -93.791917
+[OK] Moved 6661 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6641 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6529 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6517 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6505 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6501 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6404 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 6670 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6657 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6653 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6565 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6646 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6552 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6629 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6533 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6544 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6536 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6625 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6447 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 6528 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6440 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 6443 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 6524 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6617 HARVEST Trail, Chaska to 44.7923822, -93.6295602
+[OK] Moved 6521 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6510 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6506 TIMBER ARCH Drive, Chaska to 44.7969741, -93.6250894
+[OK] Moved 6415 RED CEDAR Drive, Chaska to 44.7933192, -93.6268192
+[OK] Moved 1914 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1948 FULTON Road, Carver to 44.7673813, -93.653335
+[OK] Moved 1946 FULTON Road, Carver to 44.7673749, -93.6533351
+[OK] Moved 1944 FULTON Road, Carver to 44.7673684, -93.6533352
+[OK] Moved 1942 FULTON Road, Carver to 44.767362, -93.6533353
+[OK] Moved 1908 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1953 FULTON Road, Carver to 44.7673946, -93.6531037
+[OK] Moved 1951 FULTON Road, Carver to 44.7673883, -93.6531038
+[OK] Moved 1949 FULTON Road, Carver to 44.767382, -93.6531039
+[OK] Moved 1701 GABLE Drive, Carver to 44.7706296, -93.6496562
+[OK] Moved 1707 GABLE Drive, Carver to 44.7706296, -93.6496562
+[OK] Moved 1703 GABLE Drive, Carver to 44.7706296, -93.6496562
+[OK] Moved 4900 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4909 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4991 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[FAIL] Could not find exact map coordinates for: 17207 CO RD 34, Young America Township
+[FAIL] Could not find exact map coordinates for: 6035 SHOREVIEW Point, Victoria
+[FAIL] Could not find exact map coordinates for: 6300 BLUEBELL Lane, Victoria
+[FAIL] Could not find exact map coordinates for: 6316 BLUEBELL Lane, Victoria
+[OK] Moved 6382 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[OK] Moved 6372 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[FAIL] Could not find exact map coordinates for: 6266 BLUEBELL Lane, Victoria
+[FAIL] Could not find exact map coordinates for: 6256 BLUEBELL Lane, Victoria
+[OK] Moved 6383 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[OK] Moved 6227 LAKESIDE Drive, Victoria to 44.8352401, -93.6729565
+[OK] Moved 6369 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[OK] Moved 6357 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[OK] Moved 6317 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[OK] Moved 6305 LAKESIDE Drive, Victoria to 44.8343929, -93.6630438
+[FAIL] Could not find exact map coordinates for: 6005 SHOREVIEW Point, Victoria
+[FAIL] Could not find exact map coordinates for: 6021 SHOREVIEW Point, Victoria
+[FAIL] Could not find exact map coordinates for: 6095 SHOREVIEW Point, Victoria
+[FAIL] Could not find exact map coordinates for: 6065 SHOREVIEW Point, Victoria
+[FAIL] Could not find exact map coordinates for: 6051 SHOREVIEW Point, Victoria
+[OK] Moved 4550 SAVANNA Trail, Chaska to 44.7917155, -93.6239211
+[FAIL] Could not find exact map coordinates for: 6336 BLUEBELL Lane, Victoria
+[OK] Moved 546 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 537 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 539 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 529 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 527 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 473 PRAIRIE VIEW Drive, Cologne to 44.7801424, -93.7975315
+[OK] Moved 536 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 540 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 521 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 530 WINKLER Trail North, Cologne to 44.7807922, -93.7950661
+[OK] Moved 486 PRAIRIE VIEW Drive, Cologne to 44.7803711, -93.7973849
+[OK] Moved 2039 OAKPOINTE Drive, Waconia to 44.828372, -93.8204525
+[OK] Moved 1983 OAKPOINTE Drive, Waconia to 44.8283189, -93.8210524
+[OK] Moved 1952 OAKPOINTE Drive, Waconia to 44.828574, -93.8219991
+[OK] Moved 1999 OAKPOINTE Drive, Waconia to 44.8281094, -93.8207976
+[OK] Moved 2047 OAKPOINTE Drive, Waconia to 44.8284946, -93.8201716
+[OK] Moved 2055 OAKPOINTE Drive, Waconia to 44.8284257, -93.8198984
+[OK] Moved 2063 OAKPOINTE Drive, Waconia to 44.8283415, -93.8196929
+[OK] Moved 2079 OAKPOINTE Drive, Waconia to 44.828145, -93.8194106
+[OK] Moved 2048 OAKPOINTE Drive, Waconia to 44.8279273, -93.8199943
+[OK] Moved 1149 FABEL Lane, Waconia to 44.8262715, -93.8224226
+[OK] Moved 1157 FABEL Lane, Waconia to 44.8263015, -93.8226349
+[OK] Moved 1101 FABEL Lane, Waconia to 44.8263118, -93.8211202
+[OK] Moved 1117 FABEL Lane, Waconia to 44.8263046, -93.8215774
+[OK] Moved 1133 FABEL Lane, Waconia to 44.8263123, -93.8219957
+[OK] Moved 1141 FABEL Lane, Waconia to 44.8263025, -93.8222101
+[FAIL] Could not find exact map coordinates for: 513 HAMMERS Court, Chaska
+[FAIL] Could not find exact map coordinates for: 501 HAMMERS Court, Chaska
+[FAIL] Could not find exact map coordinates for: 521 HAMMERS Court, Chaska
+[FAIL] Could not find exact map coordinates for: 517 HAMMERS Court, Chaska
+[FAIL] Could not find exact map coordinates for: 509 HAMMERS Court, Chaska
+[OK] Moved 105 LIBERTY HEIGHTS Court, Chaska to 44.7939435, -93.6083776
+[OK] Moved 109 LIBERTY HEIGHTS Court, Chaska to 44.7939435, -93.6083776
+[OK] Moved 113 LIBERTY HEIGHTS Court, Chaska to 44.7939435, -93.6083776
+[OK] Moved 973 GOLDFINCH Street, Chaska to 44.7957447, -93.6086223
+[OK] Moved 965 GOLDFINCH Street, Chaska to 44.7957447, -93.6086223
+[OK] Moved 977 GOLDFINCH Street, Chaska to 44.7957447, -93.6086223
+[OK] Moved 998 MOERS Drive, Chaska to 44.7993815, -93.6099943
+[OK] Moved 1114 MOERS Drive, Chaska to 44.7994961, -93.6099637
+[OK] Moved 1071 MOERS Drive, Chaska to 44.7992278, -93.6110714
+[OK] Moved 213 LIBERTY HEIGHTS Drive, Chaska to 44.7994423, -93.6079091
+[OK] Moved 329 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 321 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 309 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 345 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 341 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 1028 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1031 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1027 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1020 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1023 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 207 LIBERTY HEIGHTS Drive, Chaska to 44.7982244, -93.6079691
+[OK] Moved 1016 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 203 LIBERTY HEIGHTS Drive, Chaska to 44.7981783, -93.607903
+[OK] Moved 1012 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1011 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 199 LIBERTY HEIGHTS Drive, Chaska to 44.799273, -93.6079175
+[OK] Moved 999 GOLDFINCH Street, Chaska to 44.7944464, -93.6070635
+[OK] Moved 991 GOLDFINCH Street, Chaska to 44.7944464, -93.6070635
+[OK] Moved 995 GOLDFINCH Street, Chaska to 44.7957447, -93.6086223
+[OK] Moved 987 GOLDFINCH Street, Chaska to 44.7944464, -93.6070635
+[OK] Moved 1079 MOERS Drive, Chaska to 44.7993815, -93.6099943
+[OK] Moved 1075 MOERS Drive, Chaska to 44.7993815, -93.6099943
+[OK] Moved 219 LIBERTY HEIGHTS Drive, Chaska to 44.7984967, -93.6079557
+[OK] Moved 325 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 317 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 313 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 333 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 337 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 1117 MOERS Drive, Chaska to 44.7987821, -93.611457
+[OK] Moved 1113 MOERS Drive, Chaska to 44.7987005, -93.6114173
+[OK] Moved 211 LIBERTY HEIGHTS Drive, Chaska to 44.7994181, -93.6079103
+[OK] Moved 209 LIBERTY HEIGHTS Drive, Chaska to 44.7982698, -93.6079669
+[OK] Moved 1019 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1015 GOLDFINCH Court, Chaska to 44.7963466, -93.6089486
+[OK] Moved 1099 MOERS Drive, Chaska to 44.7993815, -93.6099943
+[OK] Moved 1127 MOERS Drive, Chaska to 44.7989951, -93.6114522
+[OK] Moved 360 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 364 BLUEJAY Avenue, Chaska to 44.7976458, -93.6093864
+[OK] Moved 228 ROBIN Avenue, Chaska to 44.7963091, -93.6060002
+[OK] Moved 190 LIBERTY HEIGHTS Drive, Chaska to 44.7936388, -93.6058237
+[OK] Moved 415 PRAIRIE ROSE Lane, Waconia to 44.842985, -93.8105946
+[OK] Moved 811 FOXGLOVE Terrace, Waconia to 44.8435025, -93.8101559
+[OK] Moved 417 PRAIRIE ROSE Lane, Waconia to 44.8431478, -93.8107203
+[OK] Moved 151 SNOWDROP Trail, Waconia to 44.8440435, -93.8086657
+[OK] Moved 152 SNOWDROP Trail, Waconia to 44.8438853, -93.809269
+[OK] Moved 153 SNOWDROP Trail, Waconia to 44.8438994, -93.8086705
+[OK] Moved 155 SNOWDROP Trail, Waconia to 44.8437613, -93.8086942
+[OK] Moved 813 FOXGLOVE Terrace, Waconia to 44.843538, -93.8105094
+[OK] Moved 159 SNOWDROP Trail, Waconia to 44.843403, -93.8086661
+[OK] Moved 815 FOXGLOVE Terrace, Waconia to 44.8434917, -93.8108628
+[OK] Moved 915 FOXGLOVE Terrace, Waconia to 44.8434873, -93.8147181
+[OK] Moved 720 WINTERBERRY Lane, Waconia to 44.8430516, -93.8155583
+[OK] Moved 722 WINTERBERRY Lane, Waconia to 44.8430279, -93.8158034
+[OK] Moved 716 WINTERBERRY Lane, Waconia to 44.8430191, -93.8150404
+[OK] Moved 714 WINTERBERRY Lane, Waconia to 44.8430315, -93.8147622
+[OK] Moved 712 WINTERBERRY Lane, Waconia to 44.843014, -93.8144897
+[OK] Moved 721 WINTERBERRY Lane, Waconia to 44.8426119, -93.8155429
+[OK] Moved 719 WINTERBERRY Lane, Waconia to 44.8426151, -93.8152844
+[OK] Moved 717 WINTERBERRY Lane, Waconia to 44.8425643, -93.8149894
+[OK] Moved 715 WINTERBERRY Lane, Waconia to 44.8426197, -93.8147208
+[OK] Moved 713 WINTERBERRY Lane, Waconia to 44.8426052, -93.8144338
+[OK] Moved 728 WINTERBERRY Lane, Waconia to 44.8429001, -93.8165843
+[OK] Moved 723 WINTERBERRY Lane, Waconia to 44.842629, -93.815781
+[OK] Moved 725 WINTERBERRY Lane, Waconia to 44.8425562, -93.8161282
+[OK] Moved 727 WINTERBERRY Lane, Waconia to 44.8424474, -93.8164281
+[OK] Moved 930 FOXGLOVE Terrace, Waconia to 44.8439048, -93.8168141
+[OK] Moved 1036 GOLDENROD Trail, Waconia to 44.8440076, -93.8181894
+[OK] Moved 926 FOXGLOVE Terrace, Waconia to 44.8439263, -93.8163084
+[OK] Moved 910 FOXGLOVE Terrace, Waconia to 44.8439047, -93.8142438
+[OK] Moved 1034 GOLDENROD Trail, Waconia to 44.8438559, -93.8181831
+[OK] Moved 911 FOXGLOVE Terrace, Waconia to 44.8434716, -93.8142112
+[OK] Moved 913 FOXGLOVE Terrace, Waconia to 44.8434675, -93.8144697
+[OK] Moved 729 WINTERBERRY Lane, Waconia to 44.842306, -93.8166061
+[OK] Moved 1012 GOLDENROD Trail, Waconia to 44.8420165, -93.817057
+[OK] Moved 610 GOLDENROD Trail, Waconia to 44.8421902, -93.8141064
+[OK] Moved 329 SUNFLOWER Circle, Waconia to 44.8411332, -93.8163885
+[OK] Moved 1201 ORCHARD Court, Waconia to 44.8266555, -93.8218563
+[OK] Moved 1226 ORCHARD Court, Waconia to 44.8271802, -93.8228703
+[OK] Moved 1274 ORCHARD Court, Waconia to 44.8278883, -93.8232827
+[OK] Moved 1273 ORCHARD Court, Waconia to 44.8278368, -93.8229084
+[OK] Moved 1266 ORCHARD Court, Waconia to 44.8277762, -93.8234874
+[OK] Moved 1234 ORCHARD Court, Waconia to 44.8272336, -93.8230688
+[OK] Moved 1242 ORCHARD Court, Waconia to 44.8273003, -93.823291
+[OK] Moved 1148 FABEL Lane, Waconia to 44.8267675, -93.8224018
+[OK] Moved 1156 FABEL Lane, Waconia to 44.826705, -93.8226184
+[OK] Moved 1873 CHARLESTON Lane, Waconia to 44.826307, -93.8191198
+[OK] Moved 1874 CHARLESTON Lane, Waconia to 44.8267278, -93.8192144
+[OK] Moved 1758 CHARLESTON Lane, Waconia to 44.827167, -93.8172677
+[OK] Moved 1766 CHARLESTON Lane, Waconia to 44.8271667, -93.817482
+[OK] Moved 1801 CHARLESTON Lane, Waconia to 44.8268245, -93.8174893
+[OK] Moved 1809 CHARLESTON Lane, Waconia to 44.8266594, -93.8175315
+[OK] Moved 1850 CHARLESTON Lane, Waconia to 44.826689, -93.8185263
+[OK] Moved 1858 CHARLESTON Lane, Waconia to 44.8266853, -93.818737
+[OK] Moved 1817 CHARLESTON Lane, Waconia to 44.8264875, -93.8176514
+[OK] Moved 1825 CHARLESTON Lane, Waconia to 44.8263682, -93.8178199
+[OK] Moved 1881 CHARLESTON Lane, Waconia to 44.8263033, -93.8193473
+[OK] Moved 1889 CHARLESTON Lane, Waconia to 44.8263543, -93.8195821
+[OK] Moved 1841 CHARLESTON Lane, Waconia to 44.8263123, -93.8182759
+[OK] Moved 1849 CHARLESTON Lane, Waconia to 44.8262876, -93.8184904
+[OK] Moved 1907 BROOKEVIEW Court, Carver to 44.7727942, -93.6357592
+[OK] Moved 2001 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 1895 BROOKEVIEW Court, Carver to 44.7727942, -93.6357592
+[OK] Moved 2005 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 1897 BROOKEVIEW Court, Carver to 44.7727942, -93.6357592
+[OK] Moved 2002 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 2007 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 1899 BROOKEVIEW Court, Carver to 44.7727942, -93.6357592
+[OK] Moved 2009 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 2010 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 2017 MULBERRY Lane, Carver to 44.7745595, -93.6368254
+[OK] Moved 157 HUNTINGTON Drive, Waconia to 44.8316742, -93.7900605
+[OK] Moved 155 HUNTINGTON Drive, Waconia to 44.8316511, -93.7901302
+[OK] Moved 153 HUNTINGTON Drive, Waconia to 44.831628, -93.7902
+[OK] Moved 141 HUNTINGTON Drive, Waconia to 44.8314502, -93.7905856
+[OK] Moved 139 HUNTINGTON Drive, Waconia to 44.8314182, -93.7906478
+[OK] Moved 137 HUNTINGTON Drive, Waconia to 44.8313861, -93.7907101
+[OK] Moved 135 HUNTINGTON Drive, Waconia to 44.831354, -93.7907723
+[OK] Moved 131 HUNTINGTON Drive, Waconia to 44.8312899, -93.7908968
+[OK] Moved 156 HUNTINGTON Drive, Waconia to 44.8319945, -93.7903903
+[OK] Moved 154 HUNTINGTON Drive, Waconia to 44.8319668, -93.7904808
+[OK] Moved 152 HUNTINGTON Drive, Waconia to 44.8319391, -93.7905713
+[OK] Moved 146 HUNTINGTON Drive, Waconia to 44.8318388, -93.7908363
+[OK] Moved 144 HUNTINGTON Drive, Waconia to 44.8318005, -93.7909229
+[OK] Moved 142 HUNTINGTON Drive, Waconia to 44.8317622, -93.7910094
+[OK] Moved 140 HUNTINGTON Drive, Waconia to 44.8317239, -93.7910959
+[OK] Moved 124 HUNTINGTON Drive, Waconia to 44.8313556, -93.7917251
+[OK] Moved 122 HUNTINGTON Drive, Waconia to 44.8313189, -93.7918056
+[OK] Moved 120 HUNTINGTON Drive, Waconia to 44.8312564, -93.7918588
+[OK] Moved 665 SIERRA Parkway, Waconia to 44.8272844, -93.7898632
+[OK] Moved 569 WATERFORD Place, Waconia to 44.8281069, -93.7889201
+[OK] Moved 660 SIERRA Parkway, Waconia to 44.827793, -93.7901168
+[OK] Moved 676 SIERRA Parkway, Waconia to 44.8276279, -93.7890773
+[OK] Moved 550 WATERFORD Place, Waconia to 44.8286643, -93.7900147
+[OK] Moved 554 WATERFORD Place, Waconia to 44.8286301, -93.7897831
+[OK] Moved 558 WATERFORD Place, Waconia to 44.8285902, -93.7894812
+[OK] Moved 561 WATERFORD Place, Waconia to 44.8281198, -93.7894385
+[OK] Moved 545 WATERFORD Place, Waconia to 44.8283615, -93.790428
+[OK] Moved 553 WATERFORD Place, Waconia to 44.8281747, -93.7899614
+[OK] Moved 557 WATERFORD Place, Waconia to 44.8281617, -93.7896922
+[OK] Moved 680 SIERRA Parkway, Waconia to 44.8276228, -93.7888232
+[OK] Moved 681 SIERRA Parkway, Waconia to 44.827175, -93.7888541
+[OK] Moved 673 SIERRA Parkway, Waconia to 44.8272415, -93.789355
+[OK] Moved 325 RAVENCROFT Road, Waconia to 44.828125, -93.7941982
+[OK] Moved 321 RAVENCROFT Road, Waconia to 44.8279908, -93.7943616
+[OK] Moved 317 RAVENCROFT Road, Waconia to 44.8278605, -93.7945211
+[OK] Moved 712 LONGMEADOW Lane, Waconia to 44.8289907, -93.7974773
+[OK] Moved 716 LONGMEADOW Lane, Waconia to 44.8289063, -93.7971888
+[OK] Moved 724 LONGMEADOW Lane, Waconia to 44.8286215, -93.7967075
+[OK] Moved 728 LONGMEADOW Lane, Waconia to 44.8284634, -93.7965303
+[OK] Moved 732 LONGMEADOW Lane, Waconia to 44.8282998, -93.796343
+[OK] Moved 736 LONGMEADOW Lane, Waconia to 44.8281483, -93.7961479
+[OK] Moved 744 LONGMEADOW Lane, Waconia to 44.8278263, -93.7957917
+[OK] Moved 748 LONGMEADOW Lane, Waconia to 44.8276879, -93.7955959
+[OK] Moved 709 LONGMEADOW Lane, Waconia to 44.8287676, -93.7982726
+[OK] Moved 713 LONGMEADOW Lane, Waconia to 44.8286954, -93.7979735
+[OK] Moved 721 LONGMEADOW Lane, Waconia to 44.8285315, -93.7974173
+[OK] Moved 725 LONGMEADOW Lane, Waconia to 44.8283869, -93.7972028
+[OK] Moved 729 LONGMEADOW Lane, Waconia to 44.8282166, -93.796996
+[OK] Moved 733 LONGMEADOW Lane, Waconia to 44.8280551, -93.7968105
+[OK] Moved 741 LONGMEADOW Lane, Waconia to 44.8277523, -93.7964433
+[OK] Moved 745 LONGMEADOW Lane, Waconia to 44.8275745, -93.796245
+[OK] Moved 749 LONGMEADOW Lane, Waconia to 44.8274357, -93.7960526
+[OK] Moved 1690 ST GEORGE Street, Waconia to 44.8292186, -93.7980202
+[OK] Moved 2047 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2016 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2018 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2020 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2019 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2026 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2028 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2027 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2034 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2011 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2029 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2038 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2031 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2033 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2040 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2009 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2044 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2045 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2046 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2048 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2041 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2006 FULTON Court, Carver to 44.7738093, -93.6533643
+[OK] Moved 2004 FULTON Court, Carver to 44.7738093, -93.6533643
+[OK] Moved 2051 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2055 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2054 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2057 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2059 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2056 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2061 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2003 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2060 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2062 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 2063 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[FAIL] Could not find exact map coordinates for: 739 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 758 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 729 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 725 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 752 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 746 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 734 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 726 ENSCONCED Way, Chaska
+[FAIL] Could not find exact map coordinates for: 722 ENSCONCED Way, Chaska
+[OK] Moved 1937 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1933 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1931 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1929 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1924 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1934 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1930 BALSAM Drive, Carver to 44.7709669, -93.6556707
+[OK] Moved 1648 RIVER ROCK Drive, Carver to 44.7690012, -93.6464336
+[OK] Moved 1905 BOULDER Way, Carver to 44.7691814, -93.6509582
+[OK] Moved 1644 RIVER ROCK Drive, Carver to 44.7690016, -93.6463451
+[OK] Moved 1642 RIVER ROCK Drive, Carver to 44.7690018, -93.6463008
+[OK] Moved 1904 BOULDER Way, Carver to 44.7691814, -93.6509582
+[OK] Moved 1635 RIVER ROCK Drive, Carver to 44.7690678, -93.6460477
+[OK] Moved 1637 RIVER ROCK Drive, Carver to 44.7691106, -93.646061
+[OK] Moved 1639 RIVER ROCK Drive, Carver to 44.7691492, -93.6460912
+[OK] Moved 1629 RIVER ROCK Drive, Carver to 44.7689232, -93.6460751
+[OK] Moved 1627 RIVER ROCK Drive, Carver to 44.7688751, -93.6460847
+[OK] Moved 1631 RIVER ROCK Drive, Carver to 44.7689713, -93.6460651
+[OK] Moved 1633 RIVER ROCK Drive, Carver to 44.7690194, -93.646056
+[OK] Moved 1636 RIVER ROCK Drive, Carver to 44.769026, -93.6463123
+[OK] Moved 1638 RIVER ROCK Drive, Carver to 44.7690114, -93.646299
+[OK] Moved 1640 RIVER ROCK Drive, Carver to 44.769002, -93.6462595
+[OK] Moved 1902 BOULDER Way, Carver to 44.7691814, -93.6509582
+[OK] Moved 1900 BOULDER Way, Carver to 44.7691814, -93.6509582
+[OK] Moved 1628 RIVER ROCK Drive, Carver to 44.7688533, -93.6463242
+[OK] Moved 1632 RIVER ROCK Drive, Carver to 44.7689403, -93.6463079
+[OK] Moved 1634 RIVER ROCK Drive, Carver to 44.7689843, -93.6463039
+[OK] Moved 1899 BOULDER Way, Carver to 44.768324, -93.650886
+[OK] Moved 18195 KELLY LAKE Road, San Francisco Township to 44.6736349, -93.7316571
+[OK] Moved 9511 EAGLE RIDGE Road, Chanhassen to 44.8365441, -93.5418049
+[OK] Moved 9543 EAGLE RIDGE Road, Chanhassen to 44.8365441, -93.5418049
+[FAIL] Could not find exact map coordinates for: 9383 EAGLE RIDGE Way, Chanhassen
+[FAIL] Could not find exact map coordinates for: 9399 EAGLE RIDGE Way, Chanhassen
+[FAIL] Could not find exact map coordinates for: 9415 EAGLE RIDGE Way, Chanhassen
+[FAIL] Could not find exact map coordinates for: 9463 EAGLE RIDGE Way, Chanhassen
+[FAIL] Could not find exact map coordinates for: 9479 EAGLE RIDGE Way, Chanhassen
+[OK] Moved 9559 EAGLE RIDGE Road, Chanhassen to 44.8365441, -93.5418049
+[OK] Moved 9575 EAGLE RIDGE Road, Chanhassen to 44.8365441, -93.5418049
+[OK] Moved 9591 EAGLE RIDGE Road, Chanhassen to 44.8365441, -93.5418049
+[OK] Moved 3060 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 2997 IRONWOOD Boulevard, Chaska to 44.8289593, -93.5743117
+[OK] Moved 3003 IRONWOOD Boulevard, Chaska to 44.827526, -93.5754408
+[OK] Moved 3067 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3069 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3073 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3079 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3091 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3063 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3072 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3076 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3066 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3082 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3094 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3057 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3154 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3102 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3142 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3106 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3118 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3112 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3009 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3049 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3013 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3045 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3124 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3130 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3019 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3021 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 3043 SUGAR MAPLE Drive, Chaska to 44.8325292, -93.5770899
+[OK] Moved 5055 KERBER Court, Victoria to 44.8603399, -93.6485418
+[FAIL] Could not find exact map coordinates for: 1504 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1531 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1532 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1525 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1519 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1513 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1507 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1510 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1538 CLOVER PRESERVE Way, Chaska
+[FAIL] Could not find exact map coordinates for: 1686 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1678 OAK CREEK Court, Chaska
+[OK] Moved 1535 OAK CREEK Drive, Chaska to 44.8193246, -93.6426669
+[FAIL] Could not find exact map coordinates for: 1690 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1691 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1687 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1682 OAK CREEK Court, Chaska
+[OK] Moved 1646 OAK CREEK Drive, Chaska to 44.8193246, -93.6426669
+[OK] Moved 1642 OAK CREEK Drive, Chaska to 44.8193246, -93.6426669
+[FAIL] Could not find exact map coordinates for: 1679 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1674 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1670 OAK CREEK Court, Chaska
+[FAIL] Could not find exact map coordinates for: 1675 OAK CREEK Court, Chaska
+[OK] Moved 1626 OAK CREEK Drive, Chaska to 44.8193246, -93.6426669
+[OK] Moved 1622 OAK CREEK Drive, Chaska to 44.8193246, -93.6426669
+[FAIL] Could not find exact map coordinates for: 1604 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 8770 CO RD 140, Dahlgren Township
+[FAIL] Could not find exact map coordinates for: 1520 AVIENDA Lane, Chanhassen
+[FAIL] Could not find exact map coordinates for: 1530 AVIENDA Lane, Chanhassen
+[FAIL] Could not find exact map coordinates for: 1540 AVIENDA Lane, Chanhassen
+[FAIL] Could not find exact map coordinates for: 1510 AVIENDA Lane, Chanhassen
+[FAIL] Could not find exact map coordinates for: 1560 AVIENDA Lane, Chanhassen
+[OK] Moved 9054 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9044 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9064 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9075 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9085 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9095 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9105 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9124 MILLS Lane, Chanhassen to 44.8396262, -93.5613059
+[OK] Moved 9144 MILLS Drive, Chanhassen to 44.8385782, -93.563899
+[OK] Moved 9155 MILLS Drive, Chanhassen to 44.8385782, -93.563899
+[OK] Moved 9164 MILLS Drive, Chanhassen to 44.8385782, -93.563899
+[OK] Moved 9174 MILLS Drive, Chanhassen to 44.8385782, -93.563899
+[OK] Moved 9194 MILLS Drive, Chanhassen to 44.8385782, -93.563899
+[OK] Moved 10690 150TH Street, Benton Township to 44.7314398, -93.7945947
+[OK] Moved 1971 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1968 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1969 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1967 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1965 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1964 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1962 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1960 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1963 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1958 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1961 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1956 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1957 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1954 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1924 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1923 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1940 FULTON Road, Carver to 44.7673556, -93.6533355
+[OK] Moved 1938 FULTON Road, Carver to 44.7673491, -93.6533356
+[OK] Moved 1933 FULTON Road, Carver to 44.7673318, -93.6531048
+[OK] Moved 1936 FULTON Road, Carver to 44.7673427, -93.6533357
+[OK] Moved 1931 FULTON Road, Carver to 44.7673255, -93.653105
+[OK] Moved 1934 FULTON Road, Carver to 44.7673363, -93.6533358
+[OK] Moved 1929 FULTON Road, Carver to 44.7673192, -93.6531051
+[OK] Moved 1913 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1915 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1917 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1930 FULTON Road, Carver to 44.7673234, -93.653336
+[OK] Moved 1919 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1918 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1920 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[OK] Moved 1925 FULTON Road, Carver to 44.7673067, -93.6531053
+[OK] Moved 1927 FULTON Road, Carver to 44.767313, -93.6531052
+[OK] Moved 1916 IRONWOOD Drive, Carver to 44.769762, -93.6463921
+[FAIL] Could not find exact map coordinates for: 12860 CO RD 153, Benton Township
+[OK] Moved 4718 DEVONSHIRE Lane, Chaska to 44.7889031, -93.6239158
+[OK] Moved 4722 DEVONSHIRE Lane, Chaska to 44.7889031, -93.6239158
+[OK] Moved 4710 DEVONSHIRE Lane, Chaska to 44.7889031, -93.6239158
+[OK] Moved 3965 FOUNDERS Path, Chaska to 44.78793, -93.6218445
+[OK] Moved 3959 FOUNDERS Path, Chaska to 44.7879286, -93.6218036
+[OK] Moved 3949 FOUNDERS Path, Chaska to 44.7879207, -93.621736
+[OK] Moved 3943 FOUNDERS Path, Chaska to 44.7879149, -93.6216956
+[OK] Moved 4601 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 4757 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4753 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4742 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4749 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4745 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4730 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4741 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4737 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4733 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4712 DEVONSHIRE Lane, Chaska to 44.7889031, -93.6239158
+[OK] Moved 4727 CAMDEN Circle, Chaska to 44.7892332, -93.6249713
+[OK] Moved 4706 DEVONSHIRE Lane, Chaska to 44.7889031, -93.6239158
+[OK] Moved 3977 FOUNDERS Path, Chaska to 44.7879328, -93.6219262
+[OK] Moved 6720 GOLDEN Court, Chanhassen to 44.8824648, -93.5505336
+[OK] Moved 15345 HALSEY Avenue, San Francisco Township to 44.7248059, -93.6637705
+[OK] Moved 15105 HALSEY Avenue, San Francisco Township to 44.7297069, -93.6636199
+[OK] Moved 15215 HALSEY Avenue, San Francisco Township to 44.7278274, -93.6637074
+[OK] Moved 581 FOX HILL Drive, Chanhassen to 44.8776351, -93.5357229
+[FAIL] Could not find exact map coordinates for: 3853 VISTA VIEW Court, Chaska
+[OK] Moved 4134 VISTA VIEW Drive, Chaska to 44.7931035, -93.6175176
+[OK] Moved 4138 VISTA VIEW Drive, Chaska to 44.7931036, -93.6174948
+[OK] Moved 4142 VISTA VIEW Drive, Chaska to 44.7931038, -93.6174721
+[FAIL] Could not find exact map coordinates for: 3837 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3841 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3826 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3845 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3830 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3834 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3844 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3848 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3840 VISTA VIEW Court, Chaska
+[FAIL] Could not find exact map coordinates for: 3857 VISTA VIEW Court, Chaska
+[OK] Moved 504 MAPLE Street North, Chaska to 44.7896868, -93.5946321
+[OK] Moved 502 MAPLE Street North, Chaska to 44.7896885, -93.5945931
+[OK] Moved 4424 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 5024 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 5023 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4455 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 5001 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 5006 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4508 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 5012 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 5018 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4427 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4525 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4497 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4522 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 1742 CAMPFIRE Drive West, Waconia to 44.8212189, -93.7866011
+[OK] Moved 4494 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 425 PRAIRIE VIEW Drive, Cologne to 44.7794083, -93.7974679
+[OK] Moved 1723 CAMPFIRE Drive East, Waconia to 44.8216597, -93.7852371
+[OK] Moved 1750 CAMPFIRE Drive West, Waconia to 44.8212861, -93.7868596
+[OK] Moved 1699 CAMPFIRE Drive East, Waconia to 44.8208061, -93.7859814
+[OK] Moved 4452 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 433 PRAIRIE VIEW Drive, Cologne to 44.779527, -93.7974132
+[OK] Moved 1707 CAMPFIRE Drive East, Waconia to 44.8210043, -93.7855294
+[OK] Moved 435 PRAIRIE VIEW Drive, Cologne to 44.7795589, -93.7974059
+[OK] Moved 15495 HALSEY Avenue, San Francisco Township to 44.7219443, -93.663766
+[OK] Moved 445 PRAIRIE VIEW Drive, Cologne to 44.7797195, -93.7973797
+[OK] Moved 1758 CAMPFIRE Drive West, Waconia to 44.8213923, -93.786976
+[OK] Moved 1712 CAMPFIRE Drive East, Waconia to 44.8214747, -93.7859921
+[OK] Moved 1727 CAMPFIRE Drive East, Waconia to 44.8218523, -93.7852923
+[OK] Moved 1703 CAMPFIRE Drive East, Waconia to 44.8208889, -93.7857459
+[OK] Moved 1953 WOODS Point, Waconia to 44.823757, -93.7874129
+[OK] Moved 1954 WOODS Point, Waconia to 44.8241922, -93.7870128
+[OK] Moved 1691 CAMPFIRE Drive East, Waconia to 44.8206945, -93.786506
+[OK] Moved 447 PRAIRIE VIEW Drive, Cologne to 44.7797522, -93.7973802
+[OK] Moved 4536 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 1696 CAMPFIRE Drive East, Waconia to 44.8211989, -93.7863692
+[OK] Moved 9531 TIMBER Terrace, Victoria to 44.8309079, -93.6605601
+[OK] Moved 5635 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 9538 TIMBER Terrace, Victoria to 44.8309079, -93.6605601
+[OK] Moved 5599 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 9524 TIMBER Terrace, Victoria to 44.8309079, -93.6605601
+[OK] Moved 4480 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 440 PRAIRIE VIEW Drive, Cologne to 44.7796386, -93.797136
+[OK] Moved 4466 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 1747 CAMPFIRE Drive West, Waconia to 44.8207152, -93.7867719
+[OK] Moved 5632 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5614 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5620 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5608 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5641 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5629 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5623 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5611 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5605 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 5647 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[OK] Moved 11995 POST Avenue, Benton Township to 44.7851121, -93.8387238
+[FAIL] Could not find exact map coordinates for: 10125 CORRAL Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10102 CORRAL Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10101 CORRAL Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10105 CORRAL Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10112 CORRAL Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10122 CORRAL Way, Victoria
+[OK] Moved 1481 SOPHIA Drive, Chaska to 44.816884, -93.640074
+[OK] Moved 1492 SOPHIA Drive, Chaska to 44.8170483, -93.6405322
+[FAIL] Could not find exact map coordinates for: 1629 OAK CREEK Pass, Chaska
+[OK] Moved 1483 SOPHIA Drive, Chaska to 44.816884, -93.6401514
+[OK] Moved 1484 SOPHIA Drive, Chaska to 44.8170488, -93.6402126
+[FAIL] Could not find exact map coordinates for: 1741 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1737 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1744 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1732 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1733 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1728 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1725 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1720 OAK CREEK Pass, Chaska
+[FAIL] Could not find exact map coordinates for: 1631 OAK CREEK Pass, Chaska
+[OK] Moved 4564 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[FAIL] Could not find exact map coordinates for: 1729 OAK CREEK Pass, Chaska
+[OK] Moved 4707 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 7902 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 4693 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 7932 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 7922 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 4550 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 7905 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 4718 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 7915 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 4704 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4690 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 7925 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 4676 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4679 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 7935 JADE Lane, Victoria to 44.8616808, -93.6433899
+[OK] Moved 4623 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4665 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4662 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4637 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4620 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4592 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4651 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[OK] Moved 4606 OBSIDIAN Way, Victoria to 44.8603736, -93.6426205
+[FAIL] Could not find exact map coordinates for: 10298 BIRCHWOOD Circle, Victoria
+[OK] Moved 7612 ERIE Avenue, Chanhassen to 44.8651232, -93.5263629
+[FAIL] Could not find exact map coordinates for: 10254 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10256 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10252 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10238 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10248 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10240 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10232 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10260 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10242 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10246 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10234 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10236 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10272 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10283 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10270 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10278 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10387 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10286 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10373 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10287 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10284 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10281 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10389 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10282 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10375 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10371 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10377 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10391 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10295 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10379 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10288 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10293 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10393 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10280 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10381 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10296 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10294 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10297 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10291 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 5309 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5341 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5301 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5339 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5331 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5338 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5472 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5332 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5320 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5318 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5475 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5307 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5305 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5300 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5504 ROLLING HILLS Parkway, Victoria
+[OK] Moved 15605 114TH Street, Young America Township to 44.7971123, -93.9101843
+[OK] Moved 3917 CARVER Path, Chaska to 44.786135, -93.6217402
+[OK] Moved 4546 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 894 LAUREL Court, Chaska to 44.783253, -93.6205122
+[OK] Moved 3776 BROOKSIDE Drive, Chaska to 44.7828277, -93.6189021
+[OK] Moved 4558 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 4574 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 4578 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 4570 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 4566 PERCHERON Boulevard, Chaska to 44.7908353, -93.6209068
+[OK] Moved 3923 CARVER Path, Chaska to 44.7861165, -93.621743
+[OK] Moved 3784 BROOKSIDE Drive, Chaska to 44.7828277, -93.6189021
+[OK] Moved 3780 BROOKSIDE Drive, Chaska to 44.7828277, -93.6189021
+[OK] Moved 887 LAUREL Court, Chaska to 44.783253, -93.6205122
+[OK] Moved 886 LAUREL Court, Chaska to 44.783253, -93.6205122
+[OK] Moved 882 LAUREL Court, Chaska to 44.783253, -93.6205122
+[OK] Moved 890 LAUREL Court, Chaska to 44.783253, -93.6205122
+[OK] Moved 898 LAUREL Court, Chaska to 44.783253, -93.6205122
+[FAIL] Could not find exact map coordinates for: 200 SANDY SHORES Road, Waconia
+[OK] Moved 10700 OAK Avenue, Waconia Township to 44.8106242, -93.8086579
+[OK] Moved 1909 DOGWOOD Court, Carver to 44.7687295, -93.652865
+[OK] Moved 1907 DOGWOOD Court, Carver to 44.7687295, -93.652865
+[OK] Moved 1908 DOGWOOD Court, Carver to 44.7687295, -93.652865
+[OK] Moved 1910 DOGWOOD Court, Carver to 44.7687295, -93.652865
+[OK] Moved 1928 FULTON Road, Carver to 44.767317, -93.6533362
+[OK] Moved 1926 FULTON Road, Carver to 44.7673106, -93.6533363
+[OK] Moved 1924 FULTON Road, Carver to 44.7673041, -93.6533364
+[OK] Moved 1922 FULTON Road, Carver to 44.7672977, -93.6533365
+[OK] Moved 1933 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1918 FULTON Road, Carver to 44.7672849, -93.6533368
+[OK] Moved 1946 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1948 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1950 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1943 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1939 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1944 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1942 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1940 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1938 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1935 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1931 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1930 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1934 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1932 TAMARACK Road, Carver to 44.7755892, -93.6539393
+[OK] Moved 1902 SPRUCE Court, Carver to 44.8514845, -93.656907
+[OK] Moved 1904 TIMBER Lane, Carver to 44.7686659, -93.6560472
+[OK] Moved 1922 TIMBER Lane, Carver to 44.7686659, -93.6560472
+[OK] Moved 1920 TIMBER Lane, Carver to 44.7686659, -93.6560472
+[OK] Moved 1901 SPRUCE Court, Carver to 44.8514845, -93.656907
+[OK] Moved 1903 SPRUCE Court, Carver to 44.767904, -93.6574792
+[OK] Moved 1904 SPRUCE Court, Carver to 44.8514845, -93.656907
+[OK] Moved 1905 SPRUCE Court, Carver to 44.767904, -93.6574792
+[OK] Moved 1914 TIMBER Lane, Carver to 44.7686659, -93.6560472
+[OK] Moved 5593 CATKIN Way, Victoria to 44.8285919, -93.6615589
+[FAIL] Could not find exact map coordinates for: 5511 ROLLING HILLS Parkway, Victoria
+[OK] Moved 0 COUNTY ROAD 43, Laketown Township to 44.8304463, -93.6877657
+[FAIL] Could not find exact map coordinates for: 5532 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5552 SCENIC LOOP Run, Victoria
+[OK] Moved 1918 TIMBER Lane, Carver to 44.7686659, -93.6560472
+[FAIL] Could not find exact map coordinates for: 5517 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5512 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5532 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5519 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5482 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5505 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5519 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5522 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5564 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5526 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5562 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5502 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5497 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5477 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5547 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5507 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5512 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5522 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5492 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5542 VISTA Trail, Victoria
+[FAIL] Could not find exact map coordinates for: 5565 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5579 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5558 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5563 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5548 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5551 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5537 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5543 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5515 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5537 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5527 SCENIC LOOP Run, Victoria
+[FAIL] Could not find exact map coordinates for: 5540 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5520 ROLLING HILLS Parkway, Victoria
+[FAIL] Could not find exact map coordinates for: 5530 ROLLING HILLS Parkway, Victoria
+[OK] Moved 813 LONGMEADOW Lane, Waconia to 44.8265268, -93.7950372
+[OK] Moved 229 WEDGEWOOD Lane, Waconia to 44.8277259, -93.7930272
+[OK] Moved 174 HUNTINGTON Drive, Waconia to 44.8322244, -93.7895708
+[OK] Moved 172 HUNTINGTON Drive, Waconia to 44.8322038, -93.7896632
+[OK] Moved 162 HUNTINGTON Drive, Waconia to 44.8320777, -93.7901189
+[OK] Moved 164 HUNTINGTON Drive, Waconia to 44.8321054, -93.7900284
+[OK] Moved 170 HUNTINGTON Drive, Waconia to 44.8321831, -93.7897555
+[OK] Moved 176 HUNTINGTON Drive, Waconia to 44.8322451, -93.7894785
+[OK] Moved 182 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 166 HUNTINGTON Drive, Waconia to 44.8321332, -93.7899379
+[OK] Moved 160 HUNTINGTON Drive, Waconia to 44.83205, -93.7902094
+[OK] Moved 184 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 186 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 193 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 192 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 190 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 197 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 195 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 196 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 211 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 213 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 210 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 215 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 214 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 217 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 216 HUNTINGTON Drive, Waconia to 44.8294761, -93.7895238
+[OK] Moved 213 WALNUT Street North, Chaska to 44.7857546, -93.5991253
+[OK] Moved 217 WALNUT Street North, Chaska to 44.7857865, -93.599137
+[OK] Moved 215 WALNUT Street North, Chaska to 44.7857706, -93.5991311
+[FAIL] Could not find exact map coordinates for: 10300 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10348 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10372 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10302 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10368 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10350 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10346 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10304 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10366 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10376 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10352 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10306 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10344 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10378 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10354 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10364 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10310 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10342 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10380 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10382 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10362 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10356 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10358 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10338 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10312 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10314 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10336 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10318 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10320 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10322 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10334 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10332 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10328 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10326 BIRCHWOOD Circle, Victoria
+[FAIL] Could not find exact map coordinates for: 10380 MALLARD Drive, Victoria
+[FAIL] Could not find exact map coordinates for: 10393 PHEASANT RIDGE Road, Victoria
+[FAIL] Could not find exact map coordinates for: 10377 MALLARD Drive, Victoria
+[OK] Moved 3741 BROOKSIDE Drive, Chaska to 44.7828277, -93.6189021
+[FAIL] Could not find exact map coordinates for: 10373 MALLARD Drive, Victoria
+[OK] Moved 3759 BROOKSIDE Drive, Chaska to 44.7828277, -93.6189021
+[OK] Moved 1917 RAVINE Road, Carver to 44.7665301, -93.654574
+[OK] Moved 1919 RAVINE Road, Carver to 44.7665301, -93.654574
+[OK] Moved 1921 RAVINE Road, Carver to 44.7665301, -93.654574
+[FAIL] Could not find exact map coordinates for: 5527 GAME FARM LOOKOUT, Victoria
+[OK] Moved 14190 HIGHWAY 212, Benton Township to 44.7685714, -93.7991236
+[FAIL] Could not find exact map coordinates for: 12753 CO RD 43, Dahlgren Township
+[OK] Moved 16042 COUNTY ROAD 32, Camden Township to 44.8477416, -93.9329017
+[OK] Moved 15385 COUNTY ROAD 20, Hollywood Township to 44.9635609, -93.9161231
+[OK] Moved 17865 110TH Street, Young America Township to 44.804029, -93.9767029
+[FAIL] Could not find exact map coordinates for: 10548 UPLAND Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10542 UPLAND Way, Victoria
+[FAIL] Could not find exact map coordinates for: 10537 UPLAND Way, Victoria
+
+Geocoding complete! Fixed 745 pins. Failed on 255 obscure addresses.

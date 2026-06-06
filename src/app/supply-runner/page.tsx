@@ -98,7 +98,7 @@ export default function SupplyRunnerPage() {
     // In a real app, this hits an API to send SendGrid/Resend email.
     // For now we simulate success and open mailto as fallback.
     const body = items.map(i => `${i.quantity} ${i.unit} - ${i.name} ${i.notes ? '('+i.notes+')' : ''}`).join('%0D%0A');
-    window.location.href = `mailto:${supplierEmail}?subject=Material Order - Hardhat Holdings LLC&body=Please prep the following order for Will Call:%0D%0A%0D%0A${body}%0D%0A%0D%0AThank you,%0D%0AOffice Angel Automations`;
+    window.location.href = `mailto:${supplierEmail}?subject=Material Order - Hardhat Holdings LLC&body=Please prep the following order for Will Call:%0D%0A%0D%0A${body}%0D%0A%0D%0AThank you,%0D%0AHard Hat Solutions Automations`;
     
     setTimeout(() => {
       setItems([]);

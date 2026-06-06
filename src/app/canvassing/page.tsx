@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare } from "lucide-react";
+import Link from "next/link";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
@@ -42,7 +43,7 @@ function CanvassingStats() {
 
 export default function CanvassingPage() {
   const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
-  const [view, setView] = useState<"list" | "map" | "builds" | "expected" | "territories">("list");
+  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "expected" | "territories">("list");
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [searchAddress, setSearchAddress] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -50,6 +51,7 @@ export default function CanvassingPage() {
   const [loading, setLoading] = useState(true);
   const [mapCenter, setMapCenter] = useState<[number, number] | undefined>(undefined);
   const [mapZoom, setMapZoom] = useState<number>(14);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Form State
   const [showAdd, setShowAdd] = useState(false);
@@ -130,20 +132,27 @@ export default function CanvassingPage() {
   }
 
   
-  async function handleSearch(val: string) {
+  function handleSearchInput(val: string) {
     setSearchAddress(val);
+    
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    
     if (val.length < 4) {
       setSearchResults([]);
       return;
     }
     
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val + ', MN')}&countrycodes=us&addressdetails=1&limit=5`);
-      const data = await res.json();
-      setSearchResults(data || []);
-    } catch (err) {
-      console.error(err);
-    }
+    searchTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(val + ', MN')}&countrycodes=us&addressdetails=1&limit=5`);
+        const data = await res.json();
+        setSearchResults(data || []);
+      } catch (err) {
+        console.error(err);
+      }
+    }, 500); // 500ms debounce to protect Nominatim API rate limits
   }
   
 
@@ -161,8 +170,7 @@ export default function CanvassingPage() {
             notes: (data.year_built ? `Year Built: ${data.year_built}\n` : '') + 
                    (data.beds ? `Beds/Baths: ${data.beds}/${data.baths || '-'}\n` : '') +
                    (data.sqft ? `SqFt: ${data.sqft}\n` : '') +
-                   (data.last_sale_price ? `Last Sale: ${data.last_sale_price.toLocaleString()} (${data.last_sale_date || 'Unknown Date'})\n\n` : '') + 
-                   prev.notes
+                   (data.last_sale_price ? `Last Sale: ${data.last_sale_price.toLocaleString()} (${data.last_sale_date || 'Unknown Date'})\n\n` : '') 
         }));
       })
       .catch(err => {
@@ -188,6 +196,12 @@ export default function CanvassingPage() {
           </div>
           <div className="flex items-center gap-2">
             <div className="bg-muted p-1 rounded-lg flex flex-wrap items-center">
+              <button 
+                onClick={() => setView("logged")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "logged" ? "bg-background shadow-sm text-green-600" : "text-muted-foreground"}`}
+              >
+                <CheckSquare className="w-4 h-4" /> Logged Knocks
+              </button>
               <button 
                 onClick={() => setView("list")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "list" ? "bg-background shadow-sm" : "text-muted-foreground"}`}
@@ -250,10 +264,24 @@ export default function CanvassingPage() {
                     <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Current Resident" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
                   </div>
                   <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">Rep Name</label>
+                    <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={(newVisit as any).sales_rep_name || ''} onChange={e => setNewVisit({...newVisit, sales_rep_name: e.target.value} as any)}>
+                      <option value="">-- Select Rep --</option>
+                      <option value="Jake">Jake</option>
+                      <option value="Sarah">Sarah</option>
+                      <option value="Mike">Mike</option>
+                      <option value="Christian">Christian</option>
+                      <option value="Jakob">Jakob</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Interest Level</label>
                     <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.interest_level} onChange={e => setNewVisit({...newVisit, interest_level: e.target.value})}>
                       <option value="hot">🔥 Hot Lead (Ready to buy)</option>
                       <option value="warm">⭐ Warm (Interested, needs follow up)</option>
+                      <option value="demo_set">📅 Demo Set</option>
+                      <option value="go_back">✅ Go Back</option>
+                      <option value="not_home">🏠 Not Home</option>
                       <option value="not_interested">❄️ Not Interested</option>
                       <option value="do_not_knock">🚫 Do Not Knock</option>
                     </select>
@@ -290,6 +318,75 @@ export default function CanvassingPage() {
           <NewBuildsTab onLocateOnMap={handleLocateOnMap} />
         ) : view === "territories" ? (
           <TerritoriesTab />
+        ) : view === "logged" ? (
+          <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
+            {loading ? (
+              <div className="p-8 text-center text-muted-foreground">Loading logged knocks...</div>
+            ) : visits.filter(v => v.interest_level === 'hot' || v.interest_level === 'warm' || v.interest_level === 'not_interested' || v.interest_level === 'do_not_knock').length === 0 ? (
+              <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
+                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                  <CheckSquare className="h-6 w-6 text-muted-foreground" />
+                </div>
+                <h3 className="text-lg font-semibold">No knocks logged yet</h3>
+                <p className="text-muted-foreground max-w-sm">When field reps log house visits, they will show up here.</p>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {[...visits].filter(v => ['hot', 'warm', 'demo_set', 'not_interested', 'do_not_knock', 'not_home', 'go_back'].includes(v.interest_level || '')).sort((a, b) => {
+                  return new Date(b.visited_at).getTime() - new Date(a.visited_at).getTime();
+                }).map((v) => (
+                  <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4 cursor-pointer" onClick={() => handlePinClick(v)}>
+                    <div className="flex-1">
+                      <p className="font-semibold text-base text-foreground text-blue-600">
+                        {v.resident_name && v.resident_name !== 'Current Resident' ? v.resident_name : 'Homeowner'}
+                      </p>
+                      <div className="text-sm text-foreground font-medium mt-0.5 flex items-center gap-2">
+                        <span>{v.address}</span>
+                        {v.latitude == null ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                            Not on Map
+                          </span>
+                        ) : (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleLocateOnMap(v.latitude, v.longitude); }}
+                            className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors ml-2"
+                          >
+                            View on Map
+                          </button>
+                        )}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                        <span>Logged: {new Date(v.visited_at).toLocaleString()}</span>
+                        {v.sales_rep_name && <span className="ml-2 font-medium bg-gray-100 px-2 py-0.5 rounded text-gray-700">Rep: {v.sales_rep_name}</span>}
+                      </div>
+                      {v.notes && (
+                        <div className="mt-2 text-xs text-muted-foreground bg-muted/30 p-2 rounded-md whitespace-pre-line border border-border/50">
+                          {v.notes}
+                        </div>
+                      )}
+                    </div>
+                    <div className="shrink-0 flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
+                        {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
+                        {v.interest_level === 'go_back' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><CheckSquare className="w-3.5 h-3.5"/> Go Back</span>}
+                        {v.interest_level === 'not_home' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><Home className="w-3.5 h-3.5"/> Not Home</span>}
+                        {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3.5 h-3.5"/> Cold</span>}
+                        {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3.5 h-3.5"/> DND</span>}
+                      </div>
+                      <Link 
+                        href={`/crm?new=true&name=${encodeURIComponent(v.resident_name || 'Homeowner')}&address=${encodeURIComponent(v.address || '')}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-bold bg-gray-900 text-white hover:bg-gray-800 transition-colors shadow-sm"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Make Customer
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         ) : view === "list" ? (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             {loading ? (
@@ -309,7 +406,7 @@ export default function CanvassingPage() {
                   const bUnmapped = b.latitude == null ? 1 : 0;
                   return bUnmapped - aUnmapped;
                 }).slice(0, 50).map((v) => (
-                  <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4">
+                  <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4 cursor-pointer" onClick={() => handlePinClick(v)}>
                     <div className="flex-1">
                       <p className="font-semibold text-base text-foreground text-blue-600">
                         {v.resident_name && v.resident_name !== 'Current Resident' ? v.resident_name : 'Homeowner'}
@@ -322,7 +419,7 @@ export default function CanvassingPage() {
                           </span>
                         ) : (
                           <button 
-                            onClick={() => handleLocateOnMap(v.latitude, v.longitude)}
+                            onClick={(e) => { e.stopPropagation(); handleLocateOnMap(v.latitude, v.longitude); }}
                             className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors ml-2"
                           >
                             View on Map
@@ -338,11 +435,22 @@ export default function CanvassingPage() {
                         </div>
                       )}
                     </div>
-                    <div className="shrink-0 flex items-center gap-2">
-                      {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
-                      {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
-                      {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3.5 h-3.5"/> Cold</span>}
-                      {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3.5 h-3.5"/> DND</span>}
+                    <div className="shrink-0 flex flex-col items-end gap-2">
+                      <div className="flex items-center gap-2">
+                        {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
+                        {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
+                        {v.interest_level === 'go_back' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><CheckSquare className="w-3.5 h-3.5"/> Go Back</span>}
+                        {v.interest_level === 'not_home' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><Home className="w-3.5 h-3.5"/> Not Home</span>}
+                        {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3.5 h-3.5"/> Cold</span>}
+                        {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3.5 h-3.5"/> DND</span>}
+                      </div>
+                      <Link 
+                        href={`/crm?new=true&name=${encodeURIComponent(v.resident_name || 'Homeowner')}&address=${encodeURIComponent(v.address || '')}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-bold bg-gray-900 text-white hover:bg-gray-800 transition-colors shadow-sm"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Make Customer
+                      </Link>
                     </div>
                   </div>
                 ))}
@@ -359,7 +467,7 @@ export default function CanvassingPage() {
                     type="text" 
                     placeholder="Search address to log visit..." 
                     value={searchAddress}
-                    onChange={(e: any) => handleSearch(e.target.value)}
+                    onChange={(e: any) => handleSearchInput(e.target.value)}
                     className="w-full h-12 px-3 text-sm focus:outline-none bg-transparent text-gray-900 placeholder:text-gray-400"
                   />
                   {searchAddress.length > 0 && (

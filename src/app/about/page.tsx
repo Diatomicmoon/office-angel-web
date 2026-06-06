@@ -21,7 +21,7 @@ export default function AboutPage() {
             <span className="text-blue-600">inside the walls.</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            Office Angel didn't come from a startup incubator or a venture capital pitch deck. It came from watching real contractors lose real money — one missed call at a time.
+            Hard Hat Solutions didn't come from a startup incubator or a venture capital pitch deck. It came from watching real contractors lose real money — one missed call at a time.
           </p>
         </section>
 
@@ -30,19 +30,19 @@ export default function AboutPage() {
           <div className="max-w-3xl mx-auto">
             <div className="space-y-6 text-gray-600">
               <p className="text-base md:text-lg leading-relaxed">
-                The idea for Office Angel started on a job site. A master electrician is three stories up, hands in a panel, phone buzzing in his pocket. He can't answer. The customer hangs up after four rings and calls the next contractor on Google. That job — worth $1,500 minimum — is gone before he even gets back to ground level.
+                The idea for Hard Hat Solutions started on a job site. A master electrician is three stories up, hands in a panel, phone buzzing in his pocket. He can't answer. The customer hangs up after four rings and calls the next contractor on Google. That job — worth $1,500 minimum — is gone before he even gets back to ground level.
               </p>
               <p className="text-base md:text-lg leading-relaxed">
                 It happens dozens of times a week across every trade. Electricians, HVAC techs, plumbers, roofers — every one of them running lean crews with no office staff, no receptionist, no one holding down the phones. They're doing the work and trying to run the business at the same time. Something always falls through the cracks.
               </p>
               <p className="text-base md:text-lg leading-relaxed">
-                We built Office Angel to be the thing that doesn't fall through the cracks. An AI that handles inbound calls professionally, qualifies the lead, books the job, and puts it on the crew's calendar — all before the contractor even climbs back down the ladder.
+                We built Hard Hat Solutions to be the thing that doesn't fall through the cracks. An AI that handles inbound calls professionally, qualifies the lead, books the job, and puts it on the crew's calendar — all before the contractor even climbs back down the ladder.
               </p>
               <p className="text-base md:text-lg leading-relaxed">
                 But we didn't stop at call answering. We kept asking: what else is slowing these guys down? The answer was everything — dispatch, scheduling, tracking the crew, managing customers, knowing if the business is actually making money. So we built the whole back office.
               </p>
               <p className="text-base md:text-lg leading-relaxed font-medium text-gray-800">
-                Office Angel is the AI office manager that every contractor deserves but could never afford to hire.
+                Hard Hat Solutions is the AI office manager that every contractor deserves but could never afford to hire.
               </p>
             </div>
           </div>

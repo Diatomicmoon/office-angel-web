@@ -21,7 +21,7 @@ export default function CalendlyEmbed() {
       />
       <div
         className="calendly-inline-widget w-full rounded-2xl overflow-hidden"
-        data-url="https://calendly.com/zaki-office-angel/30min?hide_event_type_details=0&hide_gdpr_banner=1&background_color=111827&text_color=ffffff&primary_color=3b82f6"
+        data-url="https://calendly.com/zaki-hardhat-solutions/30min?hide_event_type_details=0&hide_gdpr_banner=1&background_color=111827&text_color=ffffff&primary_color=3b82f6"
         style={{ minWidth: "320px", height: "700px" }}
       />
     </>

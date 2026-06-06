@@ -18,7 +18,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">1. Introduction</h2>
             <p>
-              Office Angel ("we", "our", or "us") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our AI dispatch services, or communicate with us via phone, web form, or SMS.
+              Hard Hat Solutions ("we", "our", or "us") respects your privacy and is committed to protecting your personal data. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our AI dispatch services, or communicate with us via phone, web form, or SMS.
             </p>
           </section>
 
@@ -77,7 +77,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">8. Contact Us</h2>
             <p>
-              If you have questions or comments about this Privacy Policy, please contact us at support@office-angel.com.
+              If you have questions or comments about this Privacy Policy, please contact us at support@hardhat-solutions.com.
             </p>
           </section>
           

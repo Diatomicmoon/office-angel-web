@@ -9,8 +9,8 @@ export async function GET() {
     // In pinned-tenant mode, just return the pinned company.
     if (!userId) {
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
       );
       const { data: company } = await supabase
         .from("companies")
@@ -21,8 +21,8 @@ export async function GET() {
     }
 
     const admin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
     );
 
     const { data: memberships, error: mErr } = await admin

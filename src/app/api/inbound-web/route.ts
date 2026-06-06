@@ -8,7 +8,7 @@ function corsHeaders(origin?: string | null) {
   return {
     'Access-Control-Allow-Origin': o,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, X-Office-Angel-Secret',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Hard-Hat-Secret',
   };
 }
 
@@ -155,8 +155,8 @@ export async function POST(req: Request) {
     const address = String(payload?.address || '').trim();
 
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
     );
 
     // If the messages table exists, prefer it over stuffing lead text into jobs.notes.
@@ -202,7 +202,7 @@ export async function POST(req: Request) {
 
     // In auth tenant mode, require a webhook secret (prevents random internet spam).
     if (tenantMode === 'auth') {
-      const headerSecret = String(req.headers.get('x-office-angel-secret') || '').trim();
+      const headerSecret = String(req.headers.get('x-hardhat-solutions-secret') || '').trim();
       const provided = headerSecret || secretIn;
       const { data: company } = await supabase.from('companies').select('id, webhook_secret').eq('id', companyId).maybeSingle();
       const expected = String((company as any)?.webhook_secret || '').trim();

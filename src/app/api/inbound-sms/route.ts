@@ -163,8 +163,8 @@ export async function POST(req: Request) {
     const bodyNorm = normalizeBody(body);
 
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
     );
 
     // Resolve company.
@@ -186,7 +186,7 @@ export async function POST(req: Request) {
       companyId = c0?.[0]?.id || null;
     }
     if (!companyId) {
-      return new NextResponse(twiml('Office Angel is not configured yet.'), {
+      return new NextResponse(twiml('Hard Hat Solutions is not configured yet.'), {
         status: 200,
         headers: { 'Content-Type': 'text/xml' },
       });

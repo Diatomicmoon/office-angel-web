@@ -6,3 +6,4 @@ web-dashboard/
 seed_demo.mjs
 .env
 .env.production.local
+.env*

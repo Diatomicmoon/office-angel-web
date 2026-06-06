@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 import { RefreshCw, MapPin, HardHat, CalendarDays, Home, CheckCircle2, Search, CheckSquare } from 'lucide-react';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createBrowserClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ztknhbilfergfwoxjzvb.supabase.co',
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0a25oYmlsZmVyZ2Z3b3hqenZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2Nzc2OTksImV4cCI6MjA5MzI1MzY5OX0.e6tR6oPxi6KS8bmYG0e9zKbwOVbg5rw-tARrD9Ptcdo'
 );
 
 export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode, onLocateOnMap }: { companyId?: string, fixedMode?: 'csv' | 'permits' | null, onLocateOnMap?: (lat: number, lng: number) => void }) {
@@ -216,7 +216,7 @@ export default function NewBuildsTab({ companyId: initialCompanyId, fixedMode, o
                     <div className="space-y-1">
                       <h3 className={`text-lg font-semibold flex items-start gap-2 ${isKnocked ? 'text-gray-600' : 'text-gray-900'}`}>
                         <Home className="h-5 w-5 text-gray-400 shrink-0 mt-0.5" />
-                        <span className="line-clamp-2">{lead.property_address}</span>
+                        <span className="line-clamp-2">{lead.owner_name || "Owner / Unknown"}</span><br /><span className="text-sm font-normal text-gray-500">{lead.property_address}</span>
                       </h3>
                       <div className="text-sm text-gray-500 flex items-center gap-2">
                         <MapPin className="h-3 w-3 shrink-0" />

@@ -23,7 +23,7 @@ export default function SidebarClientWrapper() {
       {/* Mobile Header for Hamburger */}
       <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-gray-900 z-[100] flex items-center justify-between px-4 shadow-md">
         <span className="text-white font-bold tracking-tight flex items-center gap-2">
-          Office Angel
+          Hard Hat Solutions
         </span>
         <button 
           onClick={() => setIsOpen(!isOpen)} 
@@ -35,7 +35,7 @@ export default function SidebarClientWrapper() {
 
       {/* Sidebar - Overlay on mobile, static on desktop */}
       <div 
-        className={`fixed inset-y-0 left-0 z-[90] transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed inset-y-0 left-0 z-[90] transform transition-transform duration-300 ease-in-out md:sticky md:top-0 md:h-screen md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}
       >
         <Sidebar />
       </div>

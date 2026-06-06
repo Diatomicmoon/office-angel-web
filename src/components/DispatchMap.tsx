@@ -1,6 +1,7 @@
 "use client";
 
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -69,34 +70,39 @@ export default function DispatchMap({
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         
-        {techsData.map(({ tech, pos }) => {
-          const speed = tech.last_location?.speed || 0;
-          return (
-            <Marker key={`tech-${tech.id}`} position={[pos.lat, pos.lng]} icon={getTechIcon(speed)}>
+        <MarkerClusterGroup
+          chunkedLoading
+          maxClusterRadius={40}
+        >
+          {techsData.map(({ tech, pos }) => {
+            const speed = tech.last_location?.speed || 0;
+            return (
+              <Marker key={`tech-${tech.id}`} position={[pos.lat, pos.lng]} icon={getTechIcon(speed)}>
+                <Popup>
+                  <div className="text-xs">
+                    <strong className={speed > 3 ? "text-green-700" : "text-blue-700"}>{tech.name || 'Technician'}</strong><br/>
+                    <span className="text-gray-600">Status: {speed > 3 ? `Driving (${Math.round(speed)} mph)` : 'Parked / On Site'}</span>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
+
+          {jobsData.map(({ job, pos }) => (
+            <Marker key={`job-${job.id}`} position={[pos.lat, pos.lng]} icon={jobIcon}>
               <Popup>
-                <div className="text-xs">
-                  <strong className={speed > 3 ? "text-green-700" : "text-blue-700"}>{tech.name || 'Technician'}</strong><br/>
-                  <span className="text-gray-600">Status: {speed > 3 ? `Driving (${Math.round(speed)} mph)` : 'Parked / On Site'}</span>
+                <div className="text-xs w-48">
+                  <strong className="text-red-700">{job.title || 'Service Call'}</strong><br/>
+                  <span className="text-gray-600 block truncate">{job.customer?.first_name} {job.customer?.last_name}</span>
+                  <span className="text-gray-500 block truncate mt-1">{job.address}</span>
+                  <span className="mt-2 inline-block px-2 py-0.5 bg-red-50 text-red-700 rounded text-[10px] uppercase font-bold tracking-wider">
+                    {job.status}
+                  </span>
                 </div>
               </Popup>
             </Marker>
-          );
-        })}
-
-        {jobsData.map(({ job, pos }) => (
-          <Marker key={`job-${job.id}`} position={[pos.lat, pos.lng]} icon={jobIcon}>
-            <Popup>
-              <div className="text-xs w-48">
-                <strong className="text-red-700">{job.title || 'Service Call'}</strong><br/>
-                <span className="text-gray-600 block truncate">{job.customer?.first_name} {job.customer?.last_name}</span>
-                <span className="text-gray-500 block truncate mt-1">{job.address}</span>
-                <span className="mt-2 inline-block px-2 py-0.5 bg-red-50 text-red-700 rounded text-[10px] uppercase font-bold tracking-wider">
-                  {job.status}
-                </span>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
+          ))}
+        </MarkerClusterGroup>
       </MapContainer>
 
       {/* Territory / Legend Overlay */}
@@ -105,7 +111,11 @@ export default function DispatchMap({
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm"></div>
-            <span className="text-xs text-gray-700 font-medium">Technicians</span>
+            <span className="text-xs text-gray-700 font-medium">Tech (Parked)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-green-500 shadow-sm"></div>
+            <span className="text-xs text-gray-700 font-medium">Tech (Driving)</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div>

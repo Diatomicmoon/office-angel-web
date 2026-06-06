@@ -1,4 +1,4 @@
-# Office Angel — Company Setup (Demo ↔ Real)
+# Hard Hat Solutions — Company Setup (Demo ↔ Real)
 
 This app supports **two modes**:
 
@@ -19,7 +19,7 @@ It also supports **multi-tenant** operation via a `companies` row in Supabase.
 
 ### Local
 
-Set in `office-angel-web/.env.local`.
+Set in `hardhat-solutions-web/.env.local`.
 
 ### Vercel (public demo)
 
@@ -179,9 +179,9 @@ Google Cloud Console checklist:
 1. Confirm accounting system: QBO vs Jobber vs other.
 2. Connect OAuth (owner account) and store tokens.
 3. Map:
-   - Office Angel `customers` ↔ external “Customer/Client”
-   - Office Angel `jobs` ↔ external “Job/Work order”
-   - Office Angel `receipts`/materials ↔ external “Expense/Job cost/Line items”
+   - Hard Hat Solutions `customers` ↔ external “Customer/Client”
+   - Hard Hat Solutions `jobs` ↔ external “Job/Work order”
+   - Hard Hat Solutions `receipts`/materials ↔ external “Expense/Job cost/Line items”
 4. Decide sync direction:
    - **OA → accounting** (recommended first)
    - or bi-directional.

@@ -18,14 +18,14 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">1. Agreement to Terms</h2>
             <p>
-              These Terms and Conditions constitute a legally binding agreement made between you and Office Angel ("we," "us," or "our"), concerning your access to and use of the office-angel.com website and our AI telecommunication services. By using our services, you agree that you have read, understood, and agreed to be bound by all of these Terms and Conditions.
+              These Terms and Conditions constitute a legally binding agreement made between you and Hard Hat Solutions ("we," "us," or "our"), concerning your access to and use of the hardhat-solutions.com website and our AI telecommunication services. By using our services, you agree that you have read, understood, and agreed to be bound by all of these Terms and Conditions.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">2. Description of Service</h2>
             <p>
-              Office Angel provides an AI-powered back-office platform designed for home service contractors. Our services include, but are not limited to, answering inbound phone calls, transcribing messages, booking appointments, routing dispatch data, and sending automated SMS notifications.
+              Hard Hat Solutions provides an AI-powered back-office platform designed for home service contractors. Our services include, but are not limited to, answering inbound phone calls, transcribing messages, booking appointments, routing dispatch data, and sending automated SMS notifications.
             </p>
           </section>
 
@@ -74,7 +74,7 @@ export default function Terms() {
           <section>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">8. Governing Law & Dispute Resolution</h2>
             <p>
-              These Terms shall be governed by and defined following the laws of the State of Minnesota. Office Angel and yourself irrevocably consent that the state and federal courts located in Minnesota shall have exclusive jurisdiction to resolve any dispute, controversy, or claim arising from or relating to these Terms or your use of the services. We expressly reject mandatory arbitration clauses; any and all legal disputes will be litigated in a court of competent jurisdiction.
+              These Terms shall be governed by and defined following the laws of the State of Minnesota. Hard Hat Solutions and yourself irrevocably consent that the state and federal courts located in Minnesota shall have exclusive jurisdiction to resolve any dispute, controversy, or claim arising from or relating to these Terms or your use of the services. We expressly reject mandatory arbitration clauses; any and all legal disputes will be litigated in a court of competent jurisdiction.
             </p>
           </section>
 

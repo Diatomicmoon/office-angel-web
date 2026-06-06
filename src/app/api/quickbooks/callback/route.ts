@@ -13,7 +13,7 @@ export async function GET(req: Request) {
 
   const clientId = process.env.QUICKBOOKS_CLIENT_ID || "AB92XjkDS1CCAJqWexCSXpPl5Iq2ujZDo4FOpLBBzt4Dvo0z1K";
   const clientSecret = process.env.QUICKBOOKS_CLIENT_SECRET || "5RYvfb0XX9uSw6YejOp6JW1YGU2BLgZqjubFjVNu";
-  const redirectUri = "https://www.office-angel.com/api/quickbooks/callback";
+  const redirectUri = "https://www.hardhat-solutions.com/api/quickbooks/callback";
 
   try {
     const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
@@ -47,8 +47,8 @@ export async function GET(req: Request) {
     }
 
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
     );
 
     // Save the tokens to the company row in Supabase

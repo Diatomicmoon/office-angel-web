@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock } from "lucide-react";
+import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock, User, LogOut, Key } from "lucide-react";
+import { createClient } from "@supabase/supabase-js";
+
+// Client-side fallback for Settings page. It uses the anon key and user's session if available.
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export type Settings = {
   id: string;
@@ -30,7 +36,17 @@ export default function SettingsPage() {
   const [inboxToken, setInboxToken] = useState<string | null>(null);
   const [qbMessage, setQbMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [resetMsg, setResetMsg] = useState<string | null>(null);
+  // Removed local createClient to use top-level instance
+
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data?.user?.email) {
+        setUserEmail(data.user.email);
+      }
+    });
+
     // Check URL for QuickBooks OAuth status
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "quickbooks_connected") {
@@ -170,7 +186,7 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
       
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-gray-900">Settings</h1>
-        <p className="text-gray-500 mt-2">Control how Office Angel handles your inbound calls.</p>
+        <p className="text-gray-500 mt-2">Control how Hard Hat Solutions handles your inbound calls.</p>
       </div>
 
       {/* AI Call Handler Toggle */}
@@ -267,7 +283,7 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
             <Clock size={18} className="text-blue-600" /> Scheduling Hours
           </h2>
-          <p className="text-sm text-gray-500 mt-1">Office Angel will only suggest times inside this window (Chicago time).</p>
+          <p className="text-sm text-gray-500 mt-1">Hard Hat Solutions will only suggest times inside this window (Chicago time).</p>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -338,7 +354,7 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
                 Save URL
               </button>
             </div>
-            <p className="text-xs text-gray-500">Office Angel will POST job data to this URL when a job is scheduled.</p>
+            <p className="text-xs text-gray-500">Hard Hat Solutions will POST job data to this URL when a job is scheduled.</p>
           </div>
 
         </div>
@@ -350,7 +366,7 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
             <Mic size={16} /> How Co-Pilot mode works
           </h3>
           <ul className="text-sm text-purple-800 space-y-1.5 list-disc list-inside">
-            <li>Customer calls your Office Angel number</li>
+            <li>Customer calls your Hard Hat Solutions number</li>
             <li>Your dispatcher's phone rings — answer like a normal call</li>
             <li>AI joins the conference silently — <strong>the caller cannot hear it</strong></li>
             <li>Real-time transcription appears on the <strong>Co-Pilot page</strong></li>
@@ -405,7 +421,7 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
               <div>
                 <p className="text-sm font-medium text-gray-900">Connect to QuickBooks Online</p>
                 <p className="text-xs text-gray-500 mt-1 max-w-sm">
-                  Authorize Office Angel to read your Chart of Accounts and automatically push material receipts as Bills.
+                  Authorize Hard Hat Solutions to read your Chart of Accounts and automatically push material receipts as Bills.
                 </p>
               </div>
               <a 
@@ -416,6 +432,64 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
               </a>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Account Settings */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-8 mb-12">
+        <div className="p-5 border-b border-gray-200 bg-gray-50 flex items-center gap-2">
+          <User className="text-gray-500 w-5 h-5" />
+          <div>
+            <h2 className="font-semibold text-gray-900">Account Settings</h2>
+            <p className="text-sm text-gray-500 mt-0.5">Manage your user profile and active session.</p>
+          </div>
+        </div>
+        <div className="p-6 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-900">Logged in as</p>
+              <p className="text-sm text-gray-500 mt-1">{userEmail || "Loading email..."}</p>
+            </div>
+            <button 
+              onClick={async () => {
+                await supabase.auth.signOut();
+                window.location.href = '/login';
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg text-sm transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
+          </div>
+          
+          <div className="pt-6 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-medium text-gray-900">Password</p>
+              <p className="text-sm text-gray-500 mt-1">Send a secure password reset link to your email.</p>
+              {resetMsg && <p className="text-xs text-green-600 mt-2 font-medium">{resetMsg}</p>}
+            </div>
+            <button 
+              onClick={async () => {
+                if (!userEmail) return;
+                setSaving(true);
+                const { error } = await supabase.auth.resetPasswordForEmail(userEmail, {
+                  redirectTo: window.location.origin + '/login',
+                });
+                setSaving(false);
+                if (error) {
+                  setResetMsg(`Error: ${error.message}`);
+                } else {
+                  setResetMsg("Password reset email sent!");
+                  setTimeout(() => setResetMsg(null), 5000);
+                }
+              }}
+              disabled={!userEmail || saving}
+              className="flex items-center justify-center gap-2 px-4 py-2 border border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
+            >
+              <Key className="w-4 h-4" />
+              Reset Password
+            </button>
+          </div>
         </div>
       </div>
 

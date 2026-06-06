@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function Login() {
   const [showLogin, setShowLogin] = useState(false);
@@ -12,7 +12,12 @@ export default function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClient();
+  
+  // We instantiate here to avoid Next.js build-time prerendering issues if env vars aren't injected at build
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ztknhbilfergfwoxjzvb.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0a25oYmlsZmVyZ2Z3b3hqenZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2Nzc2OTksImV4cCI6MjA5MzI1MzY5OX0.e6tR6oPxi6KS8bmYG0e9zKbwOVbg5rw-tARrD9Ptcdo'
+  );
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +51,7 @@ export default function Login() {
           // === DEMO GATE ===
           <div className="text-center space-y-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Office Angel</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Hard Hat Solutions</h1>
               <p className="text-gray-500 mt-2">
                 Access is reserved for onboarded clients.
               </p>
@@ -54,13 +59,13 @@ export default function Login() {
 
             <div className="bg-blue-50 border border-blue-100 rounded-xl p-6 space-y-4">
               <p className="text-gray-700 font-medium">
-                Want to see Office Angel in action?
+                Want to see Hard Hat Solutions in action?
               </p>
               <p className="text-gray-500 text-sm">
                 Book a free 30-minute demo and we&apos;ll walk you through everything — live, for your business.
               </p>
               <a
-                href="https://calendly.com/zaki-office-angel/30min"
+                href="https://calendly.com/zaki-hardhat-solutions/30min"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors text-center"
@@ -80,7 +85,7 @@ export default function Login() {
           // === LOGIN FORM ===
           <>
             <div className="mb-8 text-center">
-              <h1 className="text-2xl font-bold text-gray-900">Office Angel</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Hard Hat Solutions</h1>
               <p className="text-gray-500 mt-2">Sign in to the Dispatch Dashboard</p>
             </div>
 

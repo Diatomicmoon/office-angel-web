@@ -2,29 +2,20 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import * as cheerio from 'cheerio';
 
-export const maxDuration = 60; 
+export const maxDuration = 300; 
 export const dynamic = 'force-dynamic';
 
-// Configuration for local city portals (e.g., LOGIS and similar ePermit systems)
 const TARGET_CITIES = [
-  // Carver County
-  { name: 'Chaska', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=chaska' },
-  { name: 'Victoria', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=victoria' },
-  { name: 'Waconia', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=waconia' },
-  { name: 'Carver', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=carver' },
-  { name: 'Chanhassen', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=chanhassen' },
-  // Hennepin County
-  { name: 'Eden Prairie', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=edenprairie' },
-  { name: 'Minnetonka', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=minnetonka' },
-  { name: 'Edina', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=edina' },
-  { name: 'Bloomington', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=bloomington' },
-  { name: 'Plymouth', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=plymouth' },
-  { name: 'Maple Grove', state: 'MN', url: 'https://epermits.logis.org/search.aspx?city=maplegrove' }
+  { name: 'Waconia', state: 'MN', code: 'wa' },
+  { name: 'Eden Prairie', state: 'MN', code: 'ep' },
+  { name: 'Minnetonka', state: 'MN', code: 'mi' },
+  { name: 'Edina', state: 'MN', code: 'ed' },
+  { name: 'Maple Grove', state: 'MN', code: 'mg' }
 ];
 
 export async function GET(request: Request) {
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
-  console.log('Starting Optimized Multi-City Permit Scraper...');
+  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co', process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder');
+  console.log('Starting Live LOGIS Permit Scraper...');
 
   try {
     const { data: companies } = await supabase.from('companies').select('id').limit(1);
@@ -32,82 +23,160 @@ export async function GET(request: Request) {
     const companyId = companies[0]?.id;
 
     let totalParsed = 0;
+    let totalInserted = 0;
     const allResults: any[] = [];
 
-    // Loop through each configured city to pull their permits
-    for (const cityConfig of TARGET_CITIES) {
-      console.log(`Scraping permit portal for: ${cityConfig.name}`);
+    // Calculate dates (Last 14 days)
+    const today = new Date();
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(today.getDate() - 14);
+
+    const fmtDate = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}-00-00-00`;
+    const fmtDisplay = (d: Date) => `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+
+    const dateFrom = fmtDate(twoWeeksAgo);
+    const dateTo = fmtDate(today);
+    const displayFrom = fmtDisplay(twoWeeksAgo);
+    const displayTo = fmtDisplay(today);
+
+    for (const city of TARGET_CITIES) {
+      console.log(`Scraping permit portal for: ${city.name} (${city.code})`);
+      const url = `https://epermits.logis.org/search.aspx?city=${city.code}`;
       
-      // In production, we would use Playwright/Puppeteer to bypass ASP.NET __VIEWSTATE,
-      // or hit their internal JSON endpoints if reverse-engineered. 
-      // For now, simulating the HTML response for each city.
-      
-      const html = `
-        <table>
-          <tr>
-            <th>Permit #</th><th></th><th>Permit Type</th><th>Sub Type</th><th>Work Type</th>
-            <th>Description</th><th>Address</th><th>Contractor</th><th>Issued Date</th>
-            <th>Applied Date</th><th>Final Date</th><th>Expiration Date</th><th>Cancelled Date</th><th>ePermit</th>
-          </tr>
-          <tr>
-            <td>BLD-24-001</td><td>Inspections</td><td>Building</td><td>New Construction</td><td>Residential</td>
-            <td>New 4,200 sqft Custom Home</td><td>100 ${cityConfig.name} Pkwy</td><td>LENNAR HOMES</td><td>5/28/2026</td>
-            <td>5/1/2026</td><td></td><td></td><td></td><td>Y</td>
-          </tr>
-          <tr>
-            <td>BLD-24-002</td><td>Inspections</td><td>Building</td><td>New Construction</td><td>Townhouse</td>
-            <td>New 6-Unit Townhome Building</td><td>250 ${cityConfig.name} Ave</td><td>PULTE HOMES</td><td>5/29/2026</td>
-            <td>5/5/2026</td><td></td><td></td><td></td><td>Y</td>
-          </tr>
-        </table>
-      `;
-      
-      const $ = cheerio.load(html);
-      
-      $('table tr').each((index, element) => {
-        if (index === 0) return; // Skip header
-        
-        const tds = $(element).find('td');
-        if (tds.length < 10) return;
-        
-        const permitNum = $(tds[0]).text().trim();
-        const permitType = $(tds[2]).text().trim();
-        const subType = $(tds[3]).text().trim();
-        const workType = $(tds[4]).text().trim();
-        const description = $(tds[5]).text().trim();
-        const address = $(tds[6]).text().trim();
-        const contractor = $(tds[7]).text().trim();
-        const issuedDate = $(tds[8]).text().trim();
-        
-        // Filter strictly for New Builds based on the Sub/Work type
-        if (!subType.toLowerCase().includes('new') && !workType.toLowerCase().includes('new')) {
-           return;
+      try {
+        // Step 1: Init Session
+        const homeRes = await fetch(`https://epermits.logis.org/home.aspx?city=${city.code}`);
+        let cookies = homeRes.headers.get('set-cookie');
+
+        const initialRes = await fetch(url, { headers: { 'Cookie': cookies || '' } });
+        const initialHtml = await initialRes.text();
+        let $ = cheerio.load(initialHtml);
+
+        let viewState = $('#__VIEWSTATE').val() as string;
+        let viewStateGenerator = $('#__VIEWSTATEGENERATOR').val() as string;
+
+        if (!viewState) {
+          console.log(`Failed to extract __VIEWSTATE for ${city.name}, skipping.`);
+          continue;
         }
+
+        // Step 2: Initial Search POST
+        const form = new URLSearchParams();
+        form.append('__EVENTTARGET', '');
+        form.append('__EVENTARGUMENT', '');
+        form.append('__VIEWSTATE', viewState);
+        form.append('__VIEWSTATEGENERATOR', viewStateGenerator);
         
-        const issueDateObj = new Date(issuedDate || Date.now());
-        const estimatedCompletion = new Date(issueDateObj);
-        estimatedCompletion.setMonth(estimatedCompletion.getMonth() + 6);
+        form.append('m$m$b$b$dpIssuedDateFrom$dateInput', displayFrom);
+        form.append('m_m_b_b_dpIssuedDateFrom_dateInput_ClientState', `{"enabled":true,"emptyMessage":"","validationText":"${dateFrom}","valueAsString":"${dateFrom}","minDateStr":"1980-01-01-00-00-00","maxDateStr":"2099-12-31-00-00-00","lastSetTextBoxValue":"${displayFrom}"}`);
+        form.append('m$m$b$b$dpIssuedDateTo$dateInput', displayTo);
+        form.append('m_m_b_b_dpIssuedDateTo_dateInput_ClientState', `{"enabled":true,"emptyMessage":"","validationText":"${dateTo}","valueAsString":"${dateTo}","minDateStr":"1980-01-01-00-00-00","maxDateStr":"2099-12-31-00-00-00","lastSetTextBoxValue":"${displayTo}"}`);
         
-        allResults.push({
-          company_id: companyId,
-          property_address: address,
-          city: cityConfig.name,
-          state: cityConfig.state,
-          zip_code: '', // Will reverse geocode or map based on city later
-          contractor_name: contractor,
-          contractor_phone: null,
-          permit_date: issueDateObj.toISOString().split('T')[0],
-          estimated_completion_date: estimatedCompletion.toISOString().split('T')[0],
-          status: 'foundation',
-          notes: `Sqft/Desc: ${description} | Permit: ${permitNum}`
+        form.append('m$m$b$b$cboPermitType', 'Building');
+        form.append('m_m_b_b_cboPermitType_ClientState', '{"logEntries":[],"value":"BLD","text":"Building","enabled":true,"checkedIndices":[],"checkedItemsTextOverflows":false}');
+        form.append('m$m$b$b$btnSearch', 'Search');
+
+        let postRes = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Cookie': cookies || '',
+            'User-Agent': 'Mozilla/5.0'
+          },
+          body: form.toString()
         });
-      });
+
+        let resultHtml = await postRes.text();
+        let $res = cheerio.load(resultHtml);
+
+        // Helper to parse a page
+        const parsePage = () => {
+          $res('table tr').each((index, element) => {
+            if (index === 0) return; // Skip header row
+            const tds = $res(element).find('td');
+            if (tds.length < 8) return;
+            
+            const permitNum = $res(tds[0]).text().trim();
+            if (!permitNum.startsWith(city.code.toUpperCase())) return;
+
+            const subType = $res(tds[3]).text().trim();
+            const workType = $res(tds[4]).text().trim();
+            const description = $res(tds[5]).text().trim();
+            const address = $res(tds[6]).text().trim();
+            const contractor = $res(tds[7]).text().trim();
+            const issuedDate = $res(tds[8]).text().trim();
+            
+            const descLower = description.toLowerCase();
+            const subTypeLower = subType.toLowerCase();
+            const workTypeLower = workType.toLowerCase();
+
+            const isNewBuild = subTypeLower.includes('new') || workTypeLower.includes('new') || descLower.includes('new sfh') || descLower.includes('new home') || descLower.includes('new construct');
+
+            if (isNewBuild) {
+              const issueDateObj = new Date(issuedDate || Date.now());
+              const estimatedCompletion = new Date(issueDateObj);
+              estimatedCompletion.setMonth(estimatedCompletion.getMonth() + 6);
+              
+              allResults.push({
+                company_id: companyId,
+                property_address: address,
+                city: city.name,
+                zip_code: '', 
+                contractor_name: contractor,
+                permit_date: issueDateObj.toISOString().split('T')[0],
+                estimated_completion_date: estimatedCompletion.toISOString().split('T')[0],
+                status: 'foundation'
+              });
+              totalParsed++;
+            }
+          });
+        };
+
+        parsePage();
+
+        // Loop pagination up to 10 pages
+        for (let pageNum = 2; pageNum <= 10; pageNum++) {
+          viewState = $res('#__VIEWSTATE').val() as string;
+          viewStateGenerator = $res('#__VIEWSTATEGENERATOR').val() as string;
+          
+          let nextTarget = '';
+          $res('a').each((i, el) => {
+             const href = $res(el).attr('href');
+             if ($res(el).text().trim() === pageNum.toString() && href && href.includes('__doPostBack')) {
+                 const match = href.match(/__doPostBack\('([^']*)'/);
+                 if (match) nextTarget = match[1];
+             }
+          });
+          
+          if (!nextTarget) break; // No more pages
+
+          const pageForm = new URLSearchParams();
+          pageForm.append('__EVENTTARGET', nextTarget);
+          pageForm.append('__EVENTARGUMENT', '');
+          pageForm.append('__VIEWSTATE', viewState);
+          pageForm.append('__VIEWSTATEGENERATOR', viewStateGenerator);
+
+          postRes = await fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': cookies || '',
+              'User-Agent': 'Mozilla/5.0'
+            },
+            body: pageForm.toString()
+          });
+
+          resultHtml = await postRes.text();
+          $res = cheerio.load(resultHtml);
+          parsePage();
+        }
+      } catch (err) {
+        console.error(`Error scraping ${city.name}:`, err);
+      }
     }
 
-    console.log(`Parsed a total of ${allResults.length} new build permits across ${TARGET_CITIES.length} cities.`);
+    console.log(`Parsed ${totalParsed} new build permits.`);
 
-    // Check for duplicates and insert into the database
-    let inserted = 0;
     for (const build of allResults) {
       const { data: existing } = await supabase
         .from('new_build_permits')
@@ -117,22 +186,24 @@ export async function GET(request: Request) {
         .limit(1);
         
       if (!existing || existing.length === 0) {
-         // const { error } = await supabase.from('new_build_permits').insert([build]);
-         // if (!error) 
-         inserted++;
+         const { error } = await supabase.from('new_build_permits').insert([build]);
+         if (!error) {
+            totalInserted++;
+         } else {
+            console.error("Insert error:", error);
+         }
       }
     }
 
     return NextResponse.json({ 
       success: true, 
       cities_scraped: TARGET_CITIES.map(c => c.name),
-      total_found: allResults.length,
-      new_inserts: inserted,
-      sample_data: allResults[0]
+      total_found: totalParsed,
+      new_inserts: totalInserted
     });
 
   } catch (error: any) {
-    console.error("Scraper failed:", error);
+    console.error("Scraper route failed:", error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

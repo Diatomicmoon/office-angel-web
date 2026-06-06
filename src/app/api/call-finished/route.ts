@@ -2,28 +2,6 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
 
-async function geocodeOnce(address: string) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'OfficeAngel/1.0' } });
-  const json: any = await res.json().catch(() => null);
-  if (!json || json.length === 0) return null;
-  const loc = json[0];
-  const lat = Number(loc.lat);
-  const lng = Number(loc.lon);
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-  return { lat, lng };
-}
-
-async function geocode(address: string) {
-  const a = String(address || '').trim();
-  if (!a) return null;
-  const r1 = await geocodeOnce(a);
-  if (r1) return r1;
-  const hasState = /\b(MN|Minnesota)\b/i.test(a);
-  if (!hasState) return await geocodeOnce(`${a}, MN`);
-  return null;
-}
-
 
 function cleanCallerName(input: unknown): string | null {
   if (!input) return null;
@@ -35,7 +13,7 @@ function cleanCallerName(input: unknown): string | null {
   s = s.replace(/^(this is|my name is|name'?s?\s+is|i(?:'?m| am))\s+/i, '');
   s = s.replace(/[.,:;!]+$/g, '');
 
-  // If it looks like an intro ("Sarah with Office Angel"), keep only the person name.
+  // If it looks like an intro ("Sarah with Hard Hat Solutions"), keep only the person name.
   s = s.replace(/\s+(with|from|at)\b.*$/i, '');
 
   const bad = new Set(['unknown', 'caller', 'new', 'office', 'angel']);
@@ -298,7 +276,7 @@ export async function POST(req: Request) {
       // Prefer USER transcript (most reliable) → fall back to structured output only if it doesn't look like an agent intro.
       const rawStructuredName = typeof structuredOutputs?.caller_name === 'string' ? String(structuredOutputs.caller_name).trim() : '';
       const structuredName = rawStructuredName
-        // If the structured value contains "with/from/at" it often came from the agent intro ("Sarah with Office Angel").
+        // If the structured value contains "with/from/at" it often came from the agent intro ("Sarah with Hard Hat Solutions").
         && !rawStructuredName.match(/\b(with|from|at)\b/i)
         ? (cleanCallerName(rawStructuredName) || '')
         : '';
@@ -313,15 +291,8 @@ export async function POST(req: Request) {
       const parsedJobDetails = structuredOutputs?.job_details || null;
       console.log('📍 Parsed address:', parsedAddress, '| 👤 Name:', parsedName);
 
-      // GEOCODE!
+      // Geocoding is now handled async by the background cron to prevent rate limiting & hanging.
       let tagsToUpdate: string[] | undefined = undefined;
-      if (parsedAddress) {
-        const coords = await geocode(parsedAddress);
-        if (coords) {
-          tagsToUpdate = [`lat:${coords.lat}`, `lng:${coords.lng}`];
-          console.log('🌍 Geocoded Address to:', coords);
-        }
-      }
 
       
       console.log(`📞 Caller ID: ${phoneNumber}`);
@@ -330,8 +301,8 @@ export async function POST(req: Request) {
 
       // Connect to Supabase
       const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
       );
 
       // Scope writes to a specific company so demo + local can share a Supabase project safely.

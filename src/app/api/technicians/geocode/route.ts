@@ -3,8 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 
 const sb = () =>
   createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
   );
 
 async function getCompanyId() {
@@ -18,7 +18,7 @@ async function getCompanyId() {
 
 async function geocodeOnce(address: string) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
-  const res = await fetch(url, { headers: { 'User-Agent': 'OfficeAngel/1.0' } });
+  const res = await fetch(url, { headers: { 'User-Agent': 'HardHatSolutions/1.0' } });
   const json: any = await res.json().catch(() => null);
   if (!json || json.length === 0) return { ok: false as const, status: 'ZERO_RESULTS', error_message: 'No results found' };
   const loc = json[0];

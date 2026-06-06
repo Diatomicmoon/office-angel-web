@@ -7,12 +7,7 @@ import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
-async function getCompanyId() {
+async function getCompanyId(supabase: any) {
   let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
     const { data } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
@@ -70,7 +65,12 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const { messages } = body;
-    const companyId = await getCompanyId();
+    
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+    );
+    const companyId = await getCompanyId(supabase);
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Invalid messages format" }, { status: 400 });
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
     const systemPrompt = {
       role: "system",
-      content: "You are 'Halo', the internal AI assistant for Office Angel. You help dispatchers and office staff quickly find information about jobs, technicians, and permits without them having to click through menus. Use the provided tools to query the database. Keep your answers concise, direct, and professional."
+      content: "You are 'Halo', the internal AI assistant for Hard Hat Solutions. You help dispatchers and office staff quickly find information about jobs, technicians, and permits without them having to click through menus. Use the provided tools to query the database. Keep your answers concise, direct, and professional."
     };
 
     const conversation = [systemPrompt, ...messages];

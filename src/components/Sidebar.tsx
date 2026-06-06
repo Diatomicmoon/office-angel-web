@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck } from 'lucide-react';
+import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -16,7 +16,7 @@ export default function Sidebar() {
       <div className="p-6">
         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
           <Activity className="text-blue-500" />
-          Office Angel
+          Hard Hat Solutions
         </h1>
         <p className="text-gray-400 text-xs mt-1">Hardhat Holdings LLC</p>
       </div>
@@ -52,6 +52,10 @@ export default function Sidebar() {
         <Link href="/jobs" className={itemClass('/jobs')}>
           <Briefcase size={20} />
           <span>Job Archive</span>
+        </Link>
+        <Link href="/timesheets" className={itemClass('/timesheets')}>
+          <Clock size={20} />
+          <span>Timesheets & Payroll</span>
         </Link>
         <Link href="/dispatch" className={itemClass('/dispatch')}>
           <Calendar size={20} />

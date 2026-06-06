@@ -6,8 +6,8 @@ export async function GET(req: Request) {
   try {
     const { companyId } = await resolveCompanyIdOrThrow();
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
     );
 
     const url = new URL(req.url);

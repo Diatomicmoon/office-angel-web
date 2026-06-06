@@ -35,7 +35,7 @@ export default function LandingPage() {
             <span className="text-blue-600">Running on autopilot.</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Office Angel is a full AI back-office platform built for home service contractors. From the first inbound call to the final invoice — handled automatically, around the clock.
+            Hard Hat Solutions is a full AI back-office platform built for home service contractors. From the first inbound call to the final invoice — handled automatically, around the clock.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="#demo" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold text-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
@@ -180,7 +180,7 @@ export default function LandingPage() {
             <div className="grid sm:grid-cols-3 gap-6 text-left">
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                 <p className="font-bold text-base md:text-lg mb-2">Your existing phone number</p>
-                <p className="text-gray-600 text-sm">Overflow calls route to Office Angel automatically. Your number stays the same.</p>
+                <p className="text-gray-600 text-sm">Overflow calls route to Hard Hat Solutions automatically. Your number stays the same.</p>
               </div>
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                 <p className="font-bold text-base md:text-lg mb-2">Google & Apple Calendar</p>

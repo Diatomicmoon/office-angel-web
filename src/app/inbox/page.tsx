@@ -32,7 +32,7 @@ export default function InboxPage() {
   const [showPermitAnalytics, setShowPermitAnalytics] = useState(false);
   const [expandedReceiptId, setExpandedReceiptId] = useState<string | null>(null);
 
-  const forwardAddress = "inbox+hardhat@officeangel.com";
+  const forwardAddress = "inbox+hardhat@hardhatsolutions.com";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(forwardAddress);

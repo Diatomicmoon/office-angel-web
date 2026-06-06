@@ -5,23 +5,34 @@ import { useState } from "react";
 import { NotWired } from "@/components/NotWired";
 
 export default function Marketing() {
-  const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-  if (!isDemoMode) {
-    return (
-      <NotWired
-        title="Marketing"
-        subtitle="This screen is still demo UI (fake SEO/traffic). Next step is wiring Google Business Profile + Analytics."
-      />
-    );
-  }
-
   const [postStatus, setPostStatus] = useState("Drafting...");
+  const [isPublishing, setIsPublishing] = useState(false);
 
-  const handlePost = () => {
+  const handlePost = async () => {
+    setIsPublishing(true);
     setPostStatus("Publishing...");
-    setTimeout(() => {
-      setPostStatus("Published to GMB & Facebook ✓");
-    }, 1500);
+    
+    try {
+      const res = await fetch("/api/google-marketing/post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId: "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a", // Defaulting to your testing tenant
+          text: "Just finished up a massive 200 Amp service upgrade for a great customer in Maple Grove! ⚡ If you're dealing with an old Federal Pacific panel or need more power for an EV charger, give us a call. We are fully licensed, insured, and ready to roll. \n\n#Electrician #MapleGroveMN #PanelUpgrade #HomeImprovement #TradeVolt",
+          platforms: ["gmb", "facebook"]
+        })
+      });
+
+      if (res.ok) {
+        setPostStatus("Published to GMB & Facebook ✓");
+      } else {
+        setPostStatus("Failed to publish");
+      }
+    } catch (e) {
+      setPostStatus("Error publishing");
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   return (
@@ -33,9 +44,20 @@ export default function Marketing() {
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">SEO & Marketing AI</h1>
           <p className="text-gray-500 mt-2">Google Business Profile analytics, local ranking heatmaps, and auto-generated social posts.</p>
         </div>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2">
-          <Globe size={18} /> Connect Accounts
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => window.location.href = '/api/auth/meta?companyId=1'}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            <Globe size={18} /> Connect Facebook
+          </button>
+          <button 
+            onClick={() => window.location.href = '/api/auth/google?companyId=1'}
+            className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
+          >
+            <Globe size={18} /> Connect Google
+          </button>
+        </div>
       </div>
 
       {/* Top Stats: Google Business Profile */}

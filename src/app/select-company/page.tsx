@@ -19,9 +19,17 @@ export default function SelectCompany() {
     fetch("/api/companies/mine")
       .then((r) => r.json())
       .then((json) => {
-        setCompanies(json.companies || []);
-        setError(json.error ? String(json.error) : "");
-        setLoading(false);
+        const comps = json.companies || [];
+        if (comps.length === 1) {
+          // Auto-select if only 1 company
+          document.cookie = `oa_company_id=${comps[0].id}; Path=/; Max-Age=31536000; SameSite=Lax`;
+          router.push("/dashboard");
+          router.refresh();
+        } else {
+          setCompanies(comps);
+          setError(json.error ? String(json.error) : "");
+          setLoading(false);
+        }
       })
       .catch(() => {
         setError("Failed to load companies");
@@ -31,7 +39,7 @@ export default function SelectCompany() {
 
   const choose = (id: string) => {
     // Persist tenant selection for server routes.
-    document.cookie = `oa_company_id=${id}; Path=/; SameSite=Lax`;
+    document.cookie = `oa_company_id=${id}; Path=/; Max-Age=31536000; SameSite=Lax`;
     router.push("/dashboard");
     router.refresh();
   };

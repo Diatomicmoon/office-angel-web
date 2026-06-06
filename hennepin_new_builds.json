@@ -1,0 +1,3502 @@
+[
+  {
+    "owner": "PORT ATH CITY OF BLOOMINGTON",
+    "address": "8051 26TH AVE S, BLOOMINGTON MN 55425",
+    "build_yr": 2024,
+    "lat": "44.857144",
+    "lon": "-93.235038"
+  },
+  {
+    "owner": "SICK PRDCT & CC AMERICAS LLC",
+    "address": "2700 LINDAU LA, BLOOMINGTON MN 55425",
+    "build_yr": 2024,
+    "lat": "44.857139",
+    "lon": "-93.233598"
+  },
+  {
+    "owner": "THAT PROPERTY PLACE LLC",
+    "address": "3520 27TH AVE S, MINNEAPOLIS MN 55406",
+    "build_yr": 2025,
+    "lat": "44.938867",
+    "lon": "-93.233761"
+  },
+  {
+    "owner": "SHAWNNA KRAMER/JOHN SWANSON",
+    "address": "3716 29TH AVE S, MINNEAPOLIS MN 55406",
+    "build_yr": 2024,
+    "lat": "44.935368",
+    "lon": "-93.231214"
+  },
+  {
+    "owner": "P J STRAIN & A A STRAIN",
+    "address": "3400 MCKINLEY ST N E, MINNEAPOLIS MN 55418",
+    "build_yr": 2025,
+    "lat": "45.029691",
+    "lon": "-93.228547"
+  },
+  {
+    "owner": "JACKSON KELLY/JASON OHOTTO",
+    "address": "3234 FILLMORE ST N E, MINNEAPOLIS MN 55418",
+    "build_yr": 2024,
+    "lat": "45.026841",
+    "lon": "-93.242605"
+  },
+  {
+    "owner": "S ZHEN & E CIANCIARUSO",
+    "address": "3040 TAYLOR ST N E, MINNEAPOLIS MN 55418",
+    "build_yr": 2024,
+    "lat": "45.023152",
+    "lon": "-93.243785"
+  },
+  {
+    "owner": "ZDC PARTNERS LLC",
+    "address": "10200 YELLOW CIRCLE DR, EDEN PRAIRIE MN 55343",
+    "build_yr": 2025,
+    "lat": "44.891131",
+    "lon": "-93.408506"
+  },
+  {
+    "owner": "NEXUS BUILDING 2 LLC",
+    "address": "10100 YELLOW CIRCLE DR, EDEN PRAIRIE MN 55343",
+    "build_yr": 2025,
+    "lat": "44.891111",
+    "lon": "-93.40646"
+  },
+  {
+    "owner": "EP GTS HOUSING PHASE 11 LLC",
+    "address": "61 ADDRESS UNASSIGNED, EDEN PRAIRIE MN 00000",
+    "build_yr": 2025,
+    "lat": "44.877664",
+    "lon": "-93.413187"
+  },
+  {
+    "owner": "MATTHEW FISCUS/MAREN FISCUS",
+    "address": "1896 YORKSHIRE AVE S, MINNETONKA MN 55305",
+    "build_yr": 2025,
+    "lat": "44.964907",
+    "lon": "-93.408258"
+  },
+  {
+    "owner": "R D MOULTON REV TR ET AL",
+    "address": "153 LAKEVIEW LA S, WAYZATA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.973493",
+    "lon": "-93.525059"
+  },
+  {
+    "owner": "KSC IRREVOCABLE TRUST",
+    "address": "172 WESTWOOD LA S, WAYZATA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.973744",
+    "lon": "-93.525869"
+  },
+  {
+    "owner": "HEATHER A CUNZ REV INT TRUST",
+    "address": "430 PEAVEY LA, WAYZATA MN 55391",
+    "build_yr": 2024,
+    "lat": "44.968108",
+    "lon": "-93.533592"
+  },
+  {
+    "owner": "621 FERNDALE LLC",
+    "address": "621 FERNDALE RD W, WAYZATA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.965198",
+    "lon": "-93.539527"
+  },
+  {
+    "owner": "BFDE LLC",
+    "address": "670 FERNDALE RD W, WAYZATA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.964256",
+    "lon": "-93.541877"
+  },
+  {
+    "owner": "C BENTDAHL & S SIMON",
+    "address": "425 FERNDALE WOODS RD, WAYZATA MN 55391",
+    "build_yr": 2024,
+    "lat": "44.96712",
+    "lon": "-93.53519"
+  },
+  {
+    "owner": "55391 LLC",
+    "address": "420 HIGHCROFT RD, WAYZATA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.966608",
+    "lon": "-93.52808"
+  },
+  {
+    "owner": "OMNI CUSTOM BUILDERS LLC",
+    "address": "285 CO RD NO 19, MINNETRISTA MN 55364",
+    "build_yr": 2025,
+    "lat": "44.973563",
+    "lon": "-93.64678"
+  },
+  {
+    "owner": "OMNI CUSTOM BUILDERS LLC",
+    "address": "305 CO RD NO 19, MINNETRISTA MN 55364",
+    "build_yr": 2025,
+    "lat": "44.972938",
+    "lon": "-93.646776"
+  },
+  {
+    "owner": "M A BARRY & S R BARRY",
+    "address": "734 SHAWNEE WOODS RD, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.059385",
+    "lon": "-93.541193"
+  },
+  {
+    "owner": "TING HO & AMANDA EVENSKI",
+    "address": "714 SHAWNEE WOODS RD, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.059275",
+    "lon": "-93.540431"
+  },
+  {
+    "owner": "C D KUHLMANN & M A VICK",
+    "address": "5211 LAKE SARAH HGTS DR, INDEPENDENCE MN 55357",
+    "build_yr": 2024,
+    "lat": "45.058786",
+    "lon": "-93.658242"
+  },
+  {
+    "owner": "K R JACOBSEN & B A JACOBSEN",
+    "address": "5305 SUNSET LA, INDEPENDENCE MN 55357",
+    "build_yr": 2025,
+    "lat": "45.057908",
+    "lon": "-93.659125"
+  },
+  {
+    "owner": "AG-HRE BROCKTON I OWNER LLC",
+    "address": "52 ADDRESS PENDING, CORCORAN MN 00000",
+    "build_yr": 2025,
+    "lat": "45.14852",
+    "lon": "-93.52345"
+  },
+  {
+    "owner": "GALINA ZHELAVSKAYA ET AL",
+    "address": "19770 STIEG RD, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.146063",
+    "lon": "-93.539375"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "19525 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.143147",
+    "lon": "-93.533398"
+  },
+  {
+    "owner": "K J W GILBERTSON ET AL",
+    "address": "19552 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143484",
+    "lon": "-93.534014"
+  },
+  {
+    "owner": "NICHOLAS MEHLHAFF",
+    "address": "19540 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143679",
+    "lon": "-93.533836"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "19590 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144502",
+    "lon": "-93.534566"
+  },
+  {
+    "owner": "LINDSAY & THOMAS BULLINGER",
+    "address": "19530 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141973",
+    "lon": "-93.535007"
+  },
+  {
+    "owner": "DAVID R AND JODI W LEE",
+    "address": "19528 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142039",
+    "lon": "-93.534803"
+  },
+  {
+    "owner": "MARY FRANCES MCBAIN",
+    "address": "19526 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142084",
+    "lon": "-93.534598"
+  },
+  {
+    "owner": "RICHARD HUMMEL",
+    "address": "19524 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142096",
+    "lon": "-93.534402"
+  },
+  {
+    "owner": "JOHN & JOSIE WALD",
+    "address": "19522 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142128",
+    "lon": "-93.534213"
+  },
+  {
+    "owner": "GARY R/JOANNE K GARDNER",
+    "address": "19520 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142189",
+    "lon": "-93.534038"
+  },
+  {
+    "owner": "LISA M LINDGREN",
+    "address": "19518 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142271",
+    "lon": "-93.533882"
+  },
+  {
+    "owner": "J F LAWSON III/M A LAWSON",
+    "address": "19516 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142384",
+    "lon": "-93.533774"
+  },
+  {
+    "owner": "CYNTHIA KAY BYE",
+    "address": "19514 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142511",
+    "lon": "-93.533719"
+  },
+  {
+    "owner": "DYSART FAMILY TRUST",
+    "address": "19512 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142619",
+    "lon": "-93.53361"
+  },
+  {
+    "owner": "LYNETTE LEIGH MILLER",
+    "address": "19510 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142713",
+    "lon": "-93.533451"
+  },
+  {
+    "owner": "BARRY LIVING TRUST",
+    "address": "19508 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142797",
+    "lon": "-93.533287"
+  },
+  {
+    "owner": "DONNA K OLSON",
+    "address": "19506 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142869",
+    "lon": "-93.5331"
+  },
+  {
+    "owner": "G & C OLSON TRUST AGREEMENT",
+    "address": "19504 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142938",
+    "lon": "-93.532895"
+  },
+  {
+    "owner": "WILLIAM V & RHONDA A KLEIN",
+    "address": "19502 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142998",
+    "lon": "-93.532693"
+  },
+  {
+    "owner": "ALICE C MEYER",
+    "address": "19500 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.143046",
+    "lon": "-93.532494"
+  },
+  {
+    "owner": "JULIE C & DALE EKMAN",
+    "address": "19511 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141973",
+    "lon": "-93.533285"
+  },
+  {
+    "owner": "JEFFREY & JILL LUIKART RV TR",
+    "address": "19509 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142092",
+    "lon": "-93.533161"
+  },
+  {
+    "owner": "ROY & TERRENCE WOOD LIV TR",
+    "address": "19507 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.14221",
+    "lon": "-93.53305"
+  },
+  {
+    "owner": "DIANE L WHIPPLE",
+    "address": "19505 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142334",
+    "lon": "-93.532936"
+  },
+  {
+    "owner": "MARK MARSH/PEGGY ANN MARSH",
+    "address": "19503 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.14241",
+    "lon": "-93.532738"
+  },
+  {
+    "owner": "SHARRON S NICKASCH",
+    "address": "19501 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142442",
+    "lon": "-93.532523"
+  },
+  {
+    "owner": "ALICIA & MARISSA VICKERMAN",
+    "address": "19698 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.145174",
+    "lon": "-93.536775"
+  },
+  {
+    "owner": "E V AMMENTORP/L R VANDERGON",
+    "address": "19686 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.1452",
+    "lon": "-93.53647"
+  },
+  {
+    "owner": "VINOD M & NAVITA D RAMDIN",
+    "address": "19674 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.145157",
+    "lon": "-93.536166"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "19638 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144869",
+    "lon": "-93.53543"
+  },
+  {
+    "owner": "M SKELTON & E SKELTON",
+    "address": "19602 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144593",
+    "lon": "-93.534782"
+  },
+  {
+    "owner": "DANIEL K JUUL/AMANDA M JUUL",
+    "address": "19601 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.1441",
+    "lon": "-93.53511"
+  },
+  {
+    "owner": "S THANGARAJAN & I GOPAL",
+    "address": "19613 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144197",
+    "lon": "-93.53533"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "19625 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144294",
+    "lon": "-93.535551"
+  },
+  {
+    "owner": "B L WICKLUND & B G WICKLUND",
+    "address": "19637 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144392",
+    "lon": "-93.535771"
+  },
+  {
+    "owner": "K MARSHALL & A MARSHALL",
+    "address": "19649 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144518",
+    "lon": "-93.535987"
+  },
+  {
+    "owner": "N SHRESTHA & R SHRESTHA",
+    "address": "19661 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144591",
+    "lon": "-93.536257"
+  },
+  {
+    "owner": "A E RUELLE & K OREHOSKY",
+    "address": "19673 105TH AVE, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144607",
+    "lon": "-93.536582"
+  },
+  {
+    "owner": "A C HNATH & Z W HNATH",
+    "address": "19672 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144212",
+    "lon": "-93.53651"
+  },
+  {
+    "owner": "MICHAEL T & SHARRON V CACI",
+    "address": "19660 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.144148",
+    "lon": "-93.536186"
+  },
+  {
+    "owner": "B J KROON & J A KROON",
+    "address": "19648 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144029",
+    "lon": "-93.535935"
+  },
+  {
+    "owner": "MATTHEW J & JAMIE M HANSON",
+    "address": "19636 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.143908",
+    "lon": "-93.53573"
+  },
+  {
+    "owner": "J STEWART & C STEWART",
+    "address": "19624 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.143799",
+    "lon": "-93.535529"
+  },
+  {
+    "owner": "L T NGUYEN & L N TRAN",
+    "address": "19612 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.14369",
+    "lon": "-93.535328"
+  },
+  {
+    "owner": "C CUMMINGS & N CUMMINGS",
+    "address": "19621 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143082",
+    "lon": "-93.535544"
+  },
+  {
+    "owner": "V KOGANTI AND P KOYA",
+    "address": "19657 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143392",
+    "lon": "-93.536174"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "19669 104TH PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.143608",
+    "lon": "-93.536404"
+  },
+  {
+    "owner": "BRANDON CADLE/CHELSEA CADLE",
+    "address": "10366 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142989",
+    "lon": "-93.53615"
+  },
+  {
+    "owner": "N P FACKLER & R L FACKLER",
+    "address": "10358 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142788",
+    "lon": "-93.536035"
+  },
+  {
+    "owner": "M OTTERSON & A OTTERSON",
+    "address": "10350 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142606",
+    "lon": "-93.536006"
+  },
+  {
+    "owner": "REJOICE TARFA/JOSEPH KETTER",
+    "address": "10326 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142017",
+    "lon": "-93.535741"
+  },
+  {
+    "owner": "J F JOHNSON & T M JOHNSON",
+    "address": "10331 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142289",
+    "lon": "-93.536723"
+  },
+  {
+    "owner": "N K ARUMUGAM/S SUNDARAM",
+    "address": "10339 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142464",
+    "lon": "-93.536756"
+  },
+  {
+    "owner": "RYAN MICHAEL NELSON",
+    "address": "10347 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.142641",
+    "lon": "-93.536788"
+  },
+  {
+    "owner": "ERIC & BETHANY RATHMANNER",
+    "address": "10355 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142817",
+    "lon": "-93.536824"
+  },
+  {
+    "owner": "S M P KUPPASWAMY ET AL",
+    "address": "10363 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.142993",
+    "lon": "-93.536886"
+  },
+  {
+    "owner": "MEGAN E & NICHOLAS G MEYER",
+    "address": "10371 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143165",
+    "lon": "-93.536967"
+  },
+  {
+    "owner": "A A H THOM & M K THOM",
+    "address": "10379 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143336",
+    "lon": "-93.537048"
+  },
+  {
+    "owner": "BRYAN CIPALA",
+    "address": "10395 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.143715",
+    "lon": "-93.537199"
+  },
+  {
+    "owner": "BRIAN W & KATHERINE E BOJAN",
+    "address": "10411 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.144091",
+    "lon": "-93.537209"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10419 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144293",
+    "lon": "-93.537216"
+  },
+  {
+    "owner": "J JUERGENSEN/S JUERGENSEN",
+    "address": "10435 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.144649",
+    "lon": "-93.537247"
+  },
+  {
+    "owner": "R G KLEIN-HERGES REV TRUST",
+    "address": "19494 102ND PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.140776",
+    "lon": "-93.533951"
+  },
+  {
+    "owner": "MAY FAMILY TRUST",
+    "address": "19496 102ND PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.14066",
+    "lon": "-93.534155"
+  },
+  {
+    "owner": "JO ELLYN AAS-JAKOBSEN RV L T",
+    "address": "19543 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.140282",
+    "lon": "-93.534138"
+  },
+  {
+    "owner": "WAYNE & LUANN COWAN",
+    "address": "19541 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.140371",
+    "lon": "-93.534344"
+  },
+  {
+    "owner": "M S HOLT & J K HOLT",
+    "address": "10210 MULBERRY CT, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.139572",
+    "lon": "-93.535325"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10226 MULBERRY CT, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.139827",
+    "lon": "-93.535679"
+  },
+  {
+    "owner": "CHERYL F REID",
+    "address": "19512 102ND PL, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.139045",
+    "lon": "-93.536203"
+  },
+  {
+    "owner": "KEVIN HENRY",
+    "address": "19514 102ND PL, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.138927",
+    "lon": "-93.536409"
+  },
+  {
+    "owner": "TIMOTHY HAGEMANN",
+    "address": "19536 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141667",
+    "lon": "-93.535481"
+  },
+  {
+    "owner": "N J HEAMIADAN/S R HEMIADAN",
+    "address": "19534 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141788",
+    "lon": "-93.535353"
+  },
+  {
+    "owner": "A M LAWABNI",
+    "address": "19532 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141889",
+    "lon": "-93.535196"
+  },
+  {
+    "owner": "R BJORKLUND ET AL REV TRUST",
+    "address": "19521 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.14162",
+    "lon": "-93.534096"
+  },
+  {
+    "owner": "KARIN E BIGOVICH",
+    "address": "19519 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141649",
+    "lon": "-93.533914"
+  },
+  {
+    "owner": "CHERYL J LAMB",
+    "address": "19517 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141709",
+    "lon": "-93.533739"
+  },
+  {
+    "owner": "RONALD THOMAS VAN TASSEL",
+    "address": "19515 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141788",
+    "lon": "-93.533577"
+  },
+  {
+    "owner": "JUDY NEWMAN & BRANT NEWMAN",
+    "address": "19513 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141871",
+    "lon": "-93.533419"
+  },
+  {
+    "owner": "J JAMES & K S KURIAN",
+    "address": "10318 NORTHWOOD LA, CORCORAN MN 55374",
+    "build_yr": 2025,
+    "lat": "45.141803",
+    "lon": "-93.536002"
+  },
+  {
+    "owner": "B&D COMMERCIAL 101 LLC",
+    "address": "52 ADDRESS PENDING, CORCORAN MN 00000",
+    "build_yr": 2024,
+    "lat": "45.142023",
+    "lon": "-93.523556"
+  },
+  {
+    "owner": "LORI JANE WEGEHAUPT",
+    "address": "19314 103RD AVE, CORCORAN MN 55374",
+    "build_yr": 2024,
+    "lat": "45.141257",
+    "lon": "-93.527826"
+  },
+  {
+    "owner": "DANIEL MAKI & ELIZABETH MAKI",
+    "address": "11801 RIDGEMOUNT AVE W, MINNETONKA MN 55305",
+    "build_yr": 2025,
+    "lat": "44.978291",
+    "lon": "-93.428048"
+  },
+  {
+    "owner": "MINNETONKA MARSH LLC",
+    "address": "11816 WAYZATA BLVD, MINNETONKA MN 55305",
+    "build_yr": 2024,
+    "lat": "44.971985",
+    "lon": "-93.429336"
+  },
+  {
+    "owner": "DEBORA SWANSON/TROY SWANSON",
+    "address": "6315 PAINTERS CIR, MINNETRISTA MN 55364",
+    "build_yr": 2024,
+    "lat": "44.966264",
+    "lon": "-93.683086"
+  },
+  {
+    "owner": "BARBARA J LONGE REV TR ET AL",
+    "address": "1551 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057651",
+    "lon": "-93.558147"
+  },
+  {
+    "owner": "MARK & JILL STEINHAUSER",
+    "address": "1560 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.058171",
+    "lon": "-93.557127"
+  },
+  {
+    "owner": "SWENSON REVOC INTERVIVOS TR",
+    "address": "1558 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057955",
+    "lon": "-93.557117"
+  },
+  {
+    "owner": "KAREN L BRAUN REV TRUST",
+    "address": "1550 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057286",
+    "lon": "-93.5577"
+  },
+  {
+    "owner": "CPS HOLDINGS LLC",
+    "address": "1548 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057142",
+    "lon": "-93.557871"
+  },
+  {
+    "owner": "JOHN DREW & LINDA DREW",
+    "address": "1574 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.058106",
+    "lon": "-93.560045"
+  },
+  {
+    "owner": "GREG BARBER & NANCY BARBER",
+    "address": "1597 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057517",
+    "lon": "-93.5633"
+  },
+  {
+    "owner": "DAVID R KENNEDY ET AL JT TR",
+    "address": "1593 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057824",
+    "lon": "-93.562857"
+  },
+  {
+    "owner": "GREGORY A HAASE REV TR ET AL",
+    "address": "1591 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057931",
+    "lon": "-93.562572"
+  },
+  {
+    "owner": "RICHARD BAKER & LISA BAKER",
+    "address": "1583 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057725",
+    "lon": "-93.561441"
+  },
+  {
+    "owner": "CAROL L WEXLER TRUST",
+    "address": "1581 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057648",
+    "lon": "-93.561191"
+  },
+  {
+    "owner": "LOFFHAGEN FAMILY TRUST",
+    "address": "1579 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.05758",
+    "lon": "-93.560935"
+  },
+  {
+    "owner": "ROBIN R PACHUTA TRUST",
+    "address": "1577 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057526",
+    "lon": "-93.560652"
+  },
+  {
+    "owner": "T GALLEGOS & R D GALLEGOS",
+    "address": "1575 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057532",
+    "lon": "-93.560339"
+  },
+  {
+    "owner": "M R BRAUN & J K BRAUN",
+    "address": "1571 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057677",
+    "lon": "-93.559775"
+  },
+  {
+    "owner": "MARGARET D KNUDSEN MAR RV TR",
+    "address": "1569 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.0578",
+    "lon": "-93.559541"
+  },
+  {
+    "owner": "B CHAMPEAU & S CHAMPEAU",
+    "address": "1542 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056821",
+    "lon": "-93.558536"
+  },
+  {
+    "owner": "MEP MEDINA LLC",
+    "address": "80 ADDRESS PENDING, MEDINA MN 00000",
+    "build_yr": 2025,
+    "lat": "45.05213",
+    "lon": "-93.558786"
+  },
+  {
+    "owner": "S S T PERUMAL & S K MADASAMY",
+    "address": "1002 FIELD CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.05264",
+    "lon": "-93.54807"
+  },
+  {
+    "owner": "TARUNDEEP KAUR & SUMIT BEHL",
+    "address": "1004 FIELD CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.052612",
+    "lon": "-93.548204"
+  },
+  {
+    "owner": "R NEVILE & S NEVILE",
+    "address": "1006 FIELD CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.052587",
+    "lon": "-93.548322"
+  },
+  {
+    "owner": "LUKE CHEN & MYLAN THU TRAN",
+    "address": "1008 FIELD CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.052559",
+    "lon": "-93.548456"
+  },
+  {
+    "owner": "DOLJINSUREN BATBAATAR",
+    "address": "1098 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.052109",
+    "lon": "-93.550151"
+  },
+  {
+    "owner": "A K AGARWAL & A AGARWAL",
+    "address": "1096 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.052011",
+    "lon": "-93.550152"
+  },
+  {
+    "owner": "JIAN XUE & LILI YU",
+    "address": "1094 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.051923",
+    "lon": "-93.550152"
+  },
+  {
+    "owner": "P K GOUR & S ASTHANA",
+    "address": "1092 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.051835",
+    "lon": "-93.550153"
+  },
+  {
+    "owner": "S S R CHOLLETI/S KAVIKONDALA",
+    "address": "1090 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.051736",
+    "lon": "-93.550153"
+  },
+  {
+    "owner": "B EFFINGER JR & K EFFINGER",
+    "address": "1080 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.051295",
+    "lon": "-93.549869"
+  },
+  {
+    "owner": "S SURESH & A JHA",
+    "address": "1082 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.051367",
+    "lon": "-93.549965"
+  },
+  {
+    "owner": "M SHARMA & M JAMWAL",
+    "address": "1084 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.05143",
+    "lon": "-93.55005"
+  },
+  {
+    "owner": "JAY CHANG",
+    "address": "1086 JUBERT DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.051502",
+    "lon": "-93.550146"
+  },
+  {
+    "owner": "B ANDERSON AND M ANDERSON",
+    "address": "6195 STEPHANIE WAY, INDEPENDENCE MN 55359",
+    "build_yr": 2025,
+    "lat": "45.057897",
+    "lon": "-93.683227"
+  },
+  {
+    "owner": "CITY OF BROOKLYN PARK",
+    "address": "10407 WEST RIVER RD, BROOKLYN PARK MN 55444",
+    "build_yr": 2024,
+    "lat": "45.14038",
+    "lon": "-93.318265"
+  },
+  {
+    "owner": "316 PROPERTIES LLC",
+    "address": "8101 WENTWORTH AVE S, BLOOMINGTON MN 55420",
+    "build_yr": 2024,
+    "lat": "44.856802",
+    "lon": "-93.280514"
+  },
+  {
+    "owner": "A G MENDEZ/S E LUPPKE-MENDEZ",
+    "address": "8333 WENTWORTH AVE S, BLOOMINGTON MN 55420",
+    "build_yr": 2025,
+    "lat": "44.852475",
+    "lon": "-93.280555"
+  },
+  {
+    "owner": "GRASS ROOTS LLC",
+    "address": "403 LAKE ST E, MINNEAPOLIS MN 55408",
+    "build_yr": 2025,
+    "lat": "44.948134",
+    "lon": "-93.27001"
+  },
+  {
+    "owner": "PPL NICLAKE COMMERCIAL LLC",
+    "address": "1 ADDRESS PENDING, MINNEAPOLIS MN 00000",
+    "build_yr": 2024,
+    "lat": "44.947122",
+    "lon": "-93.278546"
+  },
+  {
+    "owner": "PPL NICLAKE COMMERCIAL LLC",
+    "address": "1 ADDRESS PENDING, MINNEAPOLIS MN 00000",
+    "build_yr": 2024,
+    "lat": "44.947122",
+    "lon": "-93.278546"
+  },
+  {
+    "owner": "PPL NICLAKE COMMERCIAL LLC",
+    "address": "1 ADDRESS PENDING, MINNEAPOLIS MN 00000",
+    "build_yr": 2024,
+    "lat": "44.947122",
+    "lon": "-93.278546"
+  },
+  {
+    "owner": "MARTISOOR HOSP GROUP LLC",
+    "address": "1 ADDRESS PENDING, MINNEAPOLIS MN 00000",
+    "build_yr": 2024,
+    "lat": "44.947122",
+    "lon": "-93.278546"
+  },
+  {
+    "owner": "MARTISOOR HOSP GROUP LLC",
+    "address": "1 ADDRESS PENDING, MINNEAPOLIS MN 00000",
+    "build_yr": 2024,
+    "lat": "44.947122",
+    "lon": "-93.278546"
+  },
+  {
+    "owner": "PPL NICLAKE LTD PARTNERSHIP",
+    "address": "1 ADDRESS PENDING, MINNEAPOLIS MN 00000",
+    "build_yr": 2024,
+    "lat": "44.947122",
+    "lon": "-93.278546"
+  },
+  {
+    "owner": "C J EHRLICH SOMES & E SOMES",
+    "address": "3428 PILLSBURY AVE, MINNEAPOLIS MN 55408",
+    "build_yr": 2025,
+    "lat": "44.940411",
+    "lon": "-93.281872"
+  },
+  {
+    "owner": "KEBA PROPERTIES LLC",
+    "address": "3601 4TH AVE S, MINNEAPOLIS MN 55409",
+    "build_yr": 2024,
+    "lat": "44.9376",
+    "lon": "-93.269806"
+  },
+  {
+    "owner": "ANTON HOMCHIK",
+    "address": "407 MILBERT RD, MINNETONKA MN 55305",
+    "build_yr": 2024,
+    "lat": "44.976253",
+    "lon": "-93.444191"
+  },
+  {
+    "owner": "LAKE WEST DEVELOPMENT LLC",
+    "address": "1934 OAKLAND RD, MINNETONKA MN 55305",
+    "build_yr": 2024,
+    "lat": "44.964024",
+    "lon": "-93.457556"
+  },
+  {
+    "owner": "1809 PLY LLC",
+    "address": "1809 PLYMOUTH RD, MINNETONKA MN 55305",
+    "build_yr": 2025,
+    "lat": "44.966633",
+    "lon": "-93.441835"
+  },
+  {
+    "owner": "HARALRED LLC",
+    "address": "325 BROWN RD S, ORONO MN 55356",
+    "build_yr": 2025,
+    "lat": "44.972382",
+    "lon": "-93.575202"
+  },
+  {
+    "owner": "T J WILKINS & C L WILKINS",
+    "address": "740 WILLOW DR S, ORONO MN 55391",
+    "build_yr": 2025,
+    "lat": "44.964896",
+    "lon": "-93.57911"
+  },
+  {
+    "owner": "LA PALMA PROPERTIES II LLC",
+    "address": "1340 SHINGLE CREEK CRSNG, BROOKLYN CENTER MN 55430",
+    "build_yr": 2024,
+    "lat": "45.056109",
+    "lon": "-93.321539"
+  },
+  {
+    "owner": "COBORN'S INC",
+    "address": "6130 SYCAMORE LA N, PLYMOUTH MN 55442",
+    "build_yr": 2025,
+    "lat": "45.065103",
+    "lon": "-93.446239"
+  },
+  {
+    "owner": "ROERS PLYMOUTH APTS LLC ETAL",
+    "address": "6074 QUINWOOD LA N, PLYMOUTH MN 55442",
+    "build_yr": 2025,
+    "lat": "45.063468",
+    "lon": "-93.443035"
+  },
+  {
+    "owner": "HPIV MINNEAPOLIS III LLC",
+    "address": "6050 SYCAMORE LA N, PLYMOUTH MN 55442",
+    "build_yr": 2024,
+    "lat": "45.06389",
+    "lon": "-93.447444"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4599 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.06184",
+    "lon": "-93.573032"
+  },
+  {
+    "owner": "ROBERT T SLAYTON TRUST",
+    "address": "4568 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060083",
+    "lon": "-93.570862"
+  },
+  {
+    "owner": "MARK OF EXCELLENCE HOMES INC",
+    "address": "4570 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060138",
+    "lon": "-93.571078"
+  },
+  {
+    "owner": "T C MACKIN & B Z MACKIN",
+    "address": "4572 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.06016",
+    "lon": "-93.571328"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4574 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060152",
+    "lon": "-93.571569"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4576 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060111",
+    "lon": "-93.571793"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4578 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.06011",
+    "lon": "-93.572002"
+  },
+  {
+    "owner": "MARGARET L BACHE-WIIG",
+    "address": "4580 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060284",
+    "lon": "-93.572296"
+  },
+  {
+    "owner": "D N & S L HESSJT LIV TRUST",
+    "address": "4582 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060433",
+    "lon": "-93.572297"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4592 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061214",
+    "lon": "-93.572312"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4594 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061369",
+    "lon": "-93.572315"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4596 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.061526",
+    "lon": "-93.572218"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4598 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.061673",
+    "lon": "-93.572221"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4500 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.061641",
+    "lon": "-93.571109"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4502 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.0615",
+    "lon": "-93.571058"
+  },
+  {
+    "owner": "ELENA HOPPER",
+    "address": "4504 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061356",
+    "lon": "-93.570959"
+  },
+  {
+    "owner": "GAIO LIVING TRUST",
+    "address": "4506 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061204",
+    "lon": "-93.570904"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4508 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.061053",
+    "lon": "-93.570849"
+  },
+  {
+    "owner": "KATHLEEN GULLO REVOCABLE TR",
+    "address": "4510 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060904",
+    "lon": "-93.570797"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4512 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060752",
+    "lon": "-93.570727"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4514 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060604",
+    "lon": "-93.570614"
+  },
+  {
+    "owner": "DEANNE E FURAN TRUST",
+    "address": "4501 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061803",
+    "lon": "-93.570375"
+  },
+  {
+    "owner": "D L LARSON & J C LARSON",
+    "address": "4503 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061661",
+    "lon": "-93.570323"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4505 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.06151",
+    "lon": "-93.570267"
+  },
+  {
+    "owner": "JEFFREY S JOYCE LIV TR ET AL",
+    "address": "4507 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.061357",
+    "lon": "-93.570211"
+  },
+  {
+    "owner": "B A MACHMEIER/L M MACHMEIER",
+    "address": "4509 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061205",
+    "lon": "-93.570152"
+  },
+  {
+    "owner": "G J BUCKINGHAM/C BUCKINGHAM",
+    "address": "4511 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.061048",
+    "lon": "-93.570101"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4513 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.06089",
+    "lon": "-93.570026"
+  },
+  {
+    "owner": "JAY P YUNEK & DEBRA E YUNEK",
+    "address": "4515 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060753",
+    "lon": "-93.56989"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4517 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.06065",
+    "lon": "-93.569726"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4519 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.060592",
+    "lon": "-93.569525"
+  },
+  {
+    "owner": "JON D GRUBB & LEAH GRUBB",
+    "address": "4521 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060516",
+    "lon": "-93.569346"
+  },
+  {
+    "owner": "T J LINDEMAN & D L LINDEMAN",
+    "address": "4523 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060437",
+    "lon": "-93.56918"
+  },
+  {
+    "owner": "G M SHARP & P L SHARP",
+    "address": "4525 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060323",
+    "lon": "-93.56902"
+  },
+  {
+    "owner": "D A MARQUIS / J W MARQUIS",
+    "address": "4527 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.060168",
+    "lon": "-93.568904"
+  },
+  {
+    "owner": "J H SCHERER & J M SCHERER",
+    "address": "4547 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.058877",
+    "lon": "-93.568943"
+  },
+  {
+    "owner": "M R SMITH AND K R SMITH",
+    "address": "4549 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.058779",
+    "lon": "-93.569152"
+  },
+  {
+    "owner": "TRUST AGRMT OF G&L ANDERSON",
+    "address": "4551 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.058818",
+    "lon": "-93.569431"
+  },
+  {
+    "owner": "MARK OF EXCELLENCE HOMES INC",
+    "address": "4553 TOVERO TR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.058887",
+    "lon": "-93.56966"
+  },
+  {
+    "owner": "M P MCMAHON & M L MCMAHON",
+    "address": "1592 MARSH POINTE CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.058148",
+    "lon": "-93.563466"
+  },
+  {
+    "owner": "HANSON BUILDERS INC",
+    "address": "1986 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057693",
+    "lon": "-93.568197"
+  },
+  {
+    "owner": "HANSON BUILDERS INC",
+    "address": "1984 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057531",
+    "lon": "-93.567651"
+  },
+  {
+    "owner": "U U REHMAN & S B CHOUDHRY",
+    "address": "1982 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057237",
+    "lon": "-93.567657"
+  },
+  {
+    "owner": "HANSON BUILDERS INC",
+    "address": "1973 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.056995",
+    "lon": "-93.568134"
+  },
+  {
+    "owner": "ASAD TARAR & NIDA TARAR",
+    "address": "2000 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057933",
+    "lon": "-93.570447"
+  },
+  {
+    "owner": "R ZEILINGER & E ZEILINGER",
+    "address": "1998 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057931",
+    "lon": "-93.570118"
+  },
+  {
+    "owner": "GARRETT GLAUS & CASIE GLAUS",
+    "address": "1996 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.05793",
+    "lon": "-93.569823"
+  },
+  {
+    "owner": "JENNIPHER MATTSON",
+    "address": "1994 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057928",
+    "lon": "-93.569529"
+  },
+  {
+    "owner": "TIMOTHY JAMES GENCK",
+    "address": "1988 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057806",
+    "lon": "-93.568547"
+  },
+  {
+    "owner": "KATHRYN E FOSS TRUST",
+    "address": "1975 LEAPING DEER CIR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057008",
+    "lon": "-93.568553"
+  },
+  {
+    "owner": "LISA K NAUSS",
+    "address": "4326 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056963",
+    "lon": "-93.570413"
+  },
+  {
+    "owner": "S KASIREDDY/P P R Y SANDINTI",
+    "address": "4324 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056753",
+    "lon": "-93.570522"
+  },
+  {
+    "owner": "ALEX CARVER/CAROLINA CARVER",
+    "address": "4314 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056106",
+    "lon": "-93.57096"
+  },
+  {
+    "owner": "BRET & DEBORAH KREUER",
+    "address": "4310 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.05565",
+    "lon": "-93.571292"
+  },
+  {
+    "owner": "M J HINGTGEN & R S HINGTGEN",
+    "address": "4306 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.055261",
+    "lon": "-93.571792"
+  },
+  {
+    "owner": "R HUBBARD & S M HUBBARD",
+    "address": "4304 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.055099",
+    "lon": "-93.572064"
+  },
+  {
+    "owner": "HANSON BUILDERS INC",
+    "address": "4302 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.054985",
+    "lon": "-93.572384"
+  },
+  {
+    "owner": "DANIEL DOHERTY/HEIDI DOHERTY",
+    "address": "4307 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.055673",
+    "lon": "-93.57217"
+  },
+  {
+    "owner": "HANSON BUILDERS INC",
+    "address": "1811 BROOKVIEW CT, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.056091",
+    "lon": "-93.571673"
+  },
+  {
+    "owner": "A L MCLEVISH & M E DIBONA",
+    "address": "1813 BROOKVIEW CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056146",
+    "lon": "-93.572023"
+  },
+  {
+    "owner": "RYAN J BUCKI/DANIELLE BUCKI",
+    "address": "1815 BROOKVIEW CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056297",
+    "lon": "-93.572327"
+  },
+  {
+    "owner": "J LUCAS & A D LUCAS",
+    "address": "1817 BROOKVIEW CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056596",
+    "lon": "-93.572345"
+  },
+  {
+    "owner": "RYAN WEISBECK ET AL",
+    "address": "1818 BROOKVIEW CT, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.056854",
+    "lon": "-93.572088"
+  },
+  {
+    "owner": "CHARLES ALVINO/SHWETA GODSE",
+    "address": "4323 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057184",
+    "lon": "-93.571131"
+  },
+  {
+    "owner": "M E SCHALL & A E SCHALL",
+    "address": "4325 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057385",
+    "lon": "-93.571186"
+  },
+  {
+    "owner": "RYAN G D'KAE & HEIDI J D'KAE",
+    "address": "4327 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2025,
+    "lat": "45.057589",
+    "lon": "-93.5712"
+  },
+  {
+    "owner": "DAVID GLEASON/KARLY GLEASON",
+    "address": "4329 HILLSIDE DR, MEDINA MN 55340",
+    "build_yr": 2024,
+    "lat": "45.057794",
+    "lon": "-93.571195"
+  },
+  {
+    "owner": "KRISTY BARNETT",
+    "address": "13823 102ND CT N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.139538",
+    "lon": "-93.45679"
+  },
+  {
+    "owner": "GB APARTMENTS LLC",
+    "address": "13785 102ND CT N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.139335",
+    "lon": "-93.456271"
+  },
+  {
+    "owner": "MARY JENNIFER HALL TRS ET AL",
+    "address": "13763 102ND CT N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.139202",
+    "lon": "-93.455932"
+  },
+  {
+    "owner": "GB APARTMENTS LLC",
+    "address": "13745 102ND CT N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.139138",
+    "lon": "-93.455756"
+  },
+  {
+    "owner": "700 AMERICAN LLLP",
+    "address": "700 AMERICAN BLVD W, BLOOMINGTON MN 55420",
+    "build_yr": 2025,
+    "lat": "44.859783",
+    "lon": "-93.289426"
+  },
+  {
+    "owner": "THE KNOX LLC ET AL",
+    "address": "1801 AMERICAN BLVD W, BLOOMINGTON MN 55431",
+    "build_yr": 2024,
+    "lat": "44.85817",
+    "lon": "-93.302641"
+  },
+  {
+    "owner": "CITY OF BLOOMINGTON",
+    "address": "1001 85TH ST W, BLOOMINGTON MN 55420",
+    "build_yr": 2025,
+    "lat": "44.849362",
+    "lon": "-93.29318"
+  },
+  {
+    "owner": "3027 JAMES LLC",
+    "address": "3027 JAMES AVE S, MINNEAPOLIS MN 55408",
+    "build_yr": 2024,
+    "lat": "44.94744",
+    "lon": "-93.303013"
+  },
+  {
+    "owner": "3213 HOLMES LLC",
+    "address": "3213 HOLMES AVE S, MINNEAPOLIS MN 55408",
+    "build_yr": 2025,
+    "lat": "44.944225",
+    "lon": "-93.299236"
+  },
+  {
+    "owner": "HENNEPIN COUNTY HRA",
+    "address": "4230 IRVING AVE N, MINNEAPOLIS MN 55412",
+    "build_yr": 2024,
+    "lat": "45.032378",
+    "lon": "-93.299213"
+  },
+  {
+    "owner": "DREAM HOMES INC",
+    "address": "6612 WARREN AVE, EDINA MN 55439",
+    "build_yr": 2025,
+    "lat": "44.882829",
+    "lon": "-93.357699"
+  },
+  {
+    "owner": "AMIRA VILLAS MINNETONKA LLC",
+    "address": "901 CARLSON PKWY, MINNETONKA MN 55305",
+    "build_yr": 2025,
+    "lat": "44.972004",
+    "lon": "-93.468027"
+  },
+  {
+    "owner": "WALSER REAL ESTATE LLC",
+    "address": "15700 WAYZATA BLVD, MINNETONKA MN 55391",
+    "build_yr": 2024,
+    "lat": "44.97318",
+    "lon": "-93.477433"
+  },
+  {
+    "owner": "MINNETONKA 55+ HSG PTNRS LLC",
+    "address": "1508 CLARE LA, MINNETONKA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.968986",
+    "lon": "-93.475386"
+  },
+  {
+    "owner": "MINNETONKA WBLVD MC OWN LLC",
+    "address": "1520 CLARE LA, MINNETONKA MN 55391",
+    "build_yr": 2025,
+    "lat": "44.968035",
+    "lon": "-93.473289"
+  },
+  {
+    "owner": "PALKERT REVOC LIVING TRUST",
+    "address": "1613 HOLDRIDGE TER, WAYZATA MN 55391",
+    "build_yr": 2024,
+    "lat": "44.968105",
+    "lon": "-93.478648"
+  },
+  {
+    "owner": "REGINA VONG & BUNRERTH MAO",
+    "address": "4824 56TH AVE N, CRYSTAL MN 55429",
+    "build_yr": 2024,
+    "lat": "45.053798",
+    "lon": "-93.342481"
+  },
+  {
+    "owner": "TRILLIUM WOODS LLC",
+    "address": "40 ADDRESS UNASSIGNED, PLYMOUTH MN 00000",
+    "build_yr": 2025,
+    "lat": "45.060111",
+    "lon": "-93.46457"
+  },
+  {
+    "owner": "T SCHWEIGER / R SCHWEIGER",
+    "address": "5260 POLARIS LA N, PLYMOUTH MN 55446",
+    "build_yr": 2024,
+    "lat": "45.051697",
+    "lon": "-93.472183"
+  },
+  {
+    "owner": "STEPHANIE CHAN",
+    "address": "5265 POLARIS LA N, PLYMOUTH MN 55446",
+    "build_yr": 2025,
+    "lat": "45.051173",
+    "lon": "-93.472676"
+  },
+  {
+    "owner": "T C HEINTZ & K HEINTZ",
+    "address": "5255 POLARIS LA N, PLYMOUTH MN 55446",
+    "build_yr": 2024,
+    "lat": "45.051111",
+    "lon": "-93.472355"
+  },
+  {
+    "owner": "M/I HOMES/MPLS/ST PAUL LLC",
+    "address": "10700 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148878",
+    "lon": "-93.462565"
+  },
+  {
+    "owner": "MICHAELA FACCHINELLO",
+    "address": "10720 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.149218",
+    "lon": "-93.462548"
+  },
+  {
+    "owner": "MARIAH A KETTLER",
+    "address": "14390 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149402",
+    "lon": "-93.46312"
+  },
+  {
+    "owner": "M/I HOMES/MPLS/ST PAUL LLC",
+    "address": "14450 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149405",
+    "lon": "-93.463957"
+  },
+  {
+    "owner": "Z D SVOBODA & B M SVOBODA",
+    "address": "14490 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149406",
+    "lon": "-93.464707"
+  },
+  {
+    "owner": "R P KASIRAJAN/R P KATHIRESAN",
+    "address": "14530 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149407",
+    "lon": "-93.465017"
+  },
+  {
+    "owner": "GREEBA B GAMBLE",
+    "address": "14550 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149407",
+    "lon": "-93.465327"
+  },
+  {
+    "owner": "MARISA C WILLIAMS ET AL",
+    "address": "14570 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.149408",
+    "lon": "-93.465753"
+  },
+  {
+    "owner": "A M LUKE & W H HENGEN",
+    "address": "14590 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149408",
+    "lon": "-93.466063"
+  },
+  {
+    "owner": "D A GIORGI & D F GIORGI",
+    "address": "14640 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149409",
+    "lon": "-93.466373"
+  },
+  {
+    "owner": "D O AKOTO & K GYLLING",
+    "address": "14660 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149417",
+    "lon": "-93.466714"
+  },
+  {
+    "owner": "J L WHIPP II & A DALTON",
+    "address": "14403 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148899",
+    "lon": "-93.463418"
+  },
+  {
+    "owner": "FENET GUDU",
+    "address": "14433 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148911",
+    "lon": "-93.463756"
+  },
+  {
+    "owner": "M/I HOMES/MPLS/ST PAUL LLC",
+    "address": "14533 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148913",
+    "lon": "-93.464918"
+  },
+  {
+    "owner": "S N MCCLELLAN/N S CARPENTER",
+    "address": "14553 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148913",
+    "lon": "-93.465209"
+  },
+  {
+    "owner": "M A YASSIN & S A MUMIN",
+    "address": "14573 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148914",
+    "lon": "-93.4655"
+  },
+  {
+    "owner": "D A OLSON & C E OLSON",
+    "address": "14593 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148914",
+    "lon": "-93.465791"
+  },
+  {
+    "owner": "M/I HOMES/MPLS/ST PAUL LLC",
+    "address": "14623 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148915",
+    "lon": "-93.466081"
+  },
+  {
+    "owner": "JAKE M KALIS",
+    "address": "14643 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148915",
+    "lon": "-93.466372"
+  },
+  {
+    "owner": "D S UTRZAN & K C MROSAK",
+    "address": "10715 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148919",
+    "lon": "-93.46747"
+  },
+  {
+    "owner": "D B THORSON & C R THORSON",
+    "address": "10725 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.149111",
+    "lon": "-93.467305"
+  },
+  {
+    "owner": "THOMAS J DEVINE JR",
+    "address": "14670 107TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14932",
+    "lon": "-93.467083"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "14748 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145553",
+    "lon": "-93.467584"
+  },
+  {
+    "owner": "S A KELLING & C A KELLING",
+    "address": "14724 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14569",
+    "lon": "-93.467415"
+  },
+  {
+    "owner": "PAIGE GOEDJEN",
+    "address": "14710 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145775",
+    "lon": "-93.467176"
+  },
+  {
+    "owner": "MARIAN S GEIRE",
+    "address": "14795 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146136",
+    "lon": "-93.468026"
+  },
+  {
+    "owner": "MOHAMED GARSO",
+    "address": "14775 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146222",
+    "lon": "-93.467778"
+  },
+  {
+    "owner": "VILAMONE & BINH TRAN ET AL",
+    "address": "14755 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.1463",
+    "lon": "-93.467552"
+  },
+  {
+    "owner": "J A JUMALE / F Y HUSSEIN",
+    "address": "14735 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146382",
+    "lon": "-93.467325"
+  },
+  {
+    "owner": "ASHLEY & JOSEPH RUE",
+    "address": "14715 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146449",
+    "lon": "-93.467085"
+  },
+  {
+    "owner": "M E MARQUES & R D C D REIS",
+    "address": "14740 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146794",
+    "lon": "-93.467792"
+  },
+  {
+    "owner": "E J NEMETZ & G NEMETZ",
+    "address": "14760 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146714",
+    "lon": "-93.46802"
+  },
+  {
+    "owner": "L WILLIAMS & V WILLIAMS",
+    "address": "14800 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146614",
+    "lon": "-93.468282"
+  },
+  {
+    "owner": "C R REED & X N REED",
+    "address": "10582 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146945",
+    "lon": "-93.468177"
+  },
+  {
+    "owner": "MEGGAN A & JOSEPH T ANTONY",
+    "address": "10602 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14714",
+    "lon": "-93.468106"
+  },
+  {
+    "owner": "M COUCORE & A IBRHAIM",
+    "address": "10624 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147325",
+    "lon": "-93.468068"
+  },
+  {
+    "owner": "T GUZMAN/J REBOLLEDO ET AL",
+    "address": "10632 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147505",
+    "lon": "-93.468121"
+  },
+  {
+    "owner": "J M BEVERLY & M BEVERLY JR",
+    "address": "10636 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14771",
+    "lon": "-93.468181"
+  },
+  {
+    "owner": "BRIAN & SARA NEVISON",
+    "address": "10675 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147857",
+    "lon": "-93.467807"
+  },
+  {
+    "owner": "K HAMSKI & B SHARRATT",
+    "address": "10671 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147698",
+    "lon": "-93.467602"
+  },
+  {
+    "owner": "A SRIDHARA/A B KRISHNAMURTHY",
+    "address": "10669 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147588",
+    "lon": "-93.467408"
+  },
+  {
+    "owner": "AINE & CHRIS LAFFIN",
+    "address": "10661 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147517",
+    "lon": "-93.467177"
+  },
+  {
+    "owner": "JACQUELINE HAUSMANN",
+    "address": "10674 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148299",
+    "lon": "-93.467275"
+  },
+  {
+    "owner": "SAVANNAH ELOUISE LIMITED TR",
+    "address": "10668 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148204",
+    "lon": "-93.467044"
+  },
+  {
+    "owner": "MAIMUNA DJAMA",
+    "address": "15005 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145643",
+    "lon": "-93.471078"
+  },
+  {
+    "owner": "MOHIT MOHAN & POOJA SAXENA",
+    "address": "14985 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145634",
+    "lon": "-93.47078"
+  },
+  {
+    "owner": "JORGE L S PLASENCIA ET AL",
+    "address": "14965 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145642",
+    "lon": "-93.47053"
+  },
+  {
+    "owner": "RUPINDER KAUR THIND",
+    "address": "14945 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145652",
+    "lon": "-93.470278"
+  },
+  {
+    "owner": "J J VIRTUE & A M SIMONET",
+    "address": "14925 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145663",
+    "lon": "-93.470027"
+  },
+  {
+    "owner": "T CARLSON & J P CARLSON",
+    "address": "14905 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145672",
+    "lon": "-93.469773"
+  },
+  {
+    "owner": "CHARLOTTE ALEXIS KAY",
+    "address": "14895 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145684",
+    "lon": "-93.469501"
+  },
+  {
+    "owner": "P K KISTAREDDYGARI ET AL",
+    "address": "14875 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145732",
+    "lon": "-93.46922"
+  },
+  {
+    "owner": "PRATAP NAGA",
+    "address": "14855 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145809",
+    "lon": "-93.468966"
+  },
+  {
+    "owner": "H A HUSSEIN/A H OTHMAN ET AL",
+    "address": "14835 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145892",
+    "lon": "-93.468736"
+  },
+  {
+    "owner": "PAVAN KUMAR REDDY GUNNA",
+    "address": "14815 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145974",
+    "lon": "-93.468497"
+  },
+  {
+    "owner": "C L GRAHAM & A A GRAHAM",
+    "address": "10535 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146103",
+    "lon": "-93.47048"
+  },
+  {
+    "owner": "V SINGH & K SIKARWAR",
+    "address": "10545 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146305",
+    "lon": "-93.470495"
+  },
+  {
+    "owner": "OMOTAYO BODUNWA",
+    "address": "10555 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146499",
+    "lon": "-93.470473"
+  },
+  {
+    "owner": "N R CHALAGONDA/A RACHAMADUGU",
+    "address": "10565 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146681",
+    "lon": "-93.470438"
+  },
+  {
+    "owner": "RACHEL VERACE/MARK VERACE",
+    "address": "10575 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146881",
+    "lon": "-93.470437"
+  },
+  {
+    "owner": "S K A BONDADA/P KANCHARLA",
+    "address": "10585 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14711",
+    "lon": "-93.470323"
+  },
+  {
+    "owner": "N D RIAL & B JO WEINAND",
+    "address": "10595 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147201",
+    "lon": "-93.46994"
+  },
+  {
+    "owner": "H M BAILEY & J D BAILEY",
+    "address": "10590 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147137",
+    "lon": "-93.469552"
+  },
+  {
+    "owner": "TYLER PAULEON/JANET TON LOI",
+    "address": "10580 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14689",
+    "lon": "-93.469399"
+  },
+  {
+    "owner": "R M V NANDIMANDALAM ET AL",
+    "address": "10570 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146668",
+    "lon": "-93.469523"
+  },
+  {
+    "owner": "GUILLAUME GIRBEAU ET AL",
+    "address": "10560 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146513",
+    "lon": "-93.469668"
+  },
+  {
+    "owner": "TRISHA HORNING/TYLER HORNING",
+    "address": "10550 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146334",
+    "lon": "-93.469764"
+  },
+  {
+    "owner": "NAWJEET SINGH/SNEHA SINGH",
+    "address": "10540 KINGSVIEW LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146136",
+    "lon": "-93.469744"
+  },
+  {
+    "owner": "A N SHURIYE & F H ABDI",
+    "address": "14860 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146264",
+    "lon": "-93.469336"
+  },
+  {
+    "owner": "CAI JIAN ZHU/LINGHONG LIN",
+    "address": "14840 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146394",
+    "lon": "-93.469101"
+  },
+  {
+    "owner": "ERIK GOETZKE/MONICA GOETZKE",
+    "address": "14820 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146443",
+    "lon": "-93.468828"
+  },
+  {
+    "owner": "AKY GROUP LLC",
+    "address": "10571 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146676",
+    "lon": "-93.468951"
+  },
+  {
+    "owner": "E ELKERTON & B ROBERTS",
+    "address": "10581 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146855",
+    "lon": "-93.468923"
+  },
+  {
+    "owner": "P KHONKHAMMY & C KHONKHAMMY",
+    "address": "10591 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147037",
+    "lon": "-93.468931"
+  },
+  {
+    "owner": "JUDITH ONSOMU",
+    "address": "10615 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147215",
+    "lon": "-93.468942"
+  },
+  {
+    "owner": "P K R YADDALA & H GORTHY",
+    "address": "10625 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147389",
+    "lon": "-93.468947"
+  },
+  {
+    "owner": "ANH CONG TRAN/TUY THI HOANG",
+    "address": "10635 JUNEAU LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147587",
+    "lon": "-93.468917"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10574 MINNESOTA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146935",
+    "lon": "-93.470945"
+  },
+  {
+    "owner": "W BACHANI & A SALYANI",
+    "address": "10584 MINNESOTA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147147",
+    "lon": "-93.470909"
+  },
+  {
+    "owner": "C A DITTMAN & J P DITTMAN JR",
+    "address": "14947 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147434",
+    "lon": "-93.470526"
+  },
+  {
+    "owner": "NOCHOLAS WEBB & TIFFANY WEBB",
+    "address": "14927 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147503",
+    "lon": "-93.470232"
+  },
+  {
+    "owner": "B ROBECK & A ROBECK",
+    "address": "14897 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147582",
+    "lon": "-93.469923"
+  },
+  {
+    "owner": "N WAGNER & E WAGNER",
+    "address": "14877 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147577",
+    "lon": "-93.469609"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10577 MINNESOTA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146967",
+    "lon": "-93.471764"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "14910 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148047",
+    "lon": "-93.470263"
+  },
+  {
+    "owner": "M JORDAHL & O JORDAHL",
+    "address": "14890 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148151",
+    "lon": "-93.469949"
+  },
+  {
+    "owner": "J PERREAULT & R VOLD",
+    "address": "14870 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148208",
+    "lon": "-93.469616"
+  },
+  {
+    "owner": "J C HAEFLIGER ET AL REV TR",
+    "address": "14850 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148083",
+    "lon": "-93.469289"
+  },
+  {
+    "owner": "J POETHKE & C POETHKE",
+    "address": "14830 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148025",
+    "lon": "-93.468995"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "14810 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148049",
+    "lon": "-93.468685"
+  },
+  {
+    "owner": "A D A TIRADO ET AL",
+    "address": "14780 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14815",
+    "lon": "-93.468413"
+  },
+  {
+    "owner": "J G LAHR & C J LAHR",
+    "address": "14750 106TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148266",
+    "lon": "-93.468159"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10695 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14857",
+    "lon": "-93.467738"
+  },
+  {
+    "owner": "LYNDA SEITZ",
+    "address": "14698 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145827",
+    "lon": "-93.466972"
+  },
+  {
+    "owner": "ROSEMARY THOSTENSON",
+    "address": "14680 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145893",
+    "lon": "-93.466787"
+  },
+  {
+    "owner": "C P MERRITT & M L WIEBER",
+    "address": "14648 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145941",
+    "lon": "-93.46656"
+  },
+  {
+    "owner": "MARY ALVA NIMIS-TYSK",
+    "address": "14634 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145943",
+    "lon": "-93.466311"
+  },
+  {
+    "owner": "VIVIAN NGUYEN/ANHTUYET TRAN",
+    "address": "14616 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145894",
+    "lon": "-93.466099"
+  },
+  {
+    "owner": "MARY P QUIGLEY TRUST",
+    "address": "14610 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145864",
+    "lon": "-93.4659"
+  },
+  {
+    "owner": "HEIDI J BRINKMAN TRUST",
+    "address": "14604 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145834",
+    "lon": "-93.46566"
+  },
+  {
+    "owner": "A N HALSTROM & K HALSTROM",
+    "address": "14598 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145715",
+    "lon": "-93.465393"
+  },
+  {
+    "owner": "STEPHANIE RAE ANDERSON",
+    "address": "14595 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145498",
+    "lon": "-93.465293"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "14601 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14529",
+    "lon": "-93.465501"
+  },
+  {
+    "owner": "J R FLORY & J HEASER",
+    "address": "14613 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145194",
+    "lon": "-93.465707"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14625 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146537",
+    "lon": "-93.466281"
+  },
+  {
+    "owner": "KATE & JOHN AMAKYE",
+    "address": "10655 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14746",
+    "lon": "-93.466934"
+  },
+  {
+    "owner": "MARIO JULIANO",
+    "address": "10645 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147402",
+    "lon": "-93.46669"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10635 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147329",
+    "lon": "-93.466454"
+  },
+  {
+    "owner": "BRADLEY & NICOLE CULLEN",
+    "address": "10597 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147218",
+    "lon": "-93.466173"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14700 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147044",
+    "lon": "-93.466851"
+  },
+  {
+    "owner": "KATE CHRISTOPHER & PAUL JUDD",
+    "address": "10658 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148109",
+    "lon": "-93.466815"
+  },
+  {
+    "owner": "M J MITCHELL & K MITCHELL",
+    "address": "10650 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147927",
+    "lon": "-93.466376"
+  },
+  {
+    "owner": "AYAN YUSUF",
+    "address": "10642 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147832",
+    "lon": "-93.46615"
+  },
+  {
+    "owner": "FARDOSA AHMED HASSAN",
+    "address": "10634 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147742",
+    "lon": "-93.465932"
+  },
+  {
+    "owner": "N JOHNSON & S MILLER",
+    "address": "10626 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147653",
+    "lon": "-93.465655"
+  },
+  {
+    "owner": "MESSIAH K MOORE",
+    "address": "10620 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.147489",
+    "lon": "-93.465307"
+  },
+  {
+    "owner": "PATRICK & KELLY J BONNER",
+    "address": "10600 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147261",
+    "lon": "-93.465248"
+  },
+  {
+    "owner": "J L PETERSEN & T PETERSEN",
+    "address": "14600 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146976",
+    "lon": "-93.46559"
+  },
+  {
+    "owner": "K A HALVERSON/J W HALVERSON",
+    "address": "14590 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146941",
+    "lon": "-93.465335"
+  },
+  {
+    "owner": "DAWN LUND",
+    "address": "14580 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146908",
+    "lon": "-93.465129"
+  },
+  {
+    "owner": "A SPENCER & B M SPENCER",
+    "address": "10555 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146673",
+    "lon": "-93.464864"
+  },
+  {
+    "owner": "C D TOLLEFSON/J L TOLLEFSON",
+    "address": "10565 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146796",
+    "lon": "-93.464739"
+  },
+  {
+    "owner": "BRIAN THUN & BETSY THUN",
+    "address": "10575 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146933",
+    "lon": "-93.464677"
+  },
+  {
+    "owner": "LAURIE YAHN",
+    "address": "10585 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147057",
+    "lon": "-93.464602"
+  },
+  {
+    "owner": "JULIE MILNER",
+    "address": "10595 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147187",
+    "lon": "-93.464452"
+  },
+  {
+    "owner": "ABDUL SAMAD & AREEHA DURRANI",
+    "address": "14405 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148047",
+    "lon": "-93.463488"
+  },
+  {
+    "owner": "R RESKI & F LINDBERG",
+    "address": "14435 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148034",
+    "lon": "-93.46384"
+  },
+  {
+    "owner": "LUCIENNE THU NGUYEN ET AL",
+    "address": "14455 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148034",
+    "lon": "-93.464092"
+  },
+  {
+    "owner": "DEVAN HENRY",
+    "address": "14475 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148035",
+    "lon": "-93.464343"
+  },
+  {
+    "owner": "NICOLE R WEBER",
+    "address": "14495 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148035",
+    "lon": "-93.464595"
+  },
+  {
+    "owner": "ALLY MCALEESE & PELE LE",
+    "address": "14525 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148035",
+    "lon": "-93.464863"
+  },
+  {
+    "owner": "JAMES PAULSON/EYAS ABUIDRES",
+    "address": "14545 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148036",
+    "lon": "-93.465136"
+  },
+  {
+    "owner": "LEAH & SAMUEL A BAILEY",
+    "address": "14575 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148098",
+    "lon": "-93.465611"
+  },
+  {
+    "owner": "CHRISTINE & MATTHEW NIZNIK",
+    "address": "14650 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148589",
+    "lon": "-93.46664"
+  },
+  {
+    "owner": "ALVERIA P & LIONEL G CLARKE",
+    "address": "14630 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14859",
+    "lon": "-93.466166"
+  },
+  {
+    "owner": "JESSE & JUSTINE LAHN",
+    "address": "14600 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148579",
+    "lon": "-93.465895"
+  },
+  {
+    "owner": "UBAH MUSA",
+    "address": "14580 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148578",
+    "lon": "-93.465643"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14560 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148578",
+    "lon": "-93.465391"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14500 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148576",
+    "lon": "-93.464616"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14420 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148575",
+    "lon": "-93.463608"
+  },
+  {
+    "owner": "PULTE HOMES OF MN LLC",
+    "address": "14400 106TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148574",
+    "lon": "-93.463342"
+  },
+  {
+    "owner": "AMANDA M CLEPPE",
+    "address": "10606 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147137",
+    "lon": "-93.463337"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10614 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.147276",
+    "lon": "-93.463207"
+  },
+  {
+    "owner": "M F KOSZALKA JR/B L KOSZALKA",
+    "address": "10622 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.1474",
+    "lon": "-93.463107"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10662 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148102",
+    "lon": "-93.462687"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10670 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.148261",
+    "lon": "-93.462654"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10678 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148402",
+    "lon": "-93.462639"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10686 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148539",
+    "lon": "-93.462621"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10694 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.148676",
+    "lon": "-93.462606"
+  },
+  {
+    "owner": "WILLIAM EDWARD JACKSON JR",
+    "address": "14605 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146473",
+    "lon": "-93.465758"
+  },
+  {
+    "owner": "SHEILA A HANSON TRUST",
+    "address": "14585 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146432",
+    "lon": "-93.465527"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "14545 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146292",
+    "lon": "-93.465181"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "14525 105TH PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14617",
+    "lon": "-93.464962"
+  },
+  {
+    "owner": "PHILIP NOMURA & JANE NOMURA",
+    "address": "10558 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146349",
+    "lon": "-93.464202"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10568 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.146475",
+    "lon": "-93.464081"
+  },
+  {
+    "owner": "M F KOSZALKA JR/B L KOSZALKA",
+    "address": "10580 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14658",
+    "lon": "-93.463956"
+  },
+  {
+    "owner": "WEEKLEY HOMES LLC",
+    "address": "10586 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146688",
+    "lon": "-93.463822"
+  },
+  {
+    "owner": "MILLROSE PROPERTIES MN LLC",
+    "address": "10547 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146017",
+    "lon": "-93.463159"
+  },
+  {
+    "owner": "MILLROSE PROPERTIES MN LLC",
+    "address": "10549 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146074",
+    "lon": "-93.463088"
+  },
+  {
+    "owner": "MILLROSE PROPERTIES MN LLC",
+    "address": "10551 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146125",
+    "lon": "-93.463023"
+  },
+  {
+    "owner": "MILLROSE PROPERTIES MN LLC",
+    "address": "10553 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.146181",
+    "lon": "-93.462952"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10537 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145771",
+    "lon": "-93.463469"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10539 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145828",
+    "lon": "-93.463398"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10541 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145879",
+    "lon": "-93.463333"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10545 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145935",
+    "lon": "-93.463262"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10529 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145487",
+    "lon": "-93.463733"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10531 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145556",
+    "lon": "-93.46369"
+  },
+  {
+    "owner": "DEYONTA DA'RELL GREEN",
+    "address": "10533 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145619",
+    "lon": "-93.463652"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10535 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145688",
+    "lon": "-93.463609"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10523 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145202",
+    "lon": "-93.463622"
+  },
+  {
+    "owner": "GABRIELLE ANN BEKIUS",
+    "address": "10525 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145265",
+    "lon": "-93.46366"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10527 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145334",
+    "lon": "-93.463701"
+  },
+  {
+    "owner": "GEOFFREY RYAN DYBICZ",
+    "address": "10520 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145176",
+    "lon": "-93.463079"
+  },
+  {
+    "owner": "DMITRY GOLTS & KEZZA M GOLTS",
+    "address": "10522 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145242",
+    "lon": "-93.463103"
+  },
+  {
+    "owner": "SWARAJ MUKHERJEE",
+    "address": "10524 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145316",
+    "lon": "-93.463128"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10534 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145475",
+    "lon": "-93.463183"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10536 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145531",
+    "lon": "-93.463112"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10538 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145582",
+    "lon": "-93.463048"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10540 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145633",
+    "lon": "-93.462983"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10544 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145685",
+    "lon": "-93.462919"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10548 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145736",
+    "lon": "-93.462854"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10552 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145787",
+    "lon": "-93.46279"
+  },
+  {
+    "owner": "US HOME LLC",
+    "address": "10556 HARBOR LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.145843",
+    "lon": "-93.462719"
+  },
+  {
+    "owner": "HEIDI KOPACEK",
+    "address": "10388 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.142281",
+    "lon": "-93.4624"
+  },
+  {
+    "owner": "LUCELIA M HUSBY",
+    "address": "10384 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14221",
+    "lon": "-93.462402"
+  },
+  {
+    "owner": "HUYEN T HO",
+    "address": "10380 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.142145",
+    "lon": "-93.462404"
+  },
+  {
+    "owner": "M TOMIAK & L TOMIAK-POPHAM",
+    "address": "10376 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.142079",
+    "lon": "-93.462407"
+  },
+  {
+    "owner": "V JAISWAL/P K V PERUMAL",
+    "address": "10374 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.142013",
+    "lon": "-93.462409"
+  },
+  {
+    "owner": "RAVEN & CASEY THOMAS-ROGERS",
+    "address": "10370 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141942",
+    "lon": "-93.462412"
+  },
+  {
+    "owner": "RONALD LIU & NHUNG DOAN",
+    "address": "10366 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141828",
+    "lon": "-93.462424"
+  },
+  {
+    "owner": "CHRISTINA ROWE",
+    "address": "10362 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141758",
+    "lon": "-93.462436"
+  },
+  {
+    "owner": "R S BRUNNER & E B ANDERSON",
+    "address": "10360 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141692",
+    "lon": "-93.462446"
+  },
+  {
+    "owner": "GARETH HARCOMBE-MINSON ET AL",
+    "address": "10356 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141627",
+    "lon": "-93.462456"
+  },
+  {
+    "owner": "JANUSZ L/IVONA D WISNIEWSKA",
+    "address": "10354 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141561",
+    "lon": "-93.462466"
+  },
+  {
+    "owner": "E A BOOTH & J M BOOTH",
+    "address": "14401 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141574",
+    "lon": "-93.463419"
+  },
+  {
+    "owner": "THU TRANG THI TRAN",
+    "address": "14409 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141613",
+    "lon": "-93.463502"
+  },
+  {
+    "owner": "E MOGAKA & D OMITI",
+    "address": "14417 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14165",
+    "lon": "-93.46358"
+  },
+  {
+    "owner": "AN C TRAN & HUE QUI TAT",
+    "address": "14425 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141686",
+    "lon": "-93.463657"
+  },
+  {
+    "owner": "MOHAMMED ABOW/SAADIA QASEM",
+    "address": "14433 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141723",
+    "lon": "-93.463735"
+  },
+  {
+    "owner": "JESSICA REMER/JOSSLYNN REMER",
+    "address": "14447 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141762",
+    "lon": "-93.463818"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14453 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141823",
+    "lon": "-93.463947"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14465 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141862",
+    "lon": "-93.464031"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14473 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141898",
+    "lon": "-93.464108"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14481 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141935",
+    "lon": "-93.464186"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14491 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141971",
+    "lon": "-93.464263"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14499 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142011",
+    "lon": "-93.464347"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10365 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142101",
+    "lon": "-93.464724"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10371 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14216",
+    "lon": "-93.464668"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10375 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142215",
+    "lon": "-93.464617"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10381 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142274",
+    "lon": "-93.464561"
+  },
+  {
+    "owner": "AMRISH PATEL",
+    "address": "10421 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14284",
+    "lon": "-93.464629"
+  },
+  {
+    "owner": "HEATHER MARIE KNUTSON",
+    "address": "10425 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.142897",
+    "lon": "-93.464688"
+  },
+  {
+    "owner": "B A CHOUDHRY & M BASHIR",
+    "address": "10429 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14295",
+    "lon": "-93.464743"
+  },
+  {
+    "owner": "NAVIN ILANGO",
+    "address": "10435 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.143003",
+    "lon": "-93.464798"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10439 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.143061",
+    "lon": "-93.464857"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "14399 104TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142388",
+    "lon": "-93.463211"
+  },
+  {
+    "owner": "GALINA TUR & EUGENE TUR",
+    "address": "14411 104TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142398",
+    "lon": "-93.46331"
+  },
+  {
+    "owner": "EMILY A LEIGHTON",
+    "address": "14419 104TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142407",
+    "lon": "-93.463402"
+  },
+  {
+    "owner": "DHAVALKUMAR A RANA",
+    "address": "14423 104TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142417",
+    "lon": "-93.463494"
+  },
+  {
+    "owner": "SARA OPHOVEN",
+    "address": "14429 104TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142426",
+    "lon": "-93.463586"
+  },
+  {
+    "owner": "JULIE KIM",
+    "address": "14437 104TH AVE N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142437",
+    "lon": "-93.463685"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10398 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142587",
+    "lon": "-93.463982"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10396 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142516",
+    "lon": "-93.463984"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10392 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.14245",
+    "lon": "-93.463985"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10388 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142384",
+    "lon": "-93.463986"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10386 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142318",
+    "lon": "-93.463987"
+  },
+  {
+    "owner": "PULTE HOMES OF MINNESOTA LLC",
+    "address": "10382 ITHACA LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142247",
+    "lon": "-93.463989"
+  },
+  {
+    "owner": "MEGAN & LEO LICKFOLD",
+    "address": "14460 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142147",
+    "lon": "-93.463703"
+  },
+  {
+    "owner": "WARREN DEAN THOMAS REV TR",
+    "address": "14452 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142108",
+    "lon": "-93.463619"
+  },
+  {
+    "owner": "NIA COFFEY",
+    "address": "14444 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142071",
+    "lon": "-93.463541"
+  },
+  {
+    "owner": "MONTSERRAT LEON VIDAL",
+    "address": "14436 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142035",
+    "lon": "-93.463464"
+  },
+  {
+    "owner": "SHYAMALA ARUNACHALAM ET AL",
+    "address": "14428 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141999",
+    "lon": "-93.463387"
+  },
+  {
+    "owner": "B A LAHR & V J LAHR TRUST",
+    "address": "14420 103RD PL N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.141959",
+    "lon": "-93.463303"
+  },
+  {
+    "owner": "S GODDETY & T THUMMATATI",
+    "address": "10361 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141742",
+    "lon": "-93.462956"
+  },
+  {
+    "owner": "GLACIER LANE RENTAL LLC",
+    "address": "10363 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141812",
+    "lon": "-93.462947"
+  },
+  {
+    "owner": "YIFEI CHE & YUQIN CHENG",
+    "address": "10367 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141878",
+    "lon": "-93.462938"
+  },
+  {
+    "owner": "S C ARUNACHALAM/R KUMARAVELU",
+    "address": "10369 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.141943",
+    "lon": "-93.462929"
+  },
+  {
+    "owner": "LEAH ENGELSTAD",
+    "address": "10373 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.142014",
+    "lon": "-93.462919"
+  },
+  {
+    "owner": "M J MCKENZIE/T J VERNSTROM",
+    "address": "10379 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142129",
+    "lon": "-93.462926"
+  },
+  {
+    "owner": "S ARUNACHALAM ET AL",
+    "address": "10383 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.1422",
+    "lon": "-93.462924"
+  },
+  {
+    "owner": "JEFFREY CHUN",
+    "address": "10385 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142266",
+    "lon": "-93.462922"
+  },
+  {
+    "owner": "ABDULRAHIM BURI",
+    "address": "10389 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142332",
+    "lon": "-93.46292"
+  },
+  {
+    "owner": "JANE M & MARK A BORTNEM",
+    "address": "10391 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142398",
+    "lon": "-93.462918"
+  },
+  {
+    "owner": "MADISON KATHLEEN JOHNSON",
+    "address": "10393 GLACIER LA N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.142469",
+    "lon": "-93.462915"
+  },
+  {
+    "owner": "THOMAS LLOYD KAY",
+    "address": "14621 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.145083",
+    "lon": "-93.465819"
+  },
+  {
+    "owner": "CATHERINE GROSSER",
+    "address": "14633 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.144977",
+    "lon": "-93.465946"
+  },
+  {
+    "owner": "MANOJ KUKALAKUNTIA",
+    "address": "14639 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2025,
+    "lat": "45.144878",
+    "lon": "-93.466079"
+  },
+  {
+    "owner": "BROOKE E BENNETT",
+    "address": "14645 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.14475",
+    "lon": "-93.466219"
+  },
+  {
+    "owner": "JILLENE SPADING",
+    "address": "14659 105TH CIR N, MAPLE GROVE MN 55369",
+    "build_yr": 2024,
+    "lat": "45.144606",
+    "lon": "-93.466426"
+  }
+]

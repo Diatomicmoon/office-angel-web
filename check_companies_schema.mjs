@@ -1,20 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.production.local' });
 
-const envFile = fs.readFileSync('office-angel-web/.env.local', 'utf8');
-const urlMatch = envFile.match(/NEXT_PUBLIC_SUPABASE_URL="(.*?)"/);
-const keyMatch = envFile.match(/SUPABASE_SERVICE_ROLE_KEY="(.*?)"/);
-
-const supabase = createClient(urlMatch[1], keyMatch[1]);
-
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 async function check() {
   const { data, error } = await supabase.from('companies').select('*').limit(1);
-  if (error) {
-    console.error("Error:", error);
-  } else if (data && data.length > 0) {
-    console.log("Columns:", Object.keys(data[0]));
-  } else {
-    console.log("No data found.");
-  }
+  if (error) console.error(error);
+  else console.log(Object.keys(data[0]));
 }
 check();

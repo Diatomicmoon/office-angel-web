@@ -1,24 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
+import { resolveCompanyIdOrThrow } from '@/lib/tenant';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-  
-  const { data: companies } = await supabase
-    .from('companies')
-    .select('id')
-    .limit(1);
-
-  if (!companies || companies.length === 0) {
-    return NextResponse.json({ visits: [] });
-  }
-
-  const companyId = companies?.[0]?.id;
+  try {
+    const { companyId } = await resolveCompanyIdOrThrow();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+    );
 
   // Fetch manually logged visits
   const { data: manualVisits } = await supabase
@@ -71,43 +63,70 @@ export async function GET(request: Request) {
   });
 
   return NextResponse.json({ visits: combined });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  try {
+    const { companyId } = await resolveCompanyIdOrThrow();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+    );
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
+
+    await supabase.from('door_knocking_visits').delete().eq('id', id).eq('company_id', companyId);
+    await supabase.from('leads').delete().eq('id', id).eq('company_id', companyId);
+    await supabase.from('new_build_permits').delete().eq('id', id).eq('company_id', companyId);
+
+  return NextResponse.json({ success: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function POST(request: Request) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  try {
+    const { companyId } = await resolveCompanyIdOrThrow();
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+    );
 
-  const { data: companies } = await supabase
-    .from('companies')
-    .select('id')
-    .limit(1);
+    const body = await request.json();
+    const { id, ...visitData } = body; 
+    
+    if (id) {
+      const { data: leadData, error: lErr } = await supabase.from('leads').update({ interest_level: visitData.interest_level, notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`, status: visitData.interest_level === 'hot' ? 'contacted' : 'new' }).eq('id', id).eq('company_id', companyId).select();
+      const { data: buildData, error: bErr } = await supabase.from('new_build_permits').update({ status: visitData.interest_level === 'hot' ? 'contacted' : 'knocked' }).eq('id', id).eq('company_id', companyId).select();
+      const { data: manualData, error: mErr } = await supabase.from('door_knocking_visits').update({
+         interest_level: visitData.interest_level,
+         notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`
+      }).eq('id', id).eq('company_id', companyId).select();
 
-  if (!companies || companies.length === 0) {
-    return NextResponse.json({ error: 'No company found' }, { status: 400 });
+    // If it was successfully updated in one of the tables, return success.
+    // Do NOT create a new duplicate row.
+    if ((leadData && leadData.length > 0) || (buildData && buildData.length > 0) || (manualData && manualData.length > 0)) {
+       return NextResponse.json({ success: true, updated: true });
+    }
   }
 
-  const body = await request.json();
-  const { id, ...visitData } = body; // remove id to prevent uuid collision
-  
-  // Also try to update the lead/new_build if they exist to keep statuses synced
-  if (id) {
-    // Try updating leads
-    await supabase.from('leads').update({ interest_level: visitData.interest_level, notes: visitData.notes, status: visitData.interest_level === 'hot' ? 'contacted' : 'new' }).eq('id', id);
-    // Try updating new builds
-    await supabase.from('new_build_permits').update({ status: visitData.interest_level === 'hot' ? 'contacted' : 'knocked' }).eq('id', id);
-  }
-
-  
+  // If it has no ID, it's a brand new pin dropped on an empty spot on the map
   const dbVisit = {
-    company_id: companies?.[0]?.id,
+    company_id: companyId,
     resident_name: visitData.resident_name,
     address: visitData.address,
     latitude: visitData.latitude,
     longitude: visitData.longitude,
     interest_level: visitData.interest_level,
-    notes: visitData.notes,
+    // Add sales rep name into the notes since the column doesn't exist yet
+    notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`,
     visited_at: new Date().toISOString()
   };
 
@@ -115,7 +134,9 @@ export async function POST(request: Request) {
     .from('door_knocking_visits')
     .insert([dbVisit]);
 
-
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, inserted: true });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }

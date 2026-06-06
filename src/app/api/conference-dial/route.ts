@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const accountSid = process.env.TWILIO_ACCOUNT_SID!;
     const authToken = process.env.TWILIO_AUTH_TOKEN!;
     const twilioPhone = process.env.TWILIO_PHONE_NUMBER!;
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.office-angel.com";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.hardhat-solutions.com";
     const auth = "Basic " + Buffer.from(`${accountSid}:${authToken}`).toString("base64");
 
     // TwiML for dispatcher — they join as a regular speaker

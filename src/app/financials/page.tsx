@@ -153,7 +153,7 @@ export default function FinancialsPage() {
                         Paid
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500 text-xs">Office Angel (SMS)</td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">Hard Hat Solutions (SMS)</td>
                     <td className="px-6 py-4 text-right">
                       <span className="text-gray-400 text-xs">Closed</span>
                     </td>
@@ -166,7 +166,7 @@ export default function FinancialsPage() {
                         Pending
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500 text-xs">Office Angel (SMS)</td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">Hard Hat Solutions (SMS)</td>
                     <td className="px-6 py-4 text-right">
                       <button className="text-blue-600 font-medium hover:underline">Copy Link</button>
                     </td>

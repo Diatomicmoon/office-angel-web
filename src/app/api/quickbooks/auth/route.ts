@@ -3,8 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function GET(req: Request) {
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
   );
 
   let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
@@ -18,7 +18,7 @@ export async function GET(req: Request) {
   }
 
   const clientId = process.env.QUICKBOOKS_CLIENT_ID || "AB92XjkDS1CCAJqWexCSXpPl5Iq2ujZDo4FOpLBBzt4Dvo0z1K";
-  const redirectUri = "https://www.office-angel.com/api/quickbooks/callback";
+  const redirectUri = "https://www.hardhat-solutions.com/api/quickbooks/callback";
   const scope = "com.intuit.quickbooks.accounting";
   const state = companyId; // Pass company ID through state to link it when QuickBooks returns
 

@@ -1,6 +1,10 @@
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+// Note: For Next.js App Router API Routes, the body size limit cannot be bypassed with 'config.api.bodyParser'.
+// If 413 Payload Too Large happens on Vercel, it must be changed in vercel.json.
+
+
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
@@ -13,13 +17,14 @@ It could either be a "receipt" from a supply house, a "lead" (a new work order o
 
 CRITICAL CLASSIFICATION RULES:
 1. If the email is from a city, municipality, state inspector, ePermits system, or AHJ (or contains words like "permit", "inspection", "building code"), you MUST classify it as "permit". Even if the email includes a fee payment confirmation or invoice for the permit, it is a "permit", NOT a "receipt".
-2. If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip (from places like Home Depot, JH Larson, CED), you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
+2. If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip (from places like Home Depot, JH Larson, CED, Viking Electric), you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
+3. If the email is a customer asking for work, an online form submission, or a new work order, classify it as "lead". DO NOT classify emails from supply houses (JH Larson, CED, etc.) as leads.
 
 FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). DO NOT just copy the raw cryptic part numbers into the description. Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
 
-FOR JOB NUMBER OR PO (Receipts only): Carefully scan the receipt/invoice for a "PO Number", "Job Name", "Ship To", "Project", or handwritten notes indicating which job this material was purchased for. If you find one, extract it into 'job_number_or_po'.
+FOR JOB NUMBER OR PO (Receipts only): Carefully scan the receipt/invoice for a "PO Number", "Job Name", "Ship To", "Project", or handwritten notes indicating which job this material was purchased for. If you find one, extract it into 'job_number_or_po'. CRITICAL: Do NOT extract the supplier/store name (like "JH Larson", "CED", "Home Depot", "Viking Electric") as the Job/PO Name! The job name is usually an address, a person's name, or a specific project name, not the wholesale house you bought it from.
 
-FOR SUPPLIER NAME (Receipts only): Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). If the receipt was forwarded, look at the original sender's email address domain.
+FOR SUPPLIER NAME (Receipts only): Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). Ensure "JH Larson" and similar companies are ALWAYS placed here in 'supplier_name', never in 'job_number_or_po'. If the receipt was forwarded, look at the original sender's email address domain.
 
 Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
 
@@ -155,7 +160,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co', process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder');
     
     let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
     if (!companyId && toEmail) {
@@ -249,6 +254,28 @@ export async function POST(req: Request) {
       status: autoLinked ? 'Reviewed' : 'Action Required', // Auto-mark as reviewed if AI confidently linked it
       line_items: parsed.line_items || []
     }]);
+
+    // Update the proprietary pricing database (material_catalog) so estimators have live prices
+    if (parsed.line_items && parsed.line_items.length > 0) {
+      const catalogUpserts = parsed.line_items.map((item: any) => ({
+        company_id: companyId,
+        sku: item.description, // We use the plain English description from AI as the SKU for estimating ease
+        description: item.description,
+        latest_cost: item.unit_price,
+        supplier_name: parsed.supplier_name || sender,
+        last_updated: new Date().toISOString()
+      })).filter((item: any) => item.latest_cost > 0);
+
+      if (catalogUpserts.length > 0) {
+        // Upsert into material_catalog (updates if company_id + sku exists, inserts if new)
+        const { error: catalogError } = await supabase
+          .from('material_catalog')
+          .upsert(catalogUpserts, { onConflict: 'company_id, sku' });
+          
+        if (catalogError) console.error('[Pricing Engine Upsert Error]:', catalogError);
+        else console.log(`[Pricing Engine] Successfully updated ${catalogUpserts.length} prices for company ${companyId}`);
+      }
+    }
 
     await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender, body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (Images: ${images.length})` }]);
     return NextResponse.json({ success: true, type: 'receipt' });

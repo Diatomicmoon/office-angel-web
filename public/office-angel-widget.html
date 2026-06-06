@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Office Angel Widget (Demo)</title>
+    <title>Hard Hat Solutions Widget (Demo)</title>
     <style>
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 24px; }
       label { display:block; font-size: 12px; font-weight: 700; color: #444; margin-top: 10px; }
@@ -44,7 +44,7 @@
           message: document.getElementById('message').value,
         };
 
-        const r = await fetch('https://www.office-angel.com/api/inbound-web', {
+        const r = await fetch('https://www.hardhat-solutions.com/api/inbound-web', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

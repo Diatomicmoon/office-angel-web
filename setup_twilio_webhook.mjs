@@ -1,10 +1,9 @@
 import twilio from 'twilio';
 
-// Load from env — never hardcode secrets
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const phoneNumber = process.env.TWILIO_PHONE_NUMBER || '+16123245110';
-const webhookUrl = 'https://office-angel-web.vercel.app/api/twilio-voice';
+const webhookUrl = 'https://www.office-angel.com/api/twilio-voice';
 
 if (!accountSid || !authToken) {
   console.error('❌ Missing TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN in environment');

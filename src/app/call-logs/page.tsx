@@ -174,10 +174,10 @@ export default function CallLogs() {
       </div>
 
       {/* Main Split View */}
-      <div className="flex-1 flex gap-6 overflow-hidden">
+      <div className="flex-1 flex flex-col md:flex-row gap-6 overflow-hidden">
         
         {/* Left Column: Call List */}
-        <div className="w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col overflow-hidden">
+        <div className={`md:w-1/3 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col ${selectedCall && 'hidden md:flex'}`}>
           <div className="p-4 border-b border-gray-200 bg-gray-50">
             <h3 className="font-semibold text-gray-900">Recent Calls (Today)</h3>
           </div>
@@ -231,12 +231,18 @@ export default function CallLogs() {
         </div>
 
         {/* Right Column: Call Detail View */}
-        <div className="w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col overflow-hidden">
+        <div className={`md:w-2/3 bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col overflow-hidden ${!selectedCall && 'hidden md:flex'}`}>
           
           {/* Detail Header & Audio Player */}
           <div className="p-6 border-b border-gray-200 bg-gray-50">
             <div className="flex justify-between items-start mb-6">
               <div>
+                <button 
+                  onClick={() => setSelectedId(null)} 
+                  className="md:hidden text-blue-600 font-semibold mb-2 flex items-center gap-1"
+                >
+                  ← Back to calls
+                </button>
                 <h2 className="text-2xl font-bold text-gray-900">{selectedCall?.customers?.phone_number || "Unknown"}</h2>
                 <p className="text-gray-500 mt-1">
                   {callerName || 'Unregistered Caller'}
@@ -260,10 +266,10 @@ export default function CallLogs() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 md:space-y-8">
             
             {/* AI Summary & Extraction Grid */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div className="space-y-3">
                 <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                   <FileText size={18} className="text-blue-600"/> 

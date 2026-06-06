@@ -1,6 +1,6 @@
-# Office Angel — Company Setup Procedure (Scalable)
+# Hard Hat Solutions — Company Setup Procedure (Scalable)
 
-This is the standardized onboarding checklist to get a new contractor/company live on Office Angel.
+This is the standardized onboarding checklist to get a new contractor/company live on Hard Hat Solutions.
 
 ## Core principles
 - **Scale cleanly:** one Twilio subaccount + one phone number per company.
@@ -51,8 +51,8 @@ Porting their existing business number into Twilio keeps their brand consistent.
 ---
 
 ## Twilio configuration (post-port or temporary number)
-- Voice webhook: `https://www.office-angel.com/api/twilio-voice`
-- SMS webhook: `https://www.office-angel.com/api/inbound-sms`
+- Voice webhook: `https://www.hardhat-solutions.com/api/twilio-voice`
+- SMS webhook: `https://www.hardhat-solutions.com/api/inbound-sms`
 - A2P 10DLC compliance may be required for long-code SMS.
 
 ---
@@ -60,23 +60,23 @@ Porting their existing business number into Twilio keeps their brand consistent.
 ## Website widget configuration
 - Pinned tenant mode (simple embed):
   ```html
-  <script src="https://www.office-angel.com/office-angel-widget.js"></script>
+  <script src="https://www.hardhat-solutions.com/hardhat-solutions-widget.js"></script>
   ```
 
 - Multi-tenant (auth mode): include company_id + webhook secret
   ```html
   <script
-    src="https://www.office-angel.com/office-angel-widget.js"
+    src="https://www.hardhat-solutions.com/hardhat-solutions-widget.js"
     data-company-id="YOUR_COMPANY_UUID"
     data-secret="YOUR_COMPANY_WEBHOOK_SECRET"
   ></script>
   ```
 
-Endpoint: `POST https://www.office-angel.com/api/inbound-web`
+Endpoint: `POST https://www.hardhat-solutions.com/api/inbound-web`
 
 ---
 
-## Internal setup steps (Office Angel)
+## Internal setup steps (Hard Hat Solutions)
 1) Create company row in `companies` (set `phone_number` E.164)
 2) Set scheduling hours (`schedule_start_minute`, `schedule_end_minute`)
 3) Set `forward_to_phone` for Co‑Pilot mode

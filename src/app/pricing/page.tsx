@@ -86,7 +86,7 @@ const competitors = [
   { name: "Basic Voice Tools", note: "Answer calls only. No scheduling, no CRM, no dashboard." },
   { name: "Generic AI Platforms", note: "Not built for trades. Miss the job flow entirely." },
   { name: "Human Answering Services", note: "Slower, expensive, and still require manual follow-up." },
-  { name: "Office Angel", note: "Purpose-built for trades. The complete AI back-office suite.", highlight: true },
+  { name: "Hard Hat Solutions", note: "Purpose-built for trades. The complete AI back-office suite.", highlight: true },
 ];
 
 export default function PricingPage() {
@@ -176,7 +176,7 @@ export default function PricingPage() {
         {/* Competitor Comparison */}
         <section className="bg-white border-t border-gray-200 py-16 md:py-20 px-4 md:px-8">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">Why contractors choose Office Angel.</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">Why contractors choose Hard Hat Solutions.</h2>
             <p className="text-center text-gray-500 mb-10 md:mb-12">Most tools solve one problem. We built the whole back office.</p>
             <div className="overflow-x-auto rounded-2xl border border-gray-200">
               <table className="w-full text-sm min-w-[400px]">
@@ -223,7 +223,7 @@ export default function PricingPage() {
                 },
                 {
                   q: "Does it work with my existing phone number?",
-                  a: "Yes. We forward overflow calls to Office Angel — your number stays exactly the same.",
+                  a: "Yes. We forward overflow calls to Hard Hat Solutions — your number stays exactly the same.",
                 },
                 {
                   q: "Does it work with Google and Apple Calendar?",
@@ -256,7 +256,7 @@ export default function PricingPage() {
 
       <footer className="bg-white py-8 border-t border-gray-200 text-center text-sm text-gray-500 px-4">
         <p>© 2026 Hard Hat Holdings LLC. All rights reserved.</p>
-        <p className="mt-2 text-xs text-gray-400 max-w-xl mx-auto">* Figures are estimates based on industry data and are provided for illustrative purposes only. Individual results will vary based on business type, call volume, and market conditions. Office Angel makes no guarantee of specific outcomes.</p>
+        <p className="mt-2 text-xs text-gray-400 max-w-xl mx-auto">* Figures are estimates based on industry data and are provided for illustrative purposes only. Individual results will vary based on business type, call volume, and market conditions. Hard Hat Solutions makes no guarantee of specific outcomes.</p>
       </footer>
     </div>
   );
