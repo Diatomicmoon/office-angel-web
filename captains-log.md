@@ -5,9 +5,9 @@ Source Sheet: https://docs.google.com/spreadsheets/d/1IUN6jvhaIj1H9YO9uMyhd2pGvN
 > This file is the local “buffer” log until Google Sheets write-access is connected.
 
 ## 2026-05-05 (America/Chicago)
-- Shifted focus away from TradeVolt and into **Office Angel**.
+- Shifted focus away from TradeVolt and into **Hard Hat Solutions**.
 - Confirmed local repo presence: `office-angel-web/` (Next.js + Supabase tooling/scripts).
-- Re-stated current Office Angel status (as of 2026-05-04): dashboard mostly built; AI Call Summaries + KPI boxes wired to Supabase; Vapi webhook saving end-of-call transcripts.
+- Re-stated current Hard Hat Solutions status (as of 2026-05-04): dashboard mostly built; AI Call Summaries + KPI boxes wired to Supabase; Vapi webhook saving end-of-call transcripts.
 - Re-stated next engineering priorities:
   - Live Field Status → real `technicians` table
   - AI Action Items → trigger from urgency flags/missed invoices
