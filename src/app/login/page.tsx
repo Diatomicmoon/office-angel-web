@@ -65,7 +65,7 @@ export default function Login() {
                 Book a free 30-minute demo and we&apos;ll walk you through everything — live, for your business.
               </p>
               <a
-                href="https://calendly.com/zaki-hardhat-solutions/30min"
+                href="https://calendly.com/zaki-office-angel/30min"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition-colors text-center"
