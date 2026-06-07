@@ -57,3 +57,7 @@ Walking Jakob through getting a Mapbox API key for the real heat map.
 **7. Native Field App (Half-Built)**
 - **Done:** Basic Expo structure exists (`field-os-app` folder).
 - **Needs Finish:** Finalizing the mobile UI for the technicians in the field, wiring up the job ticket view, and pushing the TestFlight build to your phone.
+
+**8. Co-Pilot Mode (Half-Built)**
+- **Done:** The basic UI exists for the dispatcher to see the live transcript, and the Settings toggle is wired up to switch between "AI answers" and "Human answers (Co-Pilot)".
+- **Needs Finish:** We need to finalize the Twilio SIP trunking / Conference bridging so that when a call rings the dispatcher's phone, the AI is silently patched in as a third listener to stream the transcript via WebSockets.
