@@ -66,3 +66,11 @@ Walking Jakob through getting a Mapbox API key for the real heat map.
 **9. Employee Performance & KPI Tracking (Half-Built)**
 - **Done:** We have the basic `technicians` table, timesheets table created, and they show up on the Dispatch map.
 - **Needs Finish:** We need to build a dedicated dashboard/view to track individual employee numbers (revenue generated, hours logged, jobs completed, closing rate) and properly link jobs and material receipts to specific technicians so business owners can see exactly who is profitable.
+
+**10. Predictive Canvassing Heat Map (Half-Built)**
+- **Done:** The toggle and UI logic exists on the canvassing map to display hot zones.
+- **Needs Finish:** The backend API (`/api/canvassing/heatmap`) is returning a hardcoded, fake array of zones ("High Propensity Zone A", etc.). We need to write the algorithm to actually group successful door knocks and recent permits into geographic clusters using PostGIS.
+
+**11. Supply Runner API Integration (Half-Built)**
+- **Done:** The UI allows you to build carts, edit quantities, and load kits.
+- **Needs Finish:** Clicking "Send to Supply House" just opens a generic `mailto:` email draft on the phone. We need to wire this to hit our SendGrid API to automatically dispatch professional Purchase Orders directly to the wholesale rep.
