@@ -62,3 +62,7 @@ Walking Jakob through getting a Mapbox API key for the real heat map.
 **8. Co-Pilot Mode (Half-Built)**
 - **Done:** The basic UI exists for the dispatcher to see the live transcript, and the Settings toggle is wired up to switch between "AI answers" and "Human answers (Co-Pilot)".
 - **Needs Finish:** We need to finalize the Twilio SIP trunking / Conference bridging so that when a call rings the dispatcher's phone, the AI is silently patched in as a third listener to stream the transcript via WebSockets.
+
+**9. Employee Performance & KPI Tracking (Half-Built)**
+- **Done:** We have the basic `technicians` table, timesheets table created, and they show up on the Dispatch map.
+- **Needs Finish:** We need to build a dedicated dashboard/view to track individual employee numbers (revenue generated, hours logged, jobs completed, closing rate) and properly link jobs and material receipts to specific technicians so business owners can see exactly who is profitable.
