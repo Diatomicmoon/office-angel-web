@@ -38,8 +38,9 @@ Walking Jakob through getting a Mapbox API key for the real heat map.
 - **Done:** Webhook endpoint built to catch inbound texts/appointments, sync endpoint built to pull contacts from GHL V2 API.
 - **Needs Finish:** Send a test payload from a GHL account to verify the webhook writes to Supabase, and trigger the manual sync to verify contacts pull correctly.
 
-**3. Material Pricing Catalog / Receipt OCR (Completed!)**
-- **Done:** SendGrid email parser successfully reads inbound wholesale receipts, drops line items into the `receipts` table, and upserts live material costs directly into the newly created `material_catalog` table so the AI Estimating engine always has the exact, up-to-the-minute wholesale price.
+**3. Material Pricing Engine / Receipt OCR (Half-Built)**
+- **Done:** The SendGrid email parser (/api/inbound-email) successfully catches inbound receipts and drops line items into the receipts table.
+- **Needs Finish:** We need to build the actual 'material_catalog' database table, add the logic to upsert those extracted prices into the catalog, and then build the actual AI Estimating Engine that uses those live prices to generate quotes.
 
 **4. Google Calendar Two-Way Sync (Half-Built)**
 - **Done:** Blueprint JSON exists (`office_angel_calendar_sync_blueprint.json`) for Make.com.
