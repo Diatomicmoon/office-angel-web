@@ -3,8 +3,32 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
 
 export default function Sidebar() {
+  const [role, setRole] = useState<string>('owner');
+  
+  useEffect(() => {
+    async function fetchRole() {
+      try {
+        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
+        const { data: userRes } = await supabase.auth.getUser();
+        if (userRes?.user) {
+          const { data } = await supabase.from('company_memberships').select('role').eq('user_id', userRes.user.id).limit(1);
+          if (data && data.length > 0) {
+            setRole(data[0].role);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch role", err);
+      }
+    }
+    fetchRole();
+  }, []);
+  
+  const isFieldRep = role === 'field_rep';
+
   const pathname = usePathname();
   const itemClass = (href: string) => {
     const active = pathname === href;
@@ -22,89 +46,89 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-4">
-        <Link href="/dashboard" className={itemClass('/dashboard')}>
+        {!isFieldRep && <Link href="/dashboard" className={itemClass('/dashboard')}>
           <Home size={20} />
           <span>Dashboard</span>
-        </Link>
-        <Link href="/call-logs" className={itemClass('/call-logs')}>
+        </Link>}}
+        {!isFieldRep && <Link href="/call-logs" className={itemClass('/call-logs')}>
           <Phone size={20} />
           <span>Call Logs</span>
-        </Link>
-        <Link href="/co-pilot" className={itemClass('/co-pilot')}>
+        </Link>}
+        {!isFieldRep && <Link href="/co-pilot" className={itemClass('/co-pilot')}>
           <Mic size={20} />
           <span className="flex items-center gap-2">
             Co-Pilot Mode 
             <span className="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">Beta</span>
           </span>
         </Link>
-        <Link href="/crm" className={itemClass('/crm')}>
+        {!isFieldRep && <Link href="/crm" className={itemClass('/crm')}>
           <Users size={20} />
           <span>Leads & CRM</span>
-        </Link>
+        </Link>}
         <Link href="/canvassing" className={itemClass('/canvassing')}>
           <Map size={20} />
           <span>Door-to-Door CRM</span>
         </Link>
-        <Link href="/projects" className={itemClass('/projects')}>
+        {!isFieldRep && <Link href="/projects" className={itemClass('/projects')}>
           <Archive size={20} />
           <span>Customers</span>
-        </Link>
-        <Link href="/jobs" className={itemClass('/jobs')}>
+        </Link>}
+        {!isFieldRep && <Link href="/jobs" className={itemClass('/jobs')}>
           <Briefcase size={20} />
           <span>Job Archive</span>
-        </Link>
+        </Link>}
         <Link href="/timesheets" className={itemClass('/timesheets')}>
           <Clock size={20} />
           <span>Timesheets & Payroll</span>
         </Link>
-        <Link href="/dispatch" className={itemClass('/dispatch')}>
+        {!isFieldRep && <Link href="/dispatch" className={itemClass('/dispatch')}>
           <Calendar size={20} />
           <span>Dispatch</span>
-        </Link>
-        <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
+        </Link>}
+        {!isFieldRep && <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
           <Inbox size={20} />
           <span>Scheduling Inbox</span>
-        </Link>
-        <Link href="/permits" className={itemClass('/permits')}>
+        </Link>}
+        {!isFieldRep && <Link href="/permits" className={itemClass('/permits')}>
           <FileText size={20} />
           <span>Permits & Inspections</span>
-        </Link>
-        <Link href="/pricing" className={itemClass('/pricing')}>
+        </Link>}
+        {!isFieldRep && <Link href="/pricing" className={itemClass('/pricing')}>
           <DollarSign size={20} />
           <span>Material Cost Engine</span>
-        </Link>
-        <Link href="/inbox" className={itemClass('/inbox')}>
+        </Link>}
+        {!isFieldRep && <Link href="/inbox" className={itemClass('/inbox')}>
           <Inbox size={20} />
           <span>AI Inbox & Docs</span>
-        </Link>
+        </Link>}
         <Link href="/field-app" className={itemClass('/field-app')}>
           <Smartphone size={20} />
           <span>Field App (Techs)</span>
         </Link>
-        <Link href="/marketing" className={itemClass('/marketing')}>
+        {!isFieldRep && <Link href="/marketing" className={itemClass('/marketing')}>
           <Share2 size={20} />
           <span>SEO & Marketing</span>
-        </Link>
-        <Link href="/receipts" className={itemClass('/receipts')}>
+        </Link>}
+        {!isFieldRep && <Link href="/receipts" className={itemClass('/receipts')}>
           <FileText size={20} />
           <span>Receipt Inbox</span>
-        </Link>
-        <Link href="/supply-runner" className={itemClass('/supply-runner')}>
+        </Link>}
+        {!isFieldRep && <Link href="/supply-runner" className={itemClass('/supply-runner')}>
           <Truck size={20} />
           <span>Supply Runner</span>
-        </Link>
-        <Link href="/financials" className={itemClass('/financials')}>
+        </Link>}
+        {!isFieldRep && <Link href="/financials" className={itemClass('/financials')}>
           <DollarSign size={20} />
           <span>Financial Command</span>
-        </Link>
+        </Link>}
       </nav>
 
-      <div className="p-4 border-t border-gray-800">
+      {!isFieldRep && <div className="p-4 border-t border-gray-800">
         <Link href="/settings" className={itemClass('/settings')}>
           <Settings size={20} />
           <span>Settings</span>
         </Link>
-      </div>
+      </div>}
     </div>
   );
 }

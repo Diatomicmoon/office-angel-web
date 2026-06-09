@@ -4,6 +4,7 @@ import "./globals.css";
 import SidebarClientWrapper from "@/components/SidebarClientWrapper";
 import IncomingCallBanner from "@/components/IncomingCallBanner";
 import { HaloWidget } from "@/components/HaloWidget";
+import RoleGuard from "@/components/RoleGuard";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,7 +38,7 @@ export default function RootLayout({
           
           <main className="flex-1 min-w-0 flex flex-col min-h-screen w-full">
             <div className="flex-1 mt-14 md:mt-0">
-              {children}
+              <RoleGuard>{children}</RoleGuard>
             </div>
           </main>
 
