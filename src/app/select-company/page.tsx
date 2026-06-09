@@ -21,10 +21,11 @@ export default function SelectCompany() {
       .then((json) => {
         const comps = json.companies || [];
         if (comps.length === 1) {
-          // Auto-select if only 1 company
+          // Auto-select if only 1 company — use hard redirect so cookie is
+          // guaranteed to be present before middleware checks it.
           document.cookie = `oa_company_id=${comps[0].id}; Path=/; Max-Age=31536000; SameSite=Lax`;
-          router.push("/dashboard");
-          router.refresh();
+          window.location.href = "/dashboard";
+          return; // leave loading=true; page navigates away
         } else {
           setCompanies(comps);
           setError(json.error ? String(json.error) : "");
@@ -40,8 +41,7 @@ export default function SelectCompany() {
   const choose = (id: string) => {
     // Persist tenant selection for server routes.
     document.cookie = `oa_company_id=${id}; Path=/; Max-Age=31536000; SameSite=Lax`;
-    router.push("/dashboard");
-    router.refresh();
+    window.location.href = "/dashboard";
   };
 
   return (
