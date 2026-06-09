@@ -236,6 +236,139 @@ function LeadDetail({ lead, onClose }: { lead: Lead; onClose: () => void }) {
   );
 }
 
+// ─── GHL Contact Detail Panel ───────────────────────────────────────────────
+function GhlContactDetail({ contact, onClose }: { contact: any; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* backdrop */}
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+
+      {/* panel */}
+      <div className="relative z-10 w-full max-w-lg bg-white shadow-2xl flex flex-col h-full overflow-hidden animate-slide-in">
+        {/* Header */}
+        <div className="flex items-start justify-between p-6 border-b border-gray-200 bg-gray-50">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700">GHL Contact</span>
+              {contact.dateAdded && <span className="text-xs text-gray-500">Added {new Date(contact.dateAdded).toLocaleDateString()}</span>}
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 mt-2">{contact.name}</h2>
+            {contact.phone && (
+              <a href={`tel:${contact.phone}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-1">
+                <Phone size={14} /> {contact.phone}
+              </a>
+            )}
+            {contact.email && (
+              <a href={`mailto:${contact.email}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-0.5">
+                <ExternalLink size={14} /> {contact.email}
+              </a>
+            )}
+          </div>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors text-gray-500">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+
+          {/* Address */}
+          {contact.address && (
+            <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <MapPin size={18} className="text-gray-400 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 mb-0.5">Address</p>
+                <p className="text-sm font-medium text-gray-900">{contact.address}</p>
+                <a
+                  href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:underline mt-1 inline-flex items-center gap-1"
+                >
+                  Open in Maps <ChevronRight size={12} />
+                </a>
+              </div>
+            </div>
+          )}
+
+          {/* Contact Details */}
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 space-y-3">
+            <div className="flex items-center gap-2 text-blue-700 font-semibold text-sm uppercase tracking-wider">
+              <User size={14} /> Contact Info
+            </div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div>
+                <p className="text-gray-500 text-xs mb-0.5">Type</p>
+                <p className="font-medium text-gray-900 capitalize">{contact.type || "—"}</p>
+              </div>
+              <div>
+                <p className="text-gray-500 text-xs mb-0.5">Source</p>
+                <p className="font-medium text-gray-900">{contact.source || "—"}</p>
+              </div>
+              {contact.city && (
+                <div>
+                  <p className="text-gray-500 text-xs mb-0.5">City</p>
+                  <p className="font-medium text-gray-900">{contact.city}</p>
+                </div>
+              )}
+              {contact.state && (
+                <div>
+                  <p className="text-gray-500 text-xs mb-0.5">State</p>
+                  <p className="font-medium text-gray-900">{contact.state}</p>
+                </div>
+              )}
+              {contact.zip && (
+                <div>
+                  <p className="text-gray-500 text-xs mb-0.5">Zip</p>
+                  <p className="font-medium text-gray-900">{contact.zip}</p>
+                </div>
+              )}
+              {contact.dateUpdated && (
+                <div>
+                  <p className="text-gray-500 text-xs mb-0.5">Last Updated</p>
+                  <p className="font-medium text-gray-900">{new Date(contact.dateUpdated).toLocaleDateString()}</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Tags */}
+          {contact.tags?.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-gray-700 font-semibold text-sm">
+                <Tag size={14} /> Tags
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {contact.tags.map((t: string) => (
+                  <span key={t} className="text-xs px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">{t}</span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex gap-3">
+          {contact.phone && (
+            <a
+              href={`tel:${contact.phone}`}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg text-center transition-colors flex items-center justify-center gap-2"
+            >
+              <Phone size={16} /> Call
+            </a>
+          )}
+          <Link
+            href={`/jobs?ghl_contact=${contact.id}&name=${encodeURIComponent(contact.name)}&phone=${encodeURIComponent(contact.phone || '')}&address=${encodeURIComponent(contact.address || '')}`}
+            className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <FileText size={16} /> Create Job
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main CRM Page ─────────────────────────────────────────────────────────
 export default function CRM() {
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
@@ -243,6 +376,7 @@ export default function CRM() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Lead | null>(null);
+  const [selectedGhl, setSelectedGhl] = useState<any | null>(null);
 
   // GHL state
   const [ghlContacts, setGhlContacts] = useState<any[]>([]);
@@ -419,6 +553,7 @@ export default function CRM() {
     <>
       {/* Detail Panel */}
       {selected && <LeadDetail lead={selected} onClose={() => setSelected(null)} />}
+      {selectedGhl && <GhlContactDetail contact={selectedGhl} onClose={() => setSelectedGhl(null)} />}
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col h-screen">
         <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4 mb-6">
@@ -484,7 +619,7 @@ export default function CRM() {
                   <div className="p-8 text-center text-gray-500 text-sm">No contacts found.</div>
                 ) : (
                   ghlContacts.map((c: any) => (
-                    <div key={c.id} className="grid grid-cols-4 gap-4 p-4 items-center hover:bg-indigo-50 transition-colors cursor-pointer">
+                    <div key={c.id} onClick={() => setSelectedGhl(c)} className="grid grid-cols-4 gap-4 p-4 items-center hover:bg-indigo-50 transition-colors cursor-pointer">
                       <div className="col-span-2 flex items-center gap-3">
                         <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
                           <span className="text-indigo-700 font-bold text-sm">{c.name?.charAt(0)?.toUpperCase() || "?"}</span>
