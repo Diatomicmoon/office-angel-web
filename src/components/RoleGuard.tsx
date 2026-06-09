@@ -19,29 +19,33 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    // NOTE: Auth protection is handled by server-side middleware.
+    // RoleGuard only needs to enforce field_rep route restrictions.
     async function checkRole() {
       try {
         const supabase = createClient(
           process.env.NEXT_PUBLIC_SUPABASE_URL || "",
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
         );
-        const { data: userRes } = await supabase.auth.getUser();
-        
-        if (!userRes?.user) {
-          router.push('/login');
+        const { data: sessionRes } = await supabase.auth.getSession();
+        const user = sessionRes?.session?.user;
+
+        // No session yet — middleware will handle redirect if needed. Just render.
+        if (!user) {
+          setLoading(false);
           return;
         }
 
         const { data } = await supabase
           .from("company_memberships")
           .select("role")
-          .eq("user_id", userRes.user.id)
+          .eq("user_id", user.id)
           .limit(1);
 
         if (data && data.length > 0) {
           const userRole = data[0].role;
           setRole(userRole);
-          
+
           if (userRole === "field_rep") {
             const isAllowed = fieldRepAllowedRoutes.some(route => pathname.startsWith(route));
             if (!isAllowed) {
