@@ -14,13 +14,16 @@ export async function GET(req: NextRequest) {
 
   try {
     const data = await getContacts({ limit, query, startAfter, startAfterId });
-    return NextResponse.json({
+    const res = NextResponse.json({
       contacts: (data.contacts || []).map(normalizeContact),
       total: data.meta?.total || 0,
       nextPageUrl: data.meta?.nextPageUrl || null,
       startAfter: data.meta?.startAfter || null,
       startAfterId: data.meta?.startAfterId || null,
     });
+    // Cache for 60s on CDN, serve stale for up to 5min while revalidating
+    res.headers.set("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
+    return res;
   } catch (err: any) {
     console.error("[GHL Contacts]", err);
     return NextResponse.json({ error: err.message || "Failed to fetch GHL contacts." }, { status: 500 });

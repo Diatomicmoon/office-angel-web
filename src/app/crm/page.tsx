@@ -1,6 +1,7 @@
 "use client";
 
 import { Kanban, List, MapPin, Phone, X, Clock, Zap, FileText, ChevronRight, User, ExternalLink, Users, Search, Tag } from "lucide-react";
+import { useRef, useCallback } from "react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -385,10 +386,18 @@ export default function CRM() {
   const [ghlQuery, setGhlQuery] = useState("");
   const [ghlPage, setGhlPage] = useState<{ startAfter: string; startAfterId: string } | null>(null);
 
-  const fetchGhl = (query = "", pagination: { startAfter: string; startAfterId: string } | null = null) => {
+  const abortRef = useRef<AbortController | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const fetchGhl = useCallback((query = "", pagination: { startAfter: string; startAfterId: string } | null = null) => {
+    // Cancel any in-flight request
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setGhlLoading(true);
     const params = new URLSearchParams({ limit: "20", ...(query ? { query } : {}), ...(pagination?.startAfter ? { startAfter: pagination.startAfter, startAfterId: pagination.startAfterId } : {}) });
-    fetch(`/api/ghl/contacts?${params}`)
+    fetch(`/api/ghl/contacts?${params}`, { signal: controller.signal })
       .then(r => r.json())
       .then(json => {
         if (pagination) {
@@ -399,9 +408,17 @@ export default function CRM() {
         setGhlTotal(json.total || 0);
         setGhlPage(json.startAfterId ? { startAfter: String(json.startAfter), startAfterId: json.startAfterId } : null);
       })
-      .catch(console.error)
+      .catch(err => { if (err.name !== "AbortError") console.error(err); })
       .finally(() => setGhlLoading(false));
-  };
+  }, []);
+
+  const debouncedSearch = useCallback((value: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      setGhlContacts([]);
+      fetchGhl(value);
+    }, 350);
+  }, [fetchGhl]);
 
   useEffect(() => {
     if (activeTab === "ghl" && ghlContacts.length === 0) fetchGhl();
@@ -597,8 +614,7 @@ export default function CRM() {
                   value={ghlQuery}
                   onChange={e => {
                     setGhlQuery(e.target.value);
-                    setGhlContacts([]);
-                    fetchGhl(e.target.value);
+                    debouncedSearch(e.target.value);
                   }}
                   className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
                 />

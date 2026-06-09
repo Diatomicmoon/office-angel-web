@@ -314,7 +314,7 @@ export default function Dashboard() {
                 <Users size={18} className="text-indigo-500" /> CR Leads
                 {!ghlLoading && <span className="text-xs font-medium text-gray-400 ml-1">({ghlTotal.toLocaleString()} total)</span>}
               </h2>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700">GHL Live</span>
+              <Link href="/crm" className="text-xs text-indigo-600 font-bold hover:underline">View All →</Link>
             </div>
             {ghlLoading ? (
               <div className="p-6 text-gray-500 text-sm">Loading GHL contacts...</div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, MapPin, User, ChevronRight, BadgeDollarSign, CalendarClock } from "lucide-react";
+import { Search, MapPin, User, ChevronRight, BadgeDollarSign, CalendarClock, X } from "lucide-react";
 
 type Job = {
   id: string;
@@ -55,6 +55,19 @@ export default function JobsArchivePage() {
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
+  const [ghlBanner, setGhlBanner] = useState<{ name: string; phone: string; address: string } | null>(null);
+
+  useEffect(() => {
+    // Pre-fill banner if coming from a GHL contact
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("ghl_contact")) {
+      setGhlBanner({
+        name: params.get("name") || "",
+        phone: params.get("phone") || "",
+        address: params.get("address") || "",
+      });
+    }
+  }, []);
 
   useEffect(() => {
     fetch("/api/jobs", { cache: "no-store" })
@@ -88,6 +101,19 @@ export default function JobsArchivePage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)]">
+      {/* GHL Contact Pre-fill Banner */}
+      {ghlBanner && (
+        <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-indigo-900">Creating job for GHL contact: <span className="font-bold">{ghlBanner.name}</span></p>
+            <p className="text-xs text-indigo-600 mt-0.5">{ghlBanner.phone}{ghlBanner.address ? ` · ${ghlBanner.address}` : ""}</p>
+          </div>
+          <button onClick={() => setGhlBanner(null)} className="text-indigo-400 hover:text-indigo-700 p-1">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Job Archive</h1>
