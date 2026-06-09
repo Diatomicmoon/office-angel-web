@@ -46,89 +46,121 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-4">
-        {!isFieldRep && <Link href="/dashboard" className={itemClass('/dashboard')}>
-          <Home size={20} />
-          <span>Dashboard</span>
-        </Link>}}
-        {!isFieldRep && <Link href="/call-logs" className={itemClass('/call-logs')}>
-          <Phone size={20} />
-          <span>Call Logs</span>
-        </Link>}
-        {!isFieldRep && <Link href="/co-pilot" className={itemClass('/co-pilot')}>
-          <Mic size={20} />
-          <span className="flex items-center gap-2">
-            Co-Pilot Mode 
-            <span className="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">Beta</span>
-          </span>
-        </Link>
-        {!isFieldRep && <Link href="/crm" className={itemClass('/crm')}>
-          <Users size={20} />
-          <span>Leads & CRM</span>
-        </Link>}
+        {!isFieldRep && (
+          <Link href="/dashboard" className={itemClass('/dashboard')}>
+            <Home size={20} />
+            <span>Dashboard</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/call-logs" className={itemClass('/call-logs')}>
+            <Phone size={20} />
+            <span>Call Logs</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/co-pilot" className={itemClass('/co-pilot')}>
+            <Mic size={20} />
+            <span className="flex items-center gap-2">
+              Co-Pilot Mode 
+              <span className="bg-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">Beta</span>
+            </span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/crm" className={itemClass('/crm')}>
+            <Users size={20} />
+            <span>Leads & CRM</span>
+          </Link>
+        )}
         <Link href="/canvassing" className={itemClass('/canvassing')}>
           <Map size={20} />
           <span>Door-to-Door CRM</span>
         </Link>
-        {!isFieldRep && <Link href="/projects" className={itemClass('/projects')}>
-          <Archive size={20} />
-          <span>Customers</span>
-        </Link>}
-        {!isFieldRep && <Link href="/jobs" className={itemClass('/jobs')}>
-          <Briefcase size={20} />
-          <span>Job Archive</span>
-        </Link>}
+        {!isFieldRep && (
+          <Link href="/projects" className={itemClass('/projects')}>
+            <Archive size={20} />
+            <span>Customers</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/jobs" className={itemClass('/jobs')}>
+            <Briefcase size={20} />
+            <span>Job Archive</span>
+          </Link>
+        )}
         <Link href="/timesheets" className={itemClass('/timesheets')}>
           <Clock size={20} />
           <span>Timesheets & Payroll</span>
         </Link>
-        {!isFieldRep && <Link href="/dispatch" className={itemClass('/dispatch')}>
-          <Calendar size={20} />
-          <span>Dispatch</span>
-        </Link>}
-        {!isFieldRep && <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
-          <Inbox size={20} />
-          <span>Scheduling Inbox</span>
-        </Link>}
-        {!isFieldRep && <Link href="/permits" className={itemClass('/permits')}>
-          <FileText size={20} />
-          <span>Permits & Inspections</span>
-        </Link>}
-        {!isFieldRep && <Link href="/pricing" className={itemClass('/pricing')}>
-          <DollarSign size={20} />
-          <span>Material Cost Engine</span>
-        </Link>}
-        {!isFieldRep && <Link href="/inbox" className={itemClass('/inbox')}>
-          <Inbox size={20} />
-          <span>AI Inbox & Docs</span>
-        </Link>}
+        {!isFieldRep && (
+          <Link href="/dispatch" className={itemClass('/dispatch')}>
+            <Calendar size={20} />
+            <span>Dispatch</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
+            <Inbox size={20} />
+            <span>Scheduling Inbox</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/permits" className={itemClass('/permits')}>
+            <FileText size={20} />
+            <span>Permits & Inspections</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/pricing" className={itemClass('/pricing')}>
+            <DollarSign size={20} />
+            <span>Material Cost Engine</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/inbox" className={itemClass('/inbox')}>
+            <Inbox size={20} />
+            <span>AI Inbox & Docs</span>
+          </Link>
+        )}
         <Link href="/field-app" className={itemClass('/field-app')}>
           <Smartphone size={20} />
           <span>Field App (Techs)</span>
         </Link>
-        {!isFieldRep && <Link href="/marketing" className={itemClass('/marketing')}>
-          <Share2 size={20} />
-          <span>SEO & Marketing</span>
-        </Link>}
-        {!isFieldRep && <Link href="/receipts" className={itemClass('/receipts')}>
-          <FileText size={20} />
-          <span>Receipt Inbox</span>
-        </Link>}
-        {!isFieldRep && <Link href="/supply-runner" className={itemClass('/supply-runner')}>
-          <Truck size={20} />
-          <span>Supply Runner</span>
-        </Link>}
-        {!isFieldRep && <Link href="/financials" className={itemClass('/financials')}>
-          <DollarSign size={20} />
-          <span>Financial Command</span>
-        </Link>}
+        {!isFieldRep && (
+          <Link href="/marketing" className={itemClass('/marketing')}>
+            <Share2 size={20} />
+            <span>SEO & Marketing</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/receipts" className={itemClass('/receipts')}>
+            <FileText size={20} />
+            <span>Receipt Inbox</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/supply-runner" className={itemClass('/supply-runner')}>
+            <Truck size={20} />
+            <span>Supply Runner</span>
+          </Link>
+        )}
+        {!isFieldRep && (
+          <Link href="/financials" className={itemClass('/financials')}>
+            <DollarSign size={20} />
+            <span>Financial Command</span>
+          </Link>
+        )}
       </nav>
 
-      {!isFieldRep && <div className="p-4 border-t border-gray-800">
-        <Link href="/settings" className={itemClass('/settings')}>
-          <Settings size={20} />
-          <span>Settings</span>
-        </Link>
-      </div>}
+      {!isFieldRep && (
+        <div className="p-4 border-t border-gray-800">
+          <Link href="/settings" className={itemClass('/settings')}>
+            <Settings size={20} />
+            <span>Settings</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
