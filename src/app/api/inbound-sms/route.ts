@@ -172,15 +172,15 @@ export async function POST(req: Request) {
     // - In auth tenant mode, map by inbound "To" number.
     let companyId: string | null = null;
 
-    const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
+    const tenantMode = process.env.HARD_HAT_TENANT_MODE || process.env.OFFICE_ANGEL_TENANT_MODE;
     if (tenantMode !== 'auth') {
-      companyId = process.env.OFFICE_ANGEL_COMPANY_ID || null;
+      companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID || null;
     } else if (to) {
       const { data } = await supabase.from('companies').select('id').eq('phone_number', to).limit(1);
       companyId = data?.[0]?.id || null;
     }
 
-    if (!companyId) companyId = process.env.OFFICE_ANGEL_COMPANY_ID || null;
+    if (!companyId) companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID || null;
     if (!companyId) {
       const { data: c0 } = await supabase.from('companies').select('id').order('created_at', { ascending: true }).limit(1);
       companyId = c0?.[0]?.id || null;

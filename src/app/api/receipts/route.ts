@@ -12,7 +12,7 @@ export async function GET(req: Request) {
   const status = url.searchParams.get("status") || undefined;
   const jobId = url.searchParams.get("job_id") || undefined;
 
-  let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
     const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
     companyId = c0?.[0]?.id;
@@ -43,7 +43,7 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
 
   let company_id = body.company_id as string | undefined;
-  if (!company_id) company_id = process.env.OFFICE_ANGEL_COMPANY_ID;
+  if (!company_id) company_id = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!company_id) {
     const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
     company_id = c0?.[0]?.id;

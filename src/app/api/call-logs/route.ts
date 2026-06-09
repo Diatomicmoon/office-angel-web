@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   const limit = Math.min(Number(url.searchParams.get("limit") || 50), 200);
 
   // Scope to company
-  let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
     const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
     companyId = c0?.[0]?.id;

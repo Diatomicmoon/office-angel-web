@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText } from "lucide-react";
+import { PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText, Users, Tag } from "lucide-react";
 import { VapiCallButton } from "@/components/VapiCallButton";
 import Link from "next/link";
 
@@ -36,6 +36,20 @@ export default function Dashboard() {
   const [data, setData] = useState<any>({ calls: [], technicians: [], techTableAvailable: true, actionItems: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 } });
   const [loading, setLoading] = useState(true);
   const [aiMode, setAiMode] = useState<"auto" | "copilot">("auto");
+  const [ghlContacts, setGhlContacts] = useState<any[]>([]);
+  const [ghlTotal, setGhlTotal] = useState<number>(0);
+  const [ghlLoading, setGhlLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/ghl/contacts?limit=5")
+      .then(res => res.json())
+      .then(json => {
+        setGhlContacts(json.contacts || []);
+        setGhlTotal(json.total || 0);
+        setGhlLoading(false);
+      })
+      .catch(() => setGhlLoading(false));
+  }, []);
 
   useEffect(() => {
     fetch("/api/dashboard")
@@ -289,6 +303,50 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* GHL CRM Widget */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Users size={18} className="text-indigo-500" /> CR Leads
+                {!ghlLoading && <span className="text-xs font-medium text-gray-400 ml-1">({ghlTotal.toLocaleString()} total)</span>}
+              </h2>
+              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700">GHL Live</span>
+            </div>
+            {ghlLoading ? (
+              <div className="p-6 text-gray-500 text-sm">Loading GHL contacts...</div>
+            ) : ghlContacts.length === 0 ? (
+              <div className="p-6 text-center text-gray-500 text-sm">No contacts found.</div>
+            ) : (
+              <div className="divide-y divide-gray-100">
+                {ghlContacts.map((c: any) => (
+                  <div key={c.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <span className="text-indigo-700 font-bold text-sm">{c.name?.charAt(0)?.toUpperCase() || "?"}</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 text-sm">{c.name}</p>
+                        <p className="text-xs text-gray-500">{c.phone || c.email || c.address || "No contact info"}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      {c.tags?.slice(0, 2).map((tag: string) => (
+                        <span key={tag} className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 flex items-center gap-1">
+                          <Tag size={9} /> {tag}
+                        </span>
+                      ))}
+                      {!c.tags?.length && (
+                        <span className="text-[10px] font-medium px-2 py-0.5 rounded-full border border-gray-200 bg-gray-50 text-gray-400">{c.type}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

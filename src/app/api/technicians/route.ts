@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   );
 
   const url = new URL(req.url);
-  let companyId = url.searchParams.get("company_id") || process.env.OFFICE_ANGEL_COMPANY_ID || undefined;
+  let companyId = url.searchParams.get("company_id") || process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID || undefined;
 
   if (!companyId) {
     const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
   // Resolve company_id
   let company_id = body.company_id as string | undefined;
-  if (!company_id) company_id = process.env.OFFICE_ANGEL_COMPANY_ID;
+  if (!company_id) company_id = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!company_id) {
     const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
     company_id = c0?.[0]?.id;

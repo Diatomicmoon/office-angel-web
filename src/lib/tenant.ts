@@ -13,11 +13,11 @@ export const TENANT_COOKIE = "oa_company_id";
  * - If OFFICE_ANGEL_TENANT_MODE="auth": require a logged-in user and verify membership
  */
 export async function resolveCompanyIdOrThrow() {
-  const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
+  const tenantMode = process.env.HARD_HAT_TENANT_MODE || process.env.OFFICE_ANGEL_TENANT_MODE;
 
   // Legacy / beta: pinned tenant via env
   if (tenantMode !== "auth") {
-    const pinned = process.env.OFFICE_ANGEL_COMPANY_ID;
+    const pinned = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
     if (!pinned) throw new Error("Missing OFFICE_ANGEL_COMPANY_ID (and OFFICE_ANGEL_TENANT_MODE is not 'auth').");
     return { companyId: pinned, userId: null };
   }

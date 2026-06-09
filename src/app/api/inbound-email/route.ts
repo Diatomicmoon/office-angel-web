@@ -162,7 +162,7 @@ export async function POST(req: Request) {
 
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co', process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder');
     
-    let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+    let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
     if (!companyId && toEmail) {
       const uuidMatch = toEmail.match(/inbox_([a-f0-9-]{36})@/i);
       if (uuidMatch) {

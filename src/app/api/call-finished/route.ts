@@ -325,7 +325,7 @@ export async function POST(req: Request) {
 
       // Fallback for local testing if phone number isn't mapped
       if (!companyId) {
-        companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
+        companyId = process.env.HARD_HAT_COMPANY_ID || process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
       }
       
       if (!companyId) {

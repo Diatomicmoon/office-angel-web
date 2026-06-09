@@ -171,14 +171,14 @@ export async function POST(req: Request) {
     // Resolve company.
     // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
     // - In auth tenant mode, require payload.company_id (webhook integration will supply it).
-    const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE;
+    const tenantMode = process.env.HARD_HAT_TENANT_MODE || process.env.OFFICE_ANGEL_TENANT_MODE;
     let companyId: string | null = null;
 
     if (tenantMode === 'auth') {
       companyId = companyIdIn || null;
       if (!companyId) return NextResponse.json({ ok: false, error: 'Missing company_id' }, { status: 400 });
     } else {
-      companyId = process.env.OFFICE_ANGEL_COMPANY_ID || null;
+      companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID || null;
     }
 
     if (!companyId) {

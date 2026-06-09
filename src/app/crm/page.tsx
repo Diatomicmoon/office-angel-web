@@ -1,6 +1,6 @@
 "use client";
 
-import { Kanban, List, MapPin, Phone, X, Clock, Zap, FileText, ChevronRight, User, ExternalLink } from "lucide-react";
+import { Kanban, List, MapPin, Phone, X, Clock, Zap, FileText, ChevronRight, User, ExternalLink, Users, Search, Tag } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -239,9 +239,39 @@ function LeadDetail({ lead, onClose }: { lead: Lead; onClose: () => void }) {
 // ─── Main CRM Page ─────────────────────────────────────────────────────────
 export default function CRM() {
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
+  const [activeTab, setActiveTab] = useState<"calls" | "ghl">("calls");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Lead | null>(null);
+
+  // GHL state
+  const [ghlContacts, setGhlContacts] = useState<any[]>([]);
+  const [ghlTotal, setGhlTotal] = useState(0);
+  const [ghlLoading, setGhlLoading] = useState(false);
+  const [ghlQuery, setGhlQuery] = useState("");
+  const [ghlPage, setGhlPage] = useState<{ startAfter: string; startAfterId: string } | null>(null);
+
+  const fetchGhl = (query = "", pagination: { startAfter: string; startAfterId: string } | null = null) => {
+    setGhlLoading(true);
+    const params = new URLSearchParams({ limit: "20", ...(query ? { query } : {}), ...(pagination?.startAfter ? { startAfter: pagination.startAfter, startAfterId: pagination.startAfterId } : {}) });
+    fetch(`/api/ghl/contacts?${params}`)
+      .then(r => r.json())
+      .then(json => {
+        if (pagination) {
+          setGhlContacts(prev => [...prev, ...(json.contacts || [])]);
+        } else {
+          setGhlContacts(json.contacts || []);
+        }
+        setGhlTotal(json.total || 0);
+        setGhlPage(json.startAfterId ? { startAfter: String(json.startAfter), startAfterId: json.startAfterId } : null);
+      })
+      .catch(console.error)
+      .finally(() => setGhlLoading(false));
+  };
+
+  useEffect(() => {
+    if (activeTab === "ghl" && ghlContacts.length === 0) fetchGhl();
+  }, [activeTab]);
 
   useEffect(() => {
     fetch("/api/call-logs?limit=50", { cache: "no-store" })
@@ -397,27 +427,97 @@ export default function CRM() {
             <p className="text-gray-500 mt-2">AI-captured leads from every inbound call, auto-sorted by urgency.</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            {/* Tab switcher */}
             <div className="bg-gray-100 p-1 rounded-lg flex items-center">
-              <button
-                onClick={() => setViewMode("board")}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${viewMode === "board" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-              >
-                <Kanban size={16} /> Board
+              <button onClick={() => setActiveTab("calls")} className={`px-4 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${activeTab === "calls" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}>
+                <Phone size={16} /> AI Calls
               </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`px-4 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${viewMode === "list" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}
-              >
-                <List size={16} /> List
+              <button onClick={() => setActiveTab("ghl")} className={`px-4 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${activeTab === "ghl" ? "bg-white shadow-sm text-indigo-700" : "text-gray-500 hover:text-gray-900"}`}>
+                <Users size={16} /> GHL Contacts {ghlTotal > 0 && <span className="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full font-bold">{ghlTotal.toLocaleString()}</span>}
               </button>
             </div>
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">
-              + New Lead
-            </button>
+            {activeTab === "calls" && (
+              <div className="bg-gray-100 p-1 rounded-lg flex items-center">
+                <button onClick={() => setViewMode("board")} className={`px-4 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${viewMode === "board" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}>
+                  <Kanban size={16} /> Board
+                </button>
+                <button onClick={() => setViewMode("list")} className={`px-4 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-colors ${viewMode === "list" ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900"}`}>
+                  <List size={16} /> List
+                </button>
+              </div>
+            )}
+            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors">+ New Lead</button>
           </div>
         </div>
 
-        {loading ? (
+        {activeTab === "ghl" ? (
+          <div className="flex-1 flex flex-col gap-4 overflow-hidden">
+            {/* GHL Search */}
+            <div className="flex items-center gap-3">
+              <div className="relative flex-1">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search contacts by name, email, or phone..."
+                  value={ghlQuery}
+                  onChange={e => {
+                    setGhlQuery(e.target.value);
+                    setGhlContacts([]);
+                    fetchGhl(e.target.value);
+                  }}
+                  className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+              <span className="text-xs text-gray-400 font-medium whitespace-nowrap">{ghlTotal.toLocaleString()} total contacts</span>
+            </div>
+            {/* GHL Contact List */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-hidden flex flex-col">
+              <div className="grid grid-cols-4 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <div className="col-span-2">Contact</div>
+                <div>Location</div>
+                <div>Tags / Source</div>
+              </div>
+              <div className="flex-1 overflow-y-auto divide-y divide-gray-100">
+                {ghlLoading && ghlContacts.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500 text-sm">Loading GHL contacts...</div>
+                ) : ghlContacts.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500 text-sm">No contacts found.</div>
+                ) : (
+                  ghlContacts.map((c: any) => (
+                    <div key={c.id} className="grid grid-cols-4 gap-4 p-4 items-center hover:bg-indigo-50 transition-colors cursor-pointer">
+                      <div className="col-span-2 flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                          <span className="text-indigo-700 font-bold text-sm">{c.name?.charAt(0)?.toUpperCase() || "?"}</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900 text-sm">{c.name}</p>
+                          <p className="text-xs text-gray-500">{c.phone || c.email || "—"}</p>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600 truncate">{c.city && c.state ? `${c.city}, ${c.state}` : c.address || "—"}</div>
+                      <div className="flex flex-wrap gap-1">
+                        {c.tags?.slice(0, 2).map((t: string) => (
+                          <span key={t} className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 flex items-center gap-1">
+                            <Tag size={9} />{t}
+                          </span>
+                        ))}
+                        {!c.tags?.length && c.source && <span className="text-[10px] text-gray-400">{c.source}</span>}
+                      </div>
+                    </div>
+                  ))
+                )}
+                {ghlPage && !ghlLoading && (
+                  <div className="p-4 text-center">
+                    <button onClick={() => fetchGhl(ghlQuery, ghlPage)} className="text-sm text-indigo-600 font-medium hover:underline">Load more</button>
+                  </div>
+                )}
+                {ghlLoading && ghlContacts.length > 0 && (
+                  <div className="p-4 text-center text-gray-400 text-sm">Loading...</div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : loading ? (
           <div className="flex-1 flex items-center justify-center text-gray-500">Loading leads...</div>
         ) : viewMode === "board" ? (
           <div className="flex-1 flex gap-6 overflow-x-auto pb-4">

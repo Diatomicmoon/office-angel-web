@@ -7,6 +7,7 @@ import Link from "next/link";
 export default function FinancialsPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [ghlStats, setGhlStats] = useState<any>(null);
 
   useEffect(() => {
     fetch("/api/quickbooks/test")
@@ -15,6 +16,10 @@ export default function FinancialsPage() {
         setData(json);
         setLoading(false);
       });
+    fetch("/api/ghl/stats")
+      .then(res => res.json())
+      .then(json => setGhlStats(json))
+      .catch(() => {});
   }, []);
 
   return (
@@ -49,6 +54,20 @@ export default function FinancialsPage() {
          <div className="py-20 text-center text-gray-500">Loading financial data...</div>
       ) : (
         <>
+          {/* GHL Pipeline Banner */}
+          {ghlStats && !ghlStats.error && (
+            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="bg-indigo-100 p-2 rounded-lg"><Users size={18} className="text-indigo-600" /></div>
+                <div>
+                  <p className="text-sm font-semibold text-indigo-900">GHL CRM Pipeline — CR</p>
+                  <p className="text-xs text-indigo-600">{ghlStats.totalLeads?.toLocaleString()} total contacts · {ghlStats.recentLeads} new this week</p>
+                </div>
+              </div>
+              <Link href="/crm" className="text-xs font-bold text-indigo-700 hover:underline">View in CRM →</Link>
+            </div>
+          )}
+
           {/* Core KPIs */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">

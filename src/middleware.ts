@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const tenantMode = process.env.OFFICE_ANGEL_TENANT_MODE
+  const tenantMode = process.env.HARD_HAT_TENANT_MODE || process.env.OFFICE_ANGEL_TENANT_MODE
 
   // Define public routes that don't require authentication
   // Root ('/') is now the public landing page, '/login' is auth, etc.

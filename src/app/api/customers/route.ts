@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const id = url.searchParams.get("id");
 
-  let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
     const { data: c0 } = await sb().from("companies").select("id").order("created_at", { ascending: true }).limit(1);
     companyId = c0?.[0]?.id;

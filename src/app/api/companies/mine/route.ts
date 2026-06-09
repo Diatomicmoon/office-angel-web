@@ -15,7 +15,7 @@ export async function GET() {
       const { data: company } = await supabase
         .from("companies")
         .select("id,name,phone_number,created_at")
-        .eq("id", process.env.OFFICE_ANGEL_COMPANY_ID!)
+        .eq("id", process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID!)
         .single();
       return NextResponse.json({ companies: company ? [company] : [] });
     }

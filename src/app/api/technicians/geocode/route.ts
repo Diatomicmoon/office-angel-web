@@ -8,7 +8,7 @@ const sb = () =>
   );
 
 async function getCompanyId() {
-  let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
   if (!companyId) {
     const { data } = await sb().from("companies").select("id").order("created_at", { ascending: true }).limit(1);
     companyId = data?.[0]?.id;
