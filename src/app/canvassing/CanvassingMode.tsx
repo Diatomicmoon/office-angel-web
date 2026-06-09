@@ -6,7 +6,7 @@ import { X, Crosshair, MapPin } from "lucide-react";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void, visits: any[] }) {
+export default function CanvassingMode({ onExit, onLogVisit, onPinClick, visits }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void, onPinClick?: (visit: any) => void, visits: any[] }) {
   const [center, setCenter] = useState<[number, number]>([44.9778, -93.265]);
   const [userLoc, setUserLoc] = useState<[number, number] | null>(null);
   const [zoom, setZoom] = useState(18);
@@ -58,7 +58,7 @@ export default function CanvassingMode({ onExit, onLogVisit, visits }: { onExit:
 
       <div className="flex-1 relative overflow-hidden bg-gray-100">
         {/* Pass userLoc to MapView so it can render the blue dot without recentering the map */}
-        <MapView visits={visits} center={center} userLocation={userLoc} zoom={zoom} onMapClick={onLogVisit} />
+        <MapView visits={visits} center={center} userLocation={userLoc} zoom={zoom} onMapClick={onLogVisit} onPinClick={onPinClick} />
         
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-4 items-center w-full max-w-sm px-6">
           <button 

@@ -17,7 +17,12 @@ export async function POST(req: Request) {
     }
 
     const toolCalls = message.toolCalls || [];
-    const systemPhoneNumber = message.call?.system?.number;
+    let systemPhoneNumberRaw = message.call?.system?.number;
+    let systemPhoneNumber = systemPhoneNumberRaw;
+    if (systemPhoneNumberRaw && systemPhoneNumberRaw.includes('sip:')) {
+      const match = systemPhoneNumberRaw.match(/sip:([^@]+)@/);
+      if (match) systemPhoneNumber = match[1];
+    }
 
     // Get company id securely
     let companyId = null;

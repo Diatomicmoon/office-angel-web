@@ -18,7 +18,13 @@ export async function POST(req: Request) {
 
     const callDetails = message.call;
     const customerPhoneNumber = callDetails?.customer?.number || message.customer?.number;
-    const systemPhoneNumber = callDetails?.system?.number || message.phoneNumber?.number;
+    let systemPhoneNumberRaw = callDetails?.system?.number || message.phoneNumber?.number;
+    // Clean SIP URI if present (e.g. sip:+16123245110@sip.vapi.ai -> +16123245110)
+    let systemPhoneNumber = systemPhoneNumberRaw;
+    if (systemPhoneNumberRaw && systemPhoneNumberRaw.includes('sip:')) {
+      const match = systemPhoneNumberRaw.match(/sip:([^@]+)@/);
+      if (match) systemPhoneNumber = match[1];
+    }
 
     if (!systemPhoneNumber) {
        console.error("[VAPI] No system phone number found in Vapi payload. Full payload:", JSON.stringify(body, null, 2));

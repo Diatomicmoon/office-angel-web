@@ -37,15 +37,15 @@ export async function GET() {
   if (visits) {
     for (const v of visits) {
       if (new Date(v.visited_at) >= today) stats.todayKnocks++;
-      if (v.interest_level === 'hot') stats.hotLeads++;
-      if (v.interest_level === 'warm') stats.warmLeads++;
+      if (v.interest_level === 'demo_set' || v.interest_level === 'hot') stats.hotLeads++;
+      if (v.interest_level === 'go_back' || v.interest_level === 'warm') stats.warmLeads++;
 
       // We use "rep_name" if it exists, or fall back to "Field Rep"
       // In production, the CanvassingMode should inject the logged-in rep's name
       const rep = v.rep_name || "Christian (Owner)"; 
       if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
       repCounts[rep].knocks++;
-      if (v.interest_level === 'hot') repCounts[rep].hot++;
+      if (v.interest_level === 'demo_set' || v.interest_level === 'hot') repCounts[rep].hot++;
     }
   }
 

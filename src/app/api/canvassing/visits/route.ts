@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     id: build.id,
     address: build.property_address + (build.city ? `, ${build.city}` : ''),
     resident_name: build.contractor_name || 'New Build',
-    interest_level: build.status === 'contacted' ? 'hot' : (build.status === 'knocked' ? 'warm' : 'new_build'),
+    interest_level: build.status === 'contacted' ? 'demo_set' : (build.status === 'knocked' ? 'go_back' : 'new_build'),
     visited_at: build.permit_date || build.created_at || new Date().toISOString(),
     notes: `Builder: ${build.contractor_name || 'Unknown'}\nStatus: ${build.status}\n${build.notes || ''}`,
     latitude: build.latitude || null,
@@ -103,8 +103,8 @@ export async function POST(request: Request) {
     const { id, ...visitData } = body; 
     
     if (id) {
-      const { data: leadData, error: lErr } = await supabase.from('leads').update({ interest_level: visitData.interest_level, notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`, status: visitData.interest_level === 'hot' ? 'contacted' : 'new' }).eq('id', id).eq('company_id', companyId).select();
-      const { data: buildData, error: bErr } = await supabase.from('new_build_permits').update({ status: visitData.interest_level === 'hot' ? 'contacted' : 'knocked' }).eq('id', id).eq('company_id', companyId).select();
+      const { data: leadData, error: lErr } = await supabase.from('leads').update({ interest_level: visitData.interest_level, notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`, status: ['hot', 'demo_set'].includes(visitData.interest_level) ? 'contacted' : 'new' }).eq('id', id).eq('company_id', companyId).select();
+      const { data: buildData, error: bErr } = await supabase.from('new_build_permits').update({ status: ['hot', 'demo_set'].includes(visitData.interest_level) ? 'contacted' : 'knocked' }).eq('id', id).eq('company_id', companyId).select();
       const { data: manualData, error: mErr } = await supabase.from('door_knocking_visits').update({
          interest_level: visitData.interest_level,
          notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`

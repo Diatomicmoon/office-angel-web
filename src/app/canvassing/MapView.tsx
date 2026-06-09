@@ -9,13 +9,13 @@ import "leaflet/dist/leaflet.css";
 const colorMap: Record<string, string> = {
   hot: "#f97316", // Orange (Hot Lead)
   warm: "#3b82f6", // Blue (Warm/Follow Up)
-  demo_set: "#10b981", // Emerald (Demo Set)
+  demo_set: "#f97316", // Orange (Demo Set)
   unknocked_lead: "#a855f7", // Purple (Unknocked Lead - Just 1 pin color for leads now)
   new_build: "#ef4444", // Red (New Build)
   not_interested: "#9ca3af", // Gray (Not Interested)
   do_not_knock: "#000000", // Black (Do Not Knock)
   not_home: "#fcd34d", // Yellow (Not Home)
-  go_back: "#10b981", // Green (Go Back / Appointment)
+  go_back: "#3b82f6", // Blue (Go Back)
 };
 
 const radiusMap: Record<string, number> = {

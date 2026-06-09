@@ -305,8 +305,29 @@ export async function POST(req: Request) {
         process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
       );
 
-      // Scope writes to a specific company so demo + local can share a Supabase project safely.
-      let companyId = process.env.OFFICE_ANGEL_COMPANY_ID;
+      // Determine the correct company from the system phone number receiving the call
+      let systemPhoneNumberRaw = call?.system?.number || payload?.message?.phoneNumber?.number;
+      let systemPhoneNumber = systemPhoneNumberRaw;
+      if (systemPhoneNumberRaw && systemPhoneNumberRaw.includes('sip:')) {
+        const match = systemPhoneNumberRaw.match(/sip:([^@]+)@/);
+        if (match) systemPhoneNumber = match[1];
+      }
+      let companyId = null;
+
+      if (systemPhoneNumber) {
+        const { data: companyData } = await supabase
+          .from('companies')
+          .select('id')
+          .eq('phone_number', systemPhoneNumber)
+          .single();
+        if (companyData) companyId = companyData.id;
+      }
+
+      // Fallback for local testing if phone number isn't mapped
+      if (!companyId) {
+        companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
+      }
+      
       if (!companyId) {
         const { data: c0 } = await supabase
           .from('companies')

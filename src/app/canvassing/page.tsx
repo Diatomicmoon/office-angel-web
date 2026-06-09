@@ -30,11 +30,11 @@ function CanvassingStats() {
         <div className="text-2xl font-bold">{stats.totalKnocks}</div>
       </div>
       <div className="bg-card border rounded-xl p-4 shadow-sm bg-orange-50/50">
-        <div className="text-sm text-orange-600 font-medium mb-1 flex items-center gap-1"><Flame className="w-4 h-4"/> Hot Leads</div>
+        <div className="text-sm text-orange-600 font-medium mb-1 flex items-center gap-1"><Flame className="w-4 h-4"/> Demos Set</div>
         <div className="text-2xl font-bold text-orange-700">{stats.hotLeads}</div>
       </div>
       <div className="bg-card border rounded-xl p-4 shadow-sm bg-blue-50/50">
-        <div className="text-sm text-blue-600 font-medium mb-1 flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Warm Pipeline</div>
+        <div className="text-sm text-blue-600 font-medium mb-1 flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Go Backs</div>
         <div className="text-2xl font-bold text-blue-700">{stats.warmLeads}</div>
       </div>
     </div>
@@ -184,7 +184,8 @@ export default function CanvassingPage() {
       {canvassingActive && (
         <CanvassingMode 
           onExit={() => { setCanvassingActive(false); fetchVisits(); }} 
-          onLogVisit={handleMapClick} 
+          onLogVisit={handleMapClick}
+          onPinClick={handlePinClick} 
           visits={visits}
         />
       )}
@@ -277,8 +278,8 @@ export default function CanvassingPage() {
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Interest Level</label>
                     <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.interest_level} onChange={e => setNewVisit({...newVisit, interest_level: e.target.value})}>
-                      <option value="hot">🔥 Hot Lead (Ready to buy)</option>
-                      <option value="warm">⭐ Warm (Interested, needs follow up)</option>
+                      
+                      
                       <option value="demo_set">📅 Demo Set</option>
                       <option value="go_back">✅ Go Back</option>
                       <option value="not_home">🏠 Not Home</option>
@@ -322,7 +323,7 @@ export default function CanvassingPage() {
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             {loading ? (
               <div className="p-8 text-center text-muted-foreground">Loading logged knocks...</div>
-            ) : visits.filter(v => v.interest_level === 'hot' || v.interest_level === 'warm' || v.interest_level === 'not_interested' || v.interest_level === 'do_not_knock').length === 0 ? (
+            ) : visits.filter(v => v.interest_level === 'demo_set' || v.interest_level === 'go_back' || v.interest_level === 'hot' || v.interest_level === 'warm' || v.interest_level === 'not_interested' || v.interest_level === 'do_not_knock').length === 0 ? (
               <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
                   <CheckSquare className="h-6 w-6 text-muted-foreground" />
@@ -367,9 +368,10 @@ export default function CanvassingPage() {
                     </div>
                     <div className="shrink-0 flex flex-col items-end gap-2">
                       <div className="flex items-center gap-2">
+                        {v.interest_level === 'demo_set' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Demo Set</span>}
                         {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
                         {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
-                        {v.interest_level === 'go_back' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><CheckSquare className="w-3.5 h-3.5"/> Go Back</span>}
+                        {v.interest_level === 'go_back' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Go Back</span>}
                         {v.interest_level === 'not_home' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><Home className="w-3.5 h-3.5"/> Not Home</span>}
                         {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3.5 h-3.5"/> Cold</span>}
                         {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3.5 h-3.5"/> DND</span>}
@@ -437,9 +439,10 @@ export default function CanvassingPage() {
                     </div>
                     <div className="shrink-0 flex flex-col items-end gap-2">
                       <div className="flex items-center gap-2">
+                        {v.interest_level === 'demo_set' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Demo Set</span>}
                         {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
                         {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
-                        {v.interest_level === 'go_back' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700"><CheckSquare className="w-3.5 h-3.5"/> Go Back</span>}
+                        {v.interest_level === 'go_back' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Go Back</span>}
                         {v.interest_level === 'not_home' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"><Home className="w-3.5 h-3.5"/> Not Home</span>}
                         {v.interest_level === 'not_interested' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700"><Snowflake className="w-3.5 h-3.5"/> Cold</span>}
                         {v.interest_level === 'do_not_knock' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700"><XCircle className="w-3.5 h-3.5"/> DND</span>}
