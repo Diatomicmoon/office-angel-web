@@ -1,15 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getContact, getContactOpportunities, normalizeContact, GHL_STAGE_MAP } from "@/lib/ghl";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!process.env.GHL_API_KEY || !process.env.GHL_LOCATION_ID) {
     return NextResponse.json({ error: "GHL credentials not configured." }, { status: 500 });
   }
 
   try {
+    const { id } = await params;
+    
     const [contactRes, opportunities] = await Promise.all([
-      getContact(params.id),
-      getContactOpportunities(params.id),
+      getContact(id),
+      getContactOpportunities(id),
     ]);
 
     const contact = normalizeContact(contactRes.contact || contactRes);
