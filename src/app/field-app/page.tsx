@@ -15,7 +15,21 @@ export default function FieldAppMockup() {
   const [editIn, setEditIn] = useState("");
   const [editOut, setEditOut] = useState("");
 
-  const MOCK_TECH_ID = "8dcd18c7-e3d7-4422-9f4b-6bb4e6df2f10";
+  const [techId, setTechId] = useState<string>("8dcd18c7-e3d7-4422-9f4b-6bb4e6df2f10");
+  const [techs, setTechs] = useState<{id: string, name: string}[]>([]);
+  const [showTechPicker, setShowTechPicker] = useState(false);
+  const [selectedTechName, setSelectedTechName] = useState<string>("Steve");
+
+  useEffect(() => {
+    // Load technician list and restore saved selection
+    const saved = localStorage.getItem("fieldTechId");
+    const savedName = localStorage.getItem("fieldTechName");
+    if (saved) { setTechId(saved); setSelectedTechName(savedName || ""); }
+    fetch("/api/technicians")
+      .then(r => r.json())
+      .then(json => setTechs(json.technicians || []))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetchTimesheets();
@@ -51,7 +65,7 @@ export default function FieldAppMockup() {
            const res = await fetch('/api/timesheets', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'clock_in', technician_id: MOCK_TECH_ID })
+              body: JSON.stringify({ action: 'clock_in', technician_id: techId })
            });
            const data = await res.json();
            if (data.timesheet) {
@@ -146,12 +160,38 @@ export default function FieldAppMockup() {
       <div className="bg-gray-900 text-white p-4 pt-12 flex justify-between items-center shadow-md">
          <div>
            <h1 className="font-bold text-lg">Hard Hat Solutions Field App</h1>
-           <p className="text-xs text-gray-400">Crew Alpha</p>
+           <button onClick={() => setShowTechPicker(true)} className="text-xs text-blue-400 hover:text-blue-300 mt-0.5 flex items-center gap-1">
+             👷 {selectedTechName || "Select Tech"} ›
+           </button>
          </div>
          <div className="flex gap-2">
            <Truck size={20} className="text-gray-400" />
          </div>
       </div>
+
+      {/* Tech Picker Modal */}
+      {showTechPicker && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-end">
+          <div className="bg-white w-full rounded-t-2xl p-6">
+            <h3 className="text-lg font-bold mb-4">Who are you?</h3>
+            <div className="space-y-2">
+              {techs.length === 0 && <p className="text-gray-500 text-sm">Loading technicians...</p>}
+              {techs.map(t => (
+                <button key={t.id} onClick={() => {
+                  setTechId(t.id);
+                  setSelectedTechName(t.name);
+                  localStorage.setItem("fieldTechId", t.id);
+                  localStorage.setItem("fieldTechName", t.name);
+                  setShowTechPicker(false);
+                }} className={`w-full text-left px-4 py-3 rounded-xl border font-medium transition-colors ${techId === t.id ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 hover:bg-gray-50"}`}>
+                  👷 {t.name}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShowTechPicker(false)} className="mt-4 w-full py-3 text-gray-500 text-sm">Cancel</button>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 p-4 space-y-4">
          

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, MapPin, User, ChevronRight, BadgeDollarSign, CalendarClock, X } from "lucide-react";
+import { Search, MapPin, User, ChevronRight, BadgeDollarSign, CalendarClock, X, Plus } from "lucide-react";
 
 type Job = {
   id: string;
@@ -56,16 +56,21 @@ export default function JobsArchivePage() {
   const [q, setQ] = useState("");
   const [status, setStatus] = useState<string>("all");
   const [ghlBanner, setGhlBanner] = useState<{ name: string; phone: string; address: string } | null>(null);
+  const [showNewJob, setShowNewJob] = useState(false);
+  const [newJob, setNewJob] = useState({ title: "", address: "", status: "Lead", priority: "normal" });
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     // Pre-fill banner if coming from a GHL contact
     const params = new URLSearchParams(window.location.search);
     if (params.get("ghl_contact")) {
-      setGhlBanner({
-        name: params.get("name") || "",
-        phone: params.get("phone") || "",
-        address: params.get("address") || "",
-      });
+      const name = params.get("name") || "";
+      const phone = params.get("phone") || "";
+      const address = params.get("address") || "";
+      setGhlBanner({ name, phone, address });
+      // Pre-fill new job form and open it
+      setNewJob(prev => ({ ...prev, title: name ? `${name} - Service Call` : "", address }));
+      setShowNewJob(true);
     }
   }, []);
 
@@ -101,6 +106,68 @@ export default function JobsArchivePage() {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)]">
+      {/* New Job Modal */}
+      {showNewJob && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b">
+              <h2 className="text-lg font-bold text-gray-900">New Job</h2>
+              <button onClick={() => setShowNewJob(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500"><X size={20} /></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Job Title</label>
+                <input value={newJob.title} onChange={e => setNewJob(p => ({...p, title: e.target.value}))} placeholder="e.g. Panel Upgrade - Smith Residence" className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</label>
+                <input value={newJob.address} onChange={e => setNewJob(p => ({...p, address: e.target.value}))} placeholder="123 Main St, Minneapolis" className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</label>
+                  <select value={newJob.status} onChange={e => setNewJob(p => ({...p, status: e.target.value}))} className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                    <option>Lead</option>
+                    <option>Scheduled</option>
+                    <option>In Progress</option>
+                    <option>Complete</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Priority</label>
+                  <select value={newJob.priority} onChange={e => setNewJob(p => ({...p, priority: e.target.value}))} className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                    <option value="emergency">Emergency</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="p-5 border-t flex gap-3">
+              <button onClick={() => setShowNewJob(false)} className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg text-sm font-medium hover:bg-gray-50">Cancel</button>
+              <button
+                disabled={!newJob.title.trim() || creating}
+                onClick={async () => {
+                  setCreating(true);
+                  try {
+                    const res = await fetch("/api/jobs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(newJob) });
+                    const json = await res.json();
+                    if (json.job) {
+                      setJobs(prev => [json.job, ...prev]);
+                      setShowNewJob(false);
+                      setNewJob({ title: "", address: "", status: "Lead", priority: "normal" });
+                    }
+                  } catch(e) { console.error(e); } finally { setCreating(false); }
+                }}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-sm font-bold disabled:opacity-50"
+              >
+                {creating ? "Creating..." : "Create Job"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* GHL Contact Pre-fill Banner */}
       {ghlBanner && (
         <div className="mb-4 bg-indigo-50 border border-indigo-200 rounded-xl p-4 flex items-center justify-between">
@@ -120,6 +187,9 @@ export default function JobsArchivePage() {
           <p className="text-gray-500 mt-2">Every job, status, and customer tied together — in one place.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto items-stretch sm:items-center">
+          <button onClick={() => setShowNewJob(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm">
+            <Plus size={16} /> New Job
+          </button>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input

@@ -39,6 +39,14 @@ export default function Dashboard() {
   const [ghlContacts, setGhlContacts] = useState<any[]>([]);
   const [ghlTotal, setGhlTotal] = useState<number>(0);
   const [ghlLoading, setGhlLoading] = useState(true);
+  const [recentJobs, setRecentJobs] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/jobs?limit=4")
+      .then(r => r.json())
+      .then(json => setRecentJobs((json.jobs || []).slice(0, 4)))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/ghl/contacts?limit=5")
@@ -254,55 +262,36 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Pending Close-Outs (Send Invoice & Review) */}
+        {/* Recent Jobs */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex flex-col">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              <CheckCircle2 size={18} className="text-blue-600" /> Pending Close-Outs
+              <CheckCircle2 size={18} className="text-blue-600" /> Recent Jobs
             </h2>
+            <Link href="/jobs" className="text-xs text-gray-600 font-bold hover:text-gray-900">View All →</Link>
           </div>
-          <div className="p-5 space-y-4">
-            {/* Mock Job 1 */}
-            <div className="border border-gray-100 rounded-lg p-4 bg-gray-50 hover:bg-white hover:border-gray-300 transition-colors">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h4 className="font-semibold text-gray-900">Smith Residence - Panel Swap</h4>
-                  <p className="text-sm text-gray-500 mt-1">123 Main St, Maple Grove</p>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700">
-                  Ready to Bill
-                </span>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <button className="flex-1 bg-gray-900 text-white text-sm font-medium py-2 rounded-md hover:bg-gray-800 transition-colors shadow-sm">
-                  Send Invoice
-                </button>
-                <button className="flex-1 bg-white text-green-700 border border-green-200 text-sm font-medium py-2 rounded-md hover:bg-green-50 transition-colors flex items-center justify-center gap-1 shadow-sm">
-                  <TrendingUp size={14} /> Request Review
-                </button>
-              </div>
-            </div>
-
-            {/* Mock Job 2 */}
-            <div className="border border-gray-100 rounded-lg p-4 bg-gray-50 hover:bg-white hover:border-gray-300 transition-colors">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h4 className="font-semibold text-gray-900">Target Commercial - Wire Pull</h4>
-                  <p className="text-sm text-gray-500 mt-1">456 Retail Pkwy, Edina</p>
-                </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-green-200 bg-green-50 text-green-700">
-                  Ready to Bill
-                </span>
-              </div>
-              <div className="flex gap-2 mt-4">
-                <button className="flex-1 bg-gray-900 text-white text-sm font-medium py-2 rounded-md hover:bg-gray-800 transition-colors shadow-sm">
-                  Send Invoice
-                </button>
-                <button className="flex-1 bg-white text-green-700 border border-green-200 text-sm font-medium py-2 rounded-md hover:bg-green-50 transition-colors flex items-center justify-center gap-1 shadow-sm">
-                  <TrendingUp size={14} /> Request Review
-                </button>
-              </div>
-            </div>
+          <div className="p-5 space-y-3">
+            {recentJobs.length === 0 ? (
+              <div className="text-sm text-gray-500 text-center py-4">No jobs yet. Jobs will appear here as they come in from AI calls.</div>
+            ) : recentJobs.map((job: any) => {
+              const customerName = job.customers ? `${job.customers.first_name || ""} ${job.customers.last_name || ""}`.trim() : "";
+              const statusColor = (job.status || "").toLowerCase().includes("complete") ? "border-green-200 bg-green-50 text-green-700" :
+                (job.status || "").toLowerCase().includes("schedule") ? "border-purple-200 bg-purple-50 text-purple-700" :
+                "border-yellow-200 bg-yellow-50 text-yellow-700";
+              return (
+                <Link href={`/jobs/${job.id}`} key={job.id} className="block border border-gray-100 rounded-lg p-4 bg-gray-50 hover:bg-white hover:border-gray-300 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-gray-900 text-sm truncate">{job.title || "Untitled Job"}</h4>
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">{customerName || job.address || "No address"}</p>
+                    </div>
+                    <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ml-2 shrink-0 ${statusColor}`}>
+                      {job.status || "Lead"}
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 

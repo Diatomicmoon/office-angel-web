@@ -6,6 +6,19 @@ import { FileText, MapPin, Building, Search, DollarSign, Calendar, Filter } from
 export default function PermitsPage() {
   const [permits, setPermits] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filtered = permits.filter(p => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      (p.permit_number || "").toLowerCase().includes(q) ||
+      (p.municipality || "").toLowerCase().includes(q) ||
+      (p.permit_type || "").toLowerCase().includes(q) ||
+      (p.status || "").toLowerCase().includes(q) ||
+      (p.jobs?.title || "").toLowerCase().includes(q)
+    );
+  });
 
   useEffect(() => {
     async function fetchPermits() {
@@ -36,6 +49,8 @@ export default function PermitsPage() {
             <input 
               type="text" 
               placeholder="Search permits..." 
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-2 border rounded-lg w-64 focus:ring-2 focus:ring-blue-500 outline-none"
             />
           </div>
@@ -102,7 +117,7 @@ export default function PermitsPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {permits.map(permit => (
+              {filtered.map(permit => (
                 <tr key={permit.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4">
                     <span className="font-medium">{permit.permit_number || 'Pending'}</span>

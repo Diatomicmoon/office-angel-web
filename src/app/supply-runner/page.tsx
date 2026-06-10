@@ -52,57 +52,90 @@ export default function SupplyRunnerPage() {
   const [sent, setSent] = useState(false);
   const [kits, setKits] = useState<PresetKit[]>(DEFAULT_KITS);
 
-  // Load from local storage for demo persistence
+  // Load from Supabase, fall back to localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("supplyRunnerItems");
-    if (saved) setItems(JSON.parse(saved));
+    fetch("/api/supply-runner")
+      .then(r => r.json())
+      .then(json => {
+        if (json.items && json.items.length > 0) {
+          setItems(json.items);
+          localStorage.removeItem("supplyRunnerItems"); // clear old local data
+        } else {
+          // Supabase empty or table not yet created — check localStorage
+          const saved = localStorage.getItem("supplyRunnerItems");
+          if (saved) setItems(JSON.parse(saved));
+        }
+      })
+      .catch(() => {
+        const saved = localStorage.getItem("supplyRunnerItems");
+        if (saved) setItems(JSON.parse(saved));
+      });
   }, []);
-
-  const saveToStorage = (newItems: MaterialItem[]) => {
-    setItems(newItems);
-    localStorage.setItem("supplyRunnerItems", JSON.stringify(newItems));
-  };
 
   const addItem = () => {
     if (!newItemName.trim()) return;
-    const newItem: MaterialItem = {
-      id: Math.random().toString(36).substr(2, 9),
-      name: newItemName,
-      quantity: newItemQty,
-      unit: "ea",
-      notes: ""
-    };
-    saveToStorage([...items, newItem]);
+    const tempId = Math.random().toString(36).substr(2, 9);
+    const newItem: MaterialItem = { id: tempId, name: newItemName, quantity: newItemQty, unit: "ea", notes: "" };
+    setItems(prev => [...prev, newItem]);
     setNewItemName("");
     setNewItemQty(1);
+    fetch("/api/supply-runner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add", item: { name: newItemName, quantity: newItemQty, unit: "ea", notes: "" } }),
+    })
+      .then(r => r.json())
+      .then(json => {
+        // Replace temp id with real Supabase id
+        if (json.item?.id) setItems(prev => prev.map(i => i.id === tempId ? { ...i, id: json.item.id } : i));
+      })
+      .catch(() => localStorage.setItem("supplyRunnerItems", JSON.stringify([...items, newItem])));
   };
 
   const removeItem = (id: string) => {
-    saveToStorage(items.filter(item => item.id !== id));
+    setItems(prev => prev.filter(i => i.id !== id));
+    fetch("/api/supply-runner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "remove", id }),
+    }).catch(console.error);
   };
 
   const updateItemQty = (id: string, qty: number) => {
-    saveToStorage(items.map(item => item.id === id ? { ...item, quantity: Math.max(1, qty) } : item));
+    const safe = Math.max(1, qty);
+    setItems(prev => prev.map(i => i.id === id ? { ...i, quantity: safe } : i));
+    fetch("/api/supply-runner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "update_qty", id, quantity: safe }),
+    }).catch(console.error);
   };
 
   const loadKit = (kit: PresetKit) => {
-    const newItems = kit.items.map(item => ({
-      ...item,
-      id: Math.random().toString(36).substr(2, 9)
-    }));
-    saveToStorage([...items, ...newItems]);
+    kit.items.forEach(item => {
+      const tempId = Math.random().toString(36).substr(2, 9);
+      setItems(prev => [...prev, { ...item, id: tempId }]);
+      fetch("/api/supply-runner", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "add", item }),
+      })
+        .then(r => r.json())
+        .then(json => {
+          if (json.item?.id) setItems(prev => prev.map(i => i.id === tempId ? { ...i, id: json.item.id } : i));
+        })
+        .catch(console.error);
+    });
   };
 
   const sendOrder = () => {
     setSent(true);
-    // In a real app, this hits an API to send SendGrid/Resend email.
-    // For now we simulate success and open mailto as fallback.
     const body = items.map(i => `${i.quantity} ${i.unit} - ${i.name} ${i.notes ? '('+i.notes+')' : ''}`).join('%0D%0A');
     window.location.href = `mailto:${supplierEmail}?subject=Material Order - Hardhat Holdings LLC&body=Please prep the following order for Will Call:%0D%0A%0D%0A${body}%0D%0A%0D%0AThank you,%0D%0AHard Hat Solutions Automations`;
-    
     setTimeout(() => {
       setItems([]);
       localStorage.removeItem("supplyRunnerItems");
+      fetch("/api/supply-runner", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "clear" }) }).catch(() => {});
       setSent(false);
     }, 3000);
   };
