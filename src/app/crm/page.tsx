@@ -1,7 +1,7 @@
 "use client";
 
 import { Kanban, List, MapPin, Phone, X, Clock, Zap, FileText, ChevronRight, User, ExternalLink, Users, Search, Tag } from "lucide-react";
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect as useEffectPanel } from "react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -238,7 +238,34 @@ function LeadDetail({ lead, onClose }: { lead: Lead; onClose: () => void }) {
 }
 
 // ─── GHL Contact Detail Panel ───────────────────────────────────────────────
+const STAGE_COLOR: Record<string, string> = {
+  "New Lead": "bg-blue-50 text-blue-700 border-blue-200",
+  "Contacted": "bg-yellow-50 text-yellow-700 border-yellow-200",
+  "Declined Appointment": "bg-red-50 text-red-700 border-red-200",
+  "Appointment Set": "bg-purple-50 text-purple-700 border-purple-200",
+  "Demo Ran": "bg-indigo-50 text-indigo-700 border-indigo-200",
+  "Limbo": "bg-gray-50 text-gray-600 border-gray-200",
+  "Closed": "bg-green-50 text-green-700 border-green-200",
+  "Declined Offer": "bg-orange-50 text-orange-700 border-orange-200",
+  "Installed": "bg-emerald-50 text-emerald-700 border-emerald-200",
+};
+
 function GhlContactDetail({ contact, onClose }: { contact: any; onClose: () => void }) {
+  const [full, setFull] = useState<any | null>(null);
+  const [detailLoading, setDetailLoading] = useState(true);
+
+  useEffectPanel(() => {
+    setDetailLoading(true);
+    fetch(`/api/ghl/contact/${contact.id}`)
+      .then(r => r.json())
+      .then(json => setFull(json.contact || null))
+      .catch(console.error)
+      .finally(() => setDetailLoading(false));
+  }, [contact.id]);
+
+  const c = full || contact;
+  const ghlUrl = `https://app.gohighlevel.com/location/${process.env.NEXT_PUBLIC_GHL_LOCATION_ID || "sQBA4sP42sWkqxf1pZsY"}/contacts/detail/${contact.id}`;
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* backdrop */}
@@ -249,39 +276,67 @@ function GhlContactDetail({ contact, onClose }: { contact: any; onClose: () => v
         {/* Header */}
         <div className="flex items-start justify-between p-6 border-b border-gray-200 bg-gray-50">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-indigo-200 bg-indigo-50 text-indigo-700">GHL Contact</span>
-              {contact.dateAdded && <span className="text-xs text-gray-500">Added {new Date(contact.dateAdded).toLocaleDateString()}</span>}
+              {!detailLoading && c.pipelineStage && (
+                <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${STAGE_COLOR[c.pipelineStage] || "bg-gray-50 text-gray-600 border-gray-200"}`}>
+                  {c.pipelineStage}
+                </span>
+              )}
+              {c.dateAdded && <span className="text-xs text-gray-500">Added {new Date(c.dateAdded).toLocaleDateString()}</span>}
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mt-2">{contact.name}</h2>
-            {contact.phone && (
-              <a href={`tel:${contact.phone}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-1">
-                <Phone size={14} /> {contact.phone}
+            <h2 className="text-xl font-bold text-gray-900 mt-2">{c.name}</h2>
+            {c.phone && (
+              <a href={`tel:${c.phone}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-1">
+                <Phone size={14} /> {c.phone}
               </a>
             )}
-            {contact.email && (
-              <a href={`mailto:${contact.email}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-0.5">
-                <ExternalLink size={14} /> {contact.email}
+            {c.email && (
+              <a href={`mailto:${c.email}`} className="flex items-center gap-1.5 text-sm text-blue-600 hover:underline mt-0.5">
+                <ExternalLink size={14} /> {c.email}
               </a>
             )}
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors text-gray-500">
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            <a href={ghlUrl} target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1 border border-indigo-200 bg-indigo-50 px-2 py-1 rounded-lg">
+              GHL <ExternalLink size={11} />
+            </a>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-200 transition-colors text-gray-500">
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
 
+          {detailLoading && (
+            <div className="text-center text-gray-400 text-sm py-4">Loading full profile...</div>
+          )}
+
+          {/* Pipeline Stage Card */}
+          {!detailLoading && c.pipelineStage && (
+            <div className={`rounded-xl p-4 border flex items-center justify-between ${STAGE_COLOR[c.pipelineStage] || "bg-gray-50 border-gray-200"}`}>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider opacity-70">Pipeline Stage</p>
+                <p className="text-base font-bold mt-0.5">{c.pipelineStage}</p>
+                {c.opportunityCount > 0 && <p className="text-xs opacity-70 mt-0.5">{c.opportunityCount} opportunit{c.opportunityCount === 1 ? "y" : "ies"}</p>}
+              </div>
+              {c.opportunityValue > 0 && (
+                <p className="text-lg font-bold">${c.opportunityValue.toLocaleString()}</p>
+              )}
+            </div>
+          )}
+
           {/* Address */}
-          {contact.address && (
+          {c.address && (
             <div className="flex items-start gap-3 bg-gray-50 rounded-xl p-4 border border-gray-200">
               <MapPin size={18} className="text-gray-400 mt-0.5 shrink-0" />
               <div>
                 <p className="text-xs text-gray-500 mb-0.5">Address</p>
-                <p className="text-sm font-medium text-gray-900">{contact.address}</p>
+                <p className="text-sm font-medium text-gray-900">{c.address}</p>
                 <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(contact.address)}`}
+                  href={`https://maps.google.com/?q=${encodeURIComponent(c.address)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-xs text-blue-600 hover:underline mt-1 inline-flex items-center gap-1"
@@ -300,47 +355,27 @@ function GhlContactDetail({ contact, onClose }: { contact: any; onClose: () => v
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-gray-500 text-xs mb-0.5">Type</p>
-                <p className="font-medium text-gray-900 capitalize">{contact.type || "—"}</p>
+                <p className="font-medium text-gray-900 capitalize">{c.type || "—"}</p>
               </div>
               <div>
                 <p className="text-gray-500 text-xs mb-0.5">Source</p>
-                <p className="font-medium text-gray-900">{contact.source || "—"}</p>
+                <p className="font-medium text-gray-900">{c.source || "—"}</p>
               </div>
-              {contact.city && (
-                <div>
-                  <p className="text-gray-500 text-xs mb-0.5">City</p>
-                  <p className="font-medium text-gray-900">{contact.city}</p>
-                </div>
-              )}
-              {contact.state && (
-                <div>
-                  <p className="text-gray-500 text-xs mb-0.5">State</p>
-                  <p className="font-medium text-gray-900">{contact.state}</p>
-                </div>
-              )}
-              {contact.zip && (
-                <div>
-                  <p className="text-gray-500 text-xs mb-0.5">Zip</p>
-                  <p className="font-medium text-gray-900">{contact.zip}</p>
-                </div>
-              )}
-              {contact.dateUpdated && (
-                <div>
-                  <p className="text-gray-500 text-xs mb-0.5">Last Updated</p>
-                  <p className="font-medium text-gray-900">{new Date(contact.dateUpdated).toLocaleDateString()}</p>
-                </div>
-              )}
+              {c.city && <div><p className="text-gray-500 text-xs mb-0.5">City</p><p className="font-medium text-gray-900">{c.city}</p></div>}
+              {c.state && <div><p className="text-gray-500 text-xs mb-0.5">State</p><p className="font-medium text-gray-900">{c.state}</p></div>}
+              {c.zip && <div><p className="text-gray-500 text-xs mb-0.5">Zip</p><p className="font-medium text-gray-900">{c.zip}</p></div>}
+              {c.dateUpdated && <div><p className="text-gray-500 text-xs mb-0.5">Last Updated</p><p className="font-medium text-gray-900">{new Date(c.dateUpdated).toLocaleDateString()}</p></div>}
             </div>
           </div>
 
           {/* Tags */}
-          {contact.tags?.length > 0 && (
+          {c.tags?.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-gray-700 font-semibold text-sm">
                 <Tag size={14} /> Tags
               </div>
               <div className="flex flex-wrap gap-2">
-                {contact.tags.map((t: string) => (
+                {c.tags.map((t: string) => (
                   <span key={t} className="text-xs px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">{t}</span>
                 ))}
               </div>
@@ -350,16 +385,24 @@ function GhlContactDetail({ contact, onClose }: { contact: any; onClose: () => v
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-200 bg-gray-50 flex gap-3">
-          {contact.phone && (
+          {c.phone && (
             <a
-              href={`tel:${contact.phone}`}
+              href={`tel:${c.phone}`}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg text-center transition-colors flex items-center justify-center gap-2"
             >
               <Phone size={16} /> Call
             </a>
           )}
+          <a
+            href={ghlUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+          >
+            <ExternalLink size={16} /> Open in GHL
+          </a>
           <Link
-            href={`/jobs?ghl_contact=${contact.id}&name=${encodeURIComponent(contact.name)}&phone=${encodeURIComponent(contact.phone || '')}&address=${encodeURIComponent(contact.address || '')}`}
+            href={`/jobs?ghl_contact=${contact.id}&name=${encodeURIComponent(c.name)}&phone=${encodeURIComponent(c.phone || '')}&address=${encodeURIComponent(c.address || '')}`}
             className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <FileText size={16} /> Create Job
