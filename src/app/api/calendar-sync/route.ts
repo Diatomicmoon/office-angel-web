@@ -35,8 +35,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true, message: 'Job cancelled from calendar sync' });
     }
 
+    // Determine company_id
+    let company_id = body.company_id || process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
+    if (!company_id) {
+      const { data: c0 } = await supabase.from("companies").select("id").limit(1);
+      company_id = c0?.[0]?.id;
+    }
+
+    if (!company_id) {
+      return NextResponse.json(
+        { error: 'No company configured in the system.' },
+        { status: 400 }
+      );
+    }
+
     // 2. Map Google Calendar data to Hard Hat Solutions Job schema
     const jobData = {
+      company_id,
       title: event_title,
       scheduled_start: start_time,
       scheduled_end: end_time,
