@@ -78,7 +78,7 @@ export async function GET() {
       .select('*, customers(first_name, last_name, phone_number)')
       .eq('company_id', companyId)
       .is('technician_id', null)
-      .in('status', ['Lead', 'Reschedule Requested'])
+      .in('status', ['Lead', 'Reschedule Requested', 'scheduled'])
       .order('updated_at', { ascending: false })
       .order('created_at', { ascending: false })
       .limit(50);
