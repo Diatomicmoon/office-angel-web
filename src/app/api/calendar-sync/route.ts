@@ -38,8 +38,8 @@ export async function POST(req: Request) {
     // Determine company_id
     let company_id = body.company_id || process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
     if (!company_id) {
-      const { data: c0 } = await supabase.from("companies").select("id").limit(1);
-      company_id = c0?.[0]?.id;
+      // Force it to Christian's Demo Company if env var is missing on Vercel
+      company_id = '8e53126d-d9a7-414c-8291-8657fbf43123';
     }
 
     if (!company_id) {
