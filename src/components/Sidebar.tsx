@@ -17,15 +17,28 @@ export default function Sidebar() {
         const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
         const { data: userRes } = await supabase.auth.getUser();
         if (userRes?.user) {
-          const { data } = await supabase.from('company_memberships').select('role, company_id').eq('user_id', userRes.user.id).limit(1);
-          if (data && data.length > 0) {
-            setRole(data[0].role);
-            
-            // Fetch company name
-            const { data: comp } = await supabase.from('companies').select('name').eq('id', data[0].company_id).single();
+          // Check company_memberships first
+          let foundRole = null;
+          let foundCompany = null;
+
+          const { data: memData } = await supabase.from('company_memberships').select('role, company_id').eq('user_id', userRes.user.id).limit(1);
+          if (memData && memData.length > 0) {
+            foundRole = memData[0].role;
+            foundCompany = memData[0].company_id;
+          } else {
+            // Fallback to profiles table
+            const { data: profData } = await supabase.from('profiles').select('role, company_id').eq('id', userRes.user.id).limit(1);
+            if (profData && profData.length > 0) {
+              foundRole = profData[0].role;
+              foundCompany = profData[0].company_id;
+            }
+          }
+
+          if (foundRole) {
+            setRole(foundRole);
+            const { data: comp } = await supabase.from('companies').select('name').eq('id', foundCompany).single();
             if (comp?.name) {
               setCompanyName(comp.name);
-              // Simple check if it's the internal dev instance or a customer
               if (comp.name.includes("Hardhat Electric")) {
                  setIsDemo(true);
               }
@@ -39,7 +52,8 @@ export default function Sidebar() {
     fetchRoleAndCompany();
   }, []);
   
-  const isFieldRep = role === 'field_rep';
+  // Define restrictive roles based on user request (apprentice, tech, sales, field_rep, etc.)
+  const isRestricted = ['field_rep', 'tech', 'apprentice', 'sales'].includes(role?.toLowerCase());
 
   const pathname = usePathname();
   const itemClass = (href: string) => {
@@ -64,19 +78,19 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-4">
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/dashboard" className={itemClass('/dashboard')}>
             <Home size={20} />
             <span>Dashboard</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/call-logs" className={itemClass('/call-logs')}>
             <Phone size={20} />
             <span>Call Logs</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/co-pilot" className={itemClass('/co-pilot')}>
             <Mic size={20} />
             <span className="flex items-center gap-2">
@@ -85,7 +99,7 @@ export default function Sidebar() {
             </span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/crm" className={itemClass('/crm')}>
             <Users size={20} />
             <span>Leads & CRM</span>
@@ -95,13 +109,13 @@ export default function Sidebar() {
           <Map size={20} />
           <span>Door-to-Door CRM</span>
         </Link>
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/projects" className={itemClass('/projects')}>
             <Archive size={20} />
             <span>Customers</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/jobs" className={itemClass('/jobs')}>
             <Briefcase size={20} />
             <span>Job Archive</span>
@@ -111,31 +125,31 @@ export default function Sidebar() {
           <Clock size={20} />
           <span>Timesheets & Payroll</span>
         </Link>
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/dispatch" className={itemClass('/dispatch')}>
             <Calendar size={20} />
             <span>Dispatch</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
             <Inbox size={20} />
             <span>Scheduling Inbox</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/permits" className={itemClass('/permits')}>
             <FileText size={20} />
             <span>Permits & Inspections</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/pricing" className={itemClass('/pricing')}>
             <DollarSign size={20} />
             <span>Material Cost Engine</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/inbox" className={itemClass('/inbox')}>
             <Inbox size={20} />
             <span>AI Inbox & Docs</span>
@@ -145,25 +159,25 @@ export default function Sidebar() {
           <Smartphone size={20} />
           <span>Field App (Techs)</span>
         </Link>
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/marketing" className={itemClass('/marketing')}>
             <Share2 size={20} />
             <span>SEO & Marketing</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/receipts" className={itemClass('/receipts')}>
             <FileText size={20} />
             <span>Receipt Inbox</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/supply-runner" className={itemClass('/supply-runner')}>
             <Truck size={20} />
             <span>Supply Runner</span>
           </Link>
         )}
-        {!isFieldRep && (
+        {!isRestricted && (
           <Link href="/financials" className={itemClass('/financials')}>
             <DollarSign size={20} />
             <span>Financial Command</span>
@@ -171,7 +185,7 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {!isFieldRep && (
+      {!isRestricted && (
         <div className="p-4 border-t border-gray-800">
           <Link href="/settings" className={itemClass('/settings')}>
             <Settings size={20} />
