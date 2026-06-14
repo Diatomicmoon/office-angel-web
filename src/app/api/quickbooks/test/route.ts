@@ -1,3 +1,4 @@
+import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -7,10 +8,12 @@ export async function GET(req: Request) {
     process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
   );
 
-  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
-  if (!companyId) {
-    const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
-    companyId = c0?.[0]?.id;
+  let companyId;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    companyId = res.companyId;
+  } catch (err) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Get the tokens from the DB
@@ -30,7 +33,7 @@ export async function GET(req: Request) {
   if (visits && visits.length > 0) {
     const repCounts: Record<string, { knocks: number, hot: number }> = {};
     for (const v of visits) {
-      const rep = v.rep_name || "Christian (Owner)"; 
+      const rep = v.rep_name || "Sales Rep"; 
       if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
       repCounts[rep].knocks++;
       if (v.interest_level === 'hot') repCounts[rep].hot++;

@@ -167,6 +167,49 @@ export async function POST(req: Request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
     );
 
+    // MMS Receipt Interception
+    const numMedia = Number(form.get('NumMedia') || '0');
+    if (numMedia > 0) {
+      const mediaUrl = String(form.get('MediaUrl0') || '');
+      const mediaContentType = String(form.get('MediaContentType0') || 'image/jpeg');
+      
+      if (mediaUrl && mediaContentType.startsWith('image/')) {
+        try {
+          const imgRes = await fetch(mediaUrl);
+          const imgBuffer = await imgRes.arrayBuffer();
+          
+          const fileName = `${Date.now()}_${from.replace(/\D/g,'')}.jpg`;
+          
+          const { data: uploadData, error: uploadErr } = await supabase.storage
+            .from('receipts')
+            .upload(fileName, imgBuffer, { contentType: mediaContentType });
+            
+          if (!uploadErr && uploadData) {
+            const { data: publicUrlData } = supabase.storage.from('receipts').getPublicUrl(fileName);
+            const finalUrl = publicUrlData.publicUrl;
+            
+            const baseUrl = req.url.split('/api/')[0];
+            // Fire and forget to our receipts ingestion endpoint
+            fetch(`${baseUrl}/api/receipts-inbound`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                from: from,
+                to: to,
+                subject: `SMS Receipt from ${from}`,
+                text: body,
+                imageUrl: finalUrl
+              })
+            }).catch(e => console.error("[INBOUND SMS] Error forwarding MMS to receipts:", e));
+            
+            return new NextResponse(twiml("Receipt image received! We are analyzing it now and adding it to your Material Cost Engine."), { status: 200, headers: { 'Content-Type': 'text/xml' } });
+          }
+        } catch (e) {
+          console.error("[INBOUND SMS] Failed to process MMS receipt", e);
+        }
+      }
+    }
+
     // Resolve company.
     // - In pinned-tenant mode, ALWAYS use OFFICE_ANGEL_COMPANY_ID (so inbound matches what the app is showing).
     // - In auth tenant mode, map by inbound "To" number.
@@ -427,8 +470,7 @@ export async function POST(req: Request) {
         status: 'Lead',
         priority: urgencyFlag === 'high' ? 'high' : urgencyFlag === 'low' ? 'low' : 'normal',
         estimated_minutes: estimatedMinutes,
-        scheduled_start: suggestedStart.toISOString(),
-        scheduled_end: suggestedEnd.toISOString(),
+        // Omit scheduled_start and scheduled_end so it defaults to AI Captured/Estimating
         ...(messagesTableOk ? {} : { notes: body || null }),
       };
 

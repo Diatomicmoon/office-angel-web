@@ -13,7 +13,7 @@ export const TENANT_COOKIE = "oa_company_id";
  * - If OFFICE_ANGEL_TENANT_MODE="auth": require a logged-in user and verify membership
  */
 export async function resolveCompanyIdOrThrow() {
-  const tenantMode = process.env.HARD_HAT_TENANT_MODE || process.env.OFFICE_ANGEL_TENANT_MODE;
+  const tenantMode = process.env.HARD_HAT_TENANT_MODE || process.env.OFFICE_ANGEL_TENANT_MODE || "auth";
 
   // Legacy / beta: pinned tenant via env
   if (tenantMode !== "auth") {

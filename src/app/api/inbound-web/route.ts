@@ -239,7 +239,8 @@ export async function POST(req: Request) {
     const text = [message, address].filter(Boolean).join('\n');
     const urgencyFlag = deriveUrgency(text);
     const estimatedMinutes = heuristicDurationMinutes(text);
-    const title = urgencyFlag === 'high' ? 'Emergency Web Message' : 'Website Message';
+    const baseTitle = urgencyFlag === 'high' ? 'Emergency Web Lead' : 'Web Lead';
+    const title = message ? `${baseTitle}: ${message.substring(0, 50)}${message.length > 50 ? '...' : ''}` : `${baseTitle} from ${name || 'Unknown'}`;
 
     const win = parseTimeWindow(text);
     let suggestedStart = win ? new Date(win.startIso) : suggestStartTime(urgencyFlag, scheduleStartMin, scheduleEndMin);
@@ -254,9 +255,9 @@ export async function POST(req: Request) {
       address: address || null,
       priority: urgencyFlag === 'high' ? 'high' : urgencyFlag === 'low' ? 'low' : 'normal',
       estimated_minutes: estimatedMinutes,
-      scheduled_start: suggestedStart.toISOString(),
-      scheduled_end: suggestedEnd.toISOString(),
-      ...(messagesTableOk ? {} : { notes: message || null }),
+      // Deliberately omit scheduled_start and scheduled_end so it drops into AI Captured/Estimating
+      // instead of appearing fully "Scheduled" in the CRM board.
+      notes: message || null,
     };
 
     let jobId: string | null = null;

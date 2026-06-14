@@ -23,6 +23,7 @@ type Lead = {
   status: string;
   time_ago: string;
   created_at: string;
+  isWeb?: boolean;
 };
 
 type JobLite = {
@@ -54,11 +55,12 @@ function fmtDate(iso?: string) {
   return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 }
 
-function UrgencyBadge({ urgency }: { urgency: string }) {
+function UrgencyBadge({ urgency, isWeb }: { urgency: string, isWeb?: boolean }) {
   const u = (urgency || "low").toLowerCase();
+  const icon = isWeb ? "🌐" : "📞";
   if (u === "high") return <span className="text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded">🚨 Emergency</span>;
   if (u === "medium") return <span className="text-xs font-bold text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded">📋 Estimate</span>;
-  return <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">📞 Standard</span>;
+  return <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded">{icon} Standard</span>;
 }
 
 function extractAddressFromSummary(summary: string): string | null {
@@ -113,7 +115,7 @@ function LeadDetail({ lead, onClose }: { lead: Lead; onClose: () => void }) {
         <div className="flex items-start justify-between p-6 border-b border-gray-200 bg-gray-50">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <UrgencyBadge urgency={lead.urgency} />
+              <UrgencyBadge urgency={lead.urgency} isWeb={lead.isWeb} />
               <span className="text-xs text-gray-500">{fmtDate(lead.created_at)}</span>
             </div>
             <h2 className="text-xl font-bold text-gray-900 mt-2">{lead.caller_name}</h2>
@@ -468,11 +470,20 @@ export default function CRM() {
   }, [activeTab]);
 
   useEffect(() => {
-    fetch("/api/call-logs?limit=50", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((json) => {
-        const mapped: Lead[] = (json.calls || []).map((c: any) => {
+    Promise.all([
+      fetch("/api/call-logs?limit=50", { cache: "no-store" }).then(r => r.json()),
+      fetch("/api/jobs?limit=100", { cache: "no-store" }).then(r => r.json())
+    ])
+      .then(([callsJson, jobsJson]) => {
+        const calls = callsJson.calls || [];
+        const jobs = (jobsJson.jobs || []) as any[];
+        
+        // Find jobs that have a call log linked
+        const callJobIds = new Set<string>();
+        
+        const callLeads: Lead[] = calls.map((c: any) => {
           const norm = extractNormalized(c.meta);
+          if (norm.job_id) callJobIds.add(norm.job_id);
 
           const phone = c.customers?.phone_number || "";
           const customerName = c.customers?.first_name && c.customers.first_name !== "New"
@@ -523,36 +534,62 @@ export default function CRM() {
         });
 
         // Pull linked jobs so we can show real Scheduled status/time.
-        const jobIds = Array.from(new Set(mapped.map((l) => l.job_id).filter(Boolean) as string[]));
-        if (jobIds.length === 0) {
-          setLeads(mapped);
-          setLoading(false);
-          return;
-        }
+        const jobIds = Array.from(new Set(callLeads.map((l) => l.job_id).filter(Boolean) as string[]));
 
-        fetch(`/api/jobs?ids=${encodeURIComponent(jobIds.join(','))}`, { cache: "no-store" })
-          .then((r) => r.json())
-          .then((j) => {
-            const jobs: JobLite[] = (j.jobs || []) as JobLite[];
-            const jobMap = new Map(jobs.map((x) => [x.id, x]));
-            const merged = mapped.map((l) => {
-              const job = l.job_id ? jobMap.get(l.job_id) : null;
-              const scheduledStart = (job as any)?.scheduled_start || null;
-              const jobStatus = String((job as any)?.status || '').toLowerCase();
-              const isScheduled = Boolean(scheduledStart) || jobStatus === 'scheduled';
-              return {
-                ...l,
-                scheduled_start: scheduledStart,
-                status: isScheduled ? 'scheduled' : l.status,
-              };
-            });
-            setLeads(merged);
-            setLoading(false);
-          })
-          .catch(() => {
-            setLeads(mapped);
-            setLoading(false);
+        // Map the calls with job data
+        const jobMap = new Map(jobs.map((x) => [x.id, x]));
+        const mergedCalls = callLeads.map((l) => {
+          const job = l.job_id ? jobMap.get(l.job_id) : null;
+          const scheduledStart = job?.scheduled_start || null;
+          const jobStatus = String(job?.status || '').toLowerCase();
+          const isScheduled = Boolean(scheduledStart) || jobStatus === 'scheduled';
+          return {
+            ...l,
+            scheduled_start: scheduledStart,
+            status: isScheduled ? 'scheduled' : l.status,
+          };
+        });
+
+        // Now find jobs that ARE NOT linked to a call log (like Web/SMS leads)
+        // and map them into the board
+        const webLeads: Lead[] = jobs
+          .filter((j) => !callJobIds.has(j.id))
+          .filter((j) => j.status?.toLowerCase() === 'lead' || j.status?.toLowerCase() === 'estimating' || j.status?.toLowerCase() === 'scheduled')
+          .map((job) => {
+            const customerName = job.customers?.first_name && job.customers.first_name !== "New"
+              ? `${job.customers.first_name} ${job.customers.last_name || ""}`.trim() : "";
+            const phone = job.customers?.phone_number || "";
+            const isScheduled = Boolean(job.scheduled_start) || job.status?.toLowerCase() === 'scheduled';
+            
+            // Mark it as a web/sms lead for the UI
+            const isWeb = true;
+
+            return {
+              id: job.id,
+              customer_id: job.customer_id || "",
+              job_id: job.id,
+              scheduled_start: job.scheduled_start || null,
+              caller_name: customerName || (phone ? formatPhone(phone) : "Web/SMS Lead"),
+              phone,
+              address: job.address || "Address unknown",
+              job_type: job.title || "Job Request",
+              job_details: job.notes || "",
+              urgency: job.priority || "low",
+              summary: job.notes || "",
+              action_items: "",
+              transcript: null,
+              recording_url: "",
+              status: isScheduled ? "scheduled" : (job.status?.toLowerCase() === "estimating" ? "estimating" : "captured"),
+              time_ago: timeAgo(job.created_at),
+              created_at: job.created_at,
+              isWeb,
+            };
           });
+
+        const allLeads = [...mergedCalls, ...webLeads].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        console.log("Merged Calls:", mergedCalls.length, "Web Leads:", webLeads.length, "All Leads:", allLeads.length);
+        setLeads(allLeads);
+        setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
@@ -567,7 +604,7 @@ export default function CRM() {
       className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm cursor-pointer hover:border-blue-400 hover:shadow-md transition-all group"
     >
       <div className="flex justify-between items-start mb-2">
-        <UrgencyBadge urgency={lead.urgency} />
+        <UrgencyBadge urgency={lead.urgency} isWeb={lead.isWeb} />
         <span className="text-xs text-gray-400">{lead.time_ago}</span>
       </div>
       <h4 className="font-semibold text-gray-900 mt-2 group-hover:text-blue-700 transition-colors">{lead.job_type}</h4>
@@ -740,7 +777,7 @@ export default function CRM() {
                       <Phone size={12} /> {formatPhone(lead.phone) || "—"}
                     </p>
                   </div>
-                  <div><UrgencyBadge urgency={lead.urgency} /></div>
+                  <div><UrgencyBadge urgency={lead.urgency} isWeb={lead.isWeb} /></div>
                   <div>
                     <p className="text-sm text-gray-900">{lead.job_type}</p>
                     <p className="text-xs text-gray-500 mt-0.5 truncate">{lead.address}</p>

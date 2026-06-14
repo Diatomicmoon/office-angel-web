@@ -74,8 +74,12 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Command Center</h1>
-          <p className="text-sm md:text-base text-gray-500 mt-1 md:mt-2">Live overview of dispatch, AI operations, and daily revenue.</p>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+            {data.user?.firstName ? `Hey ${data.user.firstName}, welcome back!` : "Command Center"}
+          </h1>
+          <p className="text-sm md:text-base text-gray-500 mt-1 md:mt-2">
+            {data.company?.name ? `Live overview for ${data.company.name}.` : "Live overview of dispatch, AI operations, and daily revenue."}
+          </p>
         </div>
         <div className="flex gap-3 items-center w-full md:w-auto">
           

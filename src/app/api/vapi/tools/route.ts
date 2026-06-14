@@ -51,16 +51,16 @@ export async function POST(req: Request) {
           result: `Availability for ${date}: 8:00 AM, 10:00 AM, 1:00 PM, 3:30 PM are all open.`
         });
       } 
-      else if (func.name === 'book_appointment') {
+      else if (func.name === 'create_dispatch_ticket' || func.name === 'book_appointment') {
         if (!companyId) {
           results.push({
             toolCallId: id,
-            result: "Error: Could not identify company to book under."
+            result: "Error: Could not identify company to book under. Ask the caller to hold and notify an admin."
           });
           continue;
         }
 
-        // Create job
+        // Create job ticket
         const { data: job, error } = await supabase()
           .from('jobs')
           .insert([
@@ -69,8 +69,8 @@ export async function POST(req: Request) {
               title: args.issue_description || 'Service Call',
               status: 'Lead',
               address: args.address || null,
-              scheduled_start: args.scheduled_time || null,
-              priority: 'medium'
+              notes: `Customer Name: ${args.customer_name || 'Unknown'}\nPhone: ${args.customer_phone || 'Unknown'}\nUrgency: ${args.urgency || 'Normal'}\nIssue: ${args.issue_description}`,
+              priority: args.urgency === 'high' ? 'high' : 'medium'
             }
           ])
           .select('id')
@@ -83,10 +83,10 @@ export async function POST(req: Request) {
             result: "Error booking appointment. Please try again."
           });
         } else {
-          console.log(`[VAPI TOOLS] Booked job ${job.id}`);
+          console.log(`[VAPI TOOLS] Created dispatch ticket: ${job.id}`);
           results.push({
             toolCallId: id,
-            result: `Successfully booked appointment. Job ID: ${job.id}`
+            result: `Successfully created dispatch ticket. Job ID: ${job.id}. Tell the user the ticket is on the board.`
           });
         }
       } else {

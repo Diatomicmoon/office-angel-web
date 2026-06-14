@@ -1,3 +1,4 @@
+import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -12,12 +13,13 @@ export async function GET(req: Request) {
   const status = url.searchParams.get("status") || undefined;
   const jobId = url.searchParams.get("job_id") || undefined;
 
-  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
-  if (!companyId) {
-    const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
-    companyId = c0?.[0]?.id;
+  let companyId;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    companyId = res.companyId;
+  } catch (err) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  if (!companyId) return NextResponse.json({ receipts: [] });
 
   let q = supabase
     .from("receipts")
@@ -42,14 +44,13 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => ({}));
 
-  let company_id = body.company_id as string | undefined;
-  if (!company_id) company_id = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
-  if (!company_id) {
-    const { data: c0 } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
-    company_id = c0?.[0]?.id;
+  let company_id;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    company_id = res.companyId;
+  } catch (err) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  if (!company_id) return NextResponse.json({ error: "No company configured." }, { status: 400 });
 
   const payload: any = {
     company_id,

@@ -8,23 +8,35 @@ import { createClient } from '@supabase/supabase-js';
 
 export default function Sidebar() {
   const [role, setRole] = useState<string>('owner');
+  const [companyName, setCompanyName] = useState<string>('Hard Hat Solutions');
+  const [isDemo, setIsDemo] = useState(false);
   
   useEffect(() => {
-    async function fetchRole() {
+    async function fetchRoleAndCompany() {
       try {
         const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
         const { data: userRes } = await supabase.auth.getUser();
         if (userRes?.user) {
-          const { data } = await supabase.from('company_memberships').select('role').eq('user_id', userRes.user.id).limit(1);
+          const { data } = await supabase.from('company_memberships').select('role, company_id').eq('user_id', userRes.user.id).limit(1);
           if (data && data.length > 0) {
             setRole(data[0].role);
+            
+            // Fetch company name
+            const { data: comp } = await supabase.from('companies').select('name').eq('id', data[0].company_id).single();
+            if (comp?.name) {
+              setCompanyName(comp.name);
+              // Simple check if it's the internal dev instance or a customer
+              if (comp.name.includes("Hardhat Electric")) {
+                 setIsDemo(true);
+              }
+            }
           }
         }
       } catch (err) {
         console.error("Failed to fetch role", err);
       }
     }
-    fetchRole();
+    fetchRoleAndCompany();
   }, []);
   
   const isFieldRep = role === 'field_rep';
@@ -38,11 +50,17 @@ export default function Sidebar() {
   return (
     <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-screen md:sticky md:top-0">
       <div className="p-6">
-        <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-          <Activity className="text-blue-500" />
-          Hard Hat Solutions
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
+          {companyName.includes("Yard") ? (
+            <img src="https://www.onemoreyardmn.com/logo.png" alt="One More Yard" className="h-10 w-auto object-contain brightness-0 invert" />
+          ) : (
+            <>
+              <Activity className="text-blue-500" />
+              {companyName}
+            </>
+          )}
         </h1>
-        <p className="text-gray-400 text-xs mt-1">Hardhat Holdings LLC</p>
+        <p className="text-gray-400 text-xs mt-2">Powered by Hard Hat Solutions</p>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-4">

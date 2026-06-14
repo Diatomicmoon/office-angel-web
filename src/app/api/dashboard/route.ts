@@ -1,3 +1,4 @@
+import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -17,26 +18,32 @@ export async function GET() {
     process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
   );
 
-  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
-  if (!companyId) {
-    const { data: c0 } = await supabase
-      .from("companies")
-      .select("id")
-      .order("created_at", { ascending: true })
-      .limit(1);
-    companyId = c0?.[0]?.id;
+  let companyId;
+  let userId;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    companyId = res.companyId;
+    userId = res.userId;
+  } catch (err) {
+    console.error("Dashboard auth error:", err);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
   if (!companyId) {
     return NextResponse.json({ calls: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 }, technicians: [], actionItems: [], techTableAvailable: true });
   }
 
   const { data: companyData } = await supabase
     .from("companies")
-    .select("quickbooks_realm_id, quickbooks_access_token")
+    .select("name, quickbooks_realm_id, quickbooks_access_token")
     .eq("id", companyId)
     .single();
   const qbConnected = !!companyData?.quickbooks_realm_id;
+
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("first_name")
+    .eq("id", userId)
+    .single();
 
   let qbGrossProfit = 0;
   let qbTotalExpenses = 0;
@@ -169,7 +176,7 @@ export async function GET() {
   if (visits && visits.length > 0) {
     const repCounts: Record<string, { knocks: number, hot: number }> = {};
     for (const v of visits) {
-      const rep = v.rep_name || "Christian (Owner)"; 
+      const rep = v.rep_name || "Sales Rep"; 
       if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
       repCounts[rep].knocks++;
       if (v.interest_level === 'hot') repCounts[rep].hot++;
@@ -227,6 +234,12 @@ export async function GET() {
     techTableAvailable,
     canvassingLeaderboard,
     actionItems: actionItemsOut.slice(0, 8),
+    user: {
+      firstName: profileData?.first_name || null,
+    },
+    company: {
+      name: companyData?.name || "Your Company",
+    },
     stats: {
       totalCalls,
       emergencies,

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@supabase/supabase-js";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
@@ -55,14 +56,40 @@ export default function CanvassingPage() {
 
   // Form State
   const [showAdd, setShowAdd] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
   const [newVisit, setNewVisit] = useState({
+    sales_rep_name: undefined as string | undefined,
     id: "" as string | undefined,
     resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null as number | null, longitude: null as number | null
   });
 
   useEffect(() => {
     fetchVisits();
+    fetchUser();
+
+    // Add Supabase Realtime subscription
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || "", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "");
+    const subscription = supabase
+      .channel('public:leads_and_visits')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'door_knocking_visits' }, () => {
+        fetchVisits();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
+        fetchVisits();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, []);
+
+  async function fetchUser() {
+    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || "", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "");
+    const { data: sessionRes } = await supabase.auth.getSession();
+    setCurrentUser(sessionRes?.session?.user || null);
+  }
 
   async function fetchVisits() {
     setLoading(true);
@@ -83,7 +110,7 @@ export default function CanvassingPage() {
       body: JSON.stringify({ ...newVisit, notes: finalNotes })
     });
     setShowAdd(false);
-    setNewVisit({ id: undefined, resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null, longitude: null });
+    setNewVisit({ id: undefined, resident_name: "", address: "", interest_level: "not_interested", notes: "", property_size: "", existing_system: "", water_hardness: "", latitude: null, longitude: null, sales_rep_name: undefined });
     fetchVisits();
   }
 
@@ -122,6 +149,7 @@ export default function CanvassingPage() {
       address: visit.address || "",
       interest_level: visit.interest_level || "not_interested",
       notes: visit.notes || "",
+      sales_rep_name: visit.sales_rep_name || currentUser?.user_metadata?.full_name || currentUser?.email || "Logged In Rep",
       latitude: visit.latitude || visit.lat,
       longitude: visit.longitude || visit.lng,
       property_size: "",
@@ -157,7 +185,7 @@ export default function CanvassingPage() {
   
 
   function handleMapClick(lat: number, lng: number) {
-    setNewVisit({ ...newVisit, latitude: lat, longitude: lng, address: "Loading details..." });
+    setNewVisit({ ...newVisit, sales_rep_name: currentUser?.user_metadata?.full_name || currentUser?.email || "Logged In Rep", latitude: lat, longitude: lng, address: "Loading details..." } as any);
     setShowAdd(true);
 
     fetch(`/api/property?lat=${lat}&lng=${lng}`)
@@ -217,7 +245,7 @@ export default function CanvassingPage() {
               </button>
               <button 
                 onClick={() => setView("builds")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "builds" ? "bg-background shadow-sm text-green-600" : "text-muted-foreground"}`}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "builds" ? "bg-background shadow-sm text-red-600" : "text-muted-foreground"}`}
               >
                 <Home className="w-4 h-4" /> New Builds
               </button>
@@ -265,15 +293,8 @@ export default function CanvassingPage() {
                     <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Current Resident" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
                   </div>
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Rep Name</label>
-                    <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={(newVisit as any).sales_rep_name || ''} onChange={e => setNewVisit({...newVisit, sales_rep_name: e.target.value} as any)}>
-                      <option value="">-- Select Rep --</option>
-                      <option value="Jake">Jake</option>
-                      <option value="Sarah">Sarah</option>
-                      <option value="Mike">Mike</option>
-                      <option value="Christian">Christian</option>
-                      <option value="Jakob">Jakob</option>
-                    </select>
+                    <label className="text-sm font-medium text-gray-500">Rep Name (Auto-Assigned)</label>
+                    <input disabled className="w-full flex h-10 rounded-md border border-input bg-gray-50 px-3 py-2 text-sm text-gray-600 font-medium" value={(newVisit as any).sales_rep_name || ''} />
                   </div>
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Interest Level</label>

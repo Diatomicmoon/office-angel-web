@@ -68,7 +68,7 @@ function jobTypeFromCall(call: Call) {
   return name;
 }
 
-const PRESET_TAGS = ["Dog in yard", "VIP", "Commercial", "Repeat customer", "Gate code needed", "Call before arriving"];
+const PRESET_TAGS = ["Dog in yard", "VIP", "Commercial", "Repeat customer", "Gate code needed", "Call before arriving", "Weekly Mowing", "Bi-Weekly Mowing", "Seasonal Cleanup"];
 
 function ProfileContent() {
   const params = useSearchParams();
@@ -212,12 +212,12 @@ function ProfileContent() {
         </div>
 
         <div className="text-right shrink-0">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Calls</p>
+          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Requests</p>
           <p className="text-4xl font-bold text-gray-900">{lifetimeCallCount}</p>
           <p className="text-xs text-gray-400 mt-1">Since {fmtDate(customer?.created_at)}</p>
-          <button className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ml-auto">
+          <Link href={`/jobs?ghl_contact=1&name=${encodeURIComponent(name || "")}&phone=${encodeURIComponent(customer?.phone_number || "")}&address=${encodeURIComponent(customer?.address || "")}`} className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2 ml-auto">
             <PlusCircle size={16} /> Book New Job
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -327,14 +327,14 @@ function ProfileContent() {
             <div className="p-5 border-b border-gray-200 bg-gray-50">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <Calendar size={18} className="text-blue-600" />
-                Call & Job History
+                Interaction & Job History
                 <span className="ml-auto text-xs font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{calls.length}</span>
               </h2>
             </div>
 
             <div className="p-6 overflow-y-auto">
               {calls.length === 0 ? (
-                <p className="text-gray-400 text-sm text-center py-12">No calls recorded yet.</p>
+                <p className="text-gray-400 text-sm text-center py-12">No requests recorded yet.</p>
               ) : (
                 <div className="relative border-l-2 border-gray-200 ml-3 space-y-8 pb-4">
                   {calls.map((call, i) => {

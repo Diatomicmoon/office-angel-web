@@ -4,7 +4,9 @@ import { Inbox, FileText, CheckCircle2, AlertCircle, HardHat, FileSignature, Arr
 import { useEffect, useState, useMemo } from "react";
 
 type LineItem = {
-  description: string;
+  description?: string;
+  trade_name?: string;
+  original_part_number?: string;
   quantity?: number;
   unit_price?: number;
   total?: number;
@@ -32,7 +34,7 @@ export default function InboxPage() {
   const [showPermitAnalytics, setShowPermitAnalytics] = useState(false);
   const [expandedReceiptId, setExpandedReceiptId] = useState<string | null>(null);
 
-  const forwardAddress = "inbox+hardhat@hardhatsolutions.com";
+  const forwardAddress = "bbizjgfdgr7hc1s9p1y8q2qfn7le3h81@hook.us2.make.com";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(forwardAddress);
@@ -60,6 +62,7 @@ export default function InboxPage() {
     let totalSpend = 0;
     const supplierTotals: Record<string, number> = {};
     const itemFreq: Record<string, { count: number; spend: number }> = {};
+    const priceBook: Record<string, { lastPrice: number; supplier: string; date: string }> = {};
 
     receipts.forEach(r => {
       const amount = Number(r.total_amount || 0);
@@ -70,11 +73,22 @@ export default function InboxPage() {
 
       if (r.line_items && Array.isArray(r.line_items)) {
         r.line_items.forEach(li => {
-          if (!li.description) return;
-          const desc = li.description.trim();
+          if (!li.description && !li.trade_name) return;
+          const desc = (li.trade_name || li.description || "").trim();
+          
+          // Track volume
           if (!itemFreq[desc]) itemFreq[desc] = { count: 0, spend: 0 };
           itemFreq[desc].count += (li.quantity || 1);
           itemFreq[desc].spend += (li.total || (li.quantity || 1) * (li.unit_price || 0));
+
+          // Track latest price paid (since receipts are ordered descending by created_at)
+          if (!priceBook[desc] && li.unit_price) {
+            priceBook[desc] = {
+              lastPrice: li.unit_price,
+              supplier: sup,
+              date: r.created_at ? new Date(r.created_at).toLocaleDateString() : "Recent"
+            };
+          }
         });
       }
     });
@@ -87,7 +101,9 @@ export default function InboxPage() {
       .sort((a, b) => b[1].spend - a[1].spend)
       .slice(0, 5);
 
-    return { totalSpend, topSuppliers, topItems };
+    const latestPrices = Object.entries(priceBook).sort((a, b) => a[0].localeCompare(b[0]));
+
+    return { totalSpend, topSuppliers, topItems, latestPrices };
   }, [receipts]);
 
   if (!isDemoMode) {
@@ -188,6 +204,44 @@ export default function InboxPage() {
           </div>
         )}
 
+        {/* Internal Price Book */}
+        {analytics.latestPrices.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex-shrink-0">
+            <div className="p-5 border-b border-gray-200 bg-white flex items-center justify-between">
+              <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+                <Search size={18} className="text-emerald-600"/> Internal Price Book
+              </h2>
+              <span className="text-xs bg-emerald-50 text-emerald-700 font-medium px-2 py-1 rounded-md border border-emerald-200">
+                Auto-updated from receipts
+              </span>
+            </div>
+            <div className="max-h-80 overflow-y-auto">
+              <table className="w-full text-left text-sm whitespace-nowrap">
+                <thead className="bg-gray-50 border-b border-gray-100 sticky top-0">
+                  <tr>
+                    <th className="py-3 px-4 font-semibold text-gray-600">Material (Trade Name)</th>
+                    <th className="py-3 px-4 font-semibold text-gray-600 text-right">Last Price Paid</th>
+                    <th className="py-3 px-4 font-semibold text-gray-600 text-right">Supplier</th>
+                    <th className="py-3 px-4 font-semibold text-gray-600 text-right">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {analytics.latestPrices.map(([desc, data], i) => (
+                    <div key={i} className="contents hover:bg-gray-50 transition-colors">
+                      <tr>
+                        <td className="py-3 px-4 font-medium text-gray-900">{desc}</td>
+                        <td className="py-3 px-4 text-right font-bold text-emerald-700">${data.lastPrice.toFixed(2)}</td>
+                        <td className="py-3 px-4 text-right text-gray-600">{data.supplier}</td>
+                        <td className="py-3 px-4 text-right text-gray-400">{data.date}</td>
+                      </tr>
+                    </div>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Receipts Feed */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden flex-shrink-0">
           <div className="p-5 border-b border-gray-200 bg-white flex items-center justify-between">
@@ -255,7 +309,10 @@ export default function InboxPage() {
                           <tbody className="divide-y divide-gray-100">
                             {r.line_items.map((li, i) => (
                               <tr key={i} className="text-gray-800">
-                                <td className="py-2 pr-4">{li.description || "Unknown item"}</td>
+                                <td className="py-2 pr-4">
+                                  <div className="font-medium text-gray-900">{li.trade_name || li.description || "Unknown item"}</div>
+                                  {li.original_part_number && <div className="text-xs text-gray-500 font-mono mt-0.5">{li.original_part_number}</div>}
+                                </td>
                                 <td className="py-2 text-right">{li.quantity || "-"}</td>
                                 <td className="py-2 text-right">{li.unit_price ? `$${li.unit_price.toFixed(2)}` : "-"}</td>
                                 <td className="py-2 text-right font-medium">{li.total ? `$${li.total.toFixed(2)}` : "-"}</td>

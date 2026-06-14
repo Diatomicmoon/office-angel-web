@@ -1,3 +1,4 @@
+import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
@@ -8,10 +9,12 @@ const sb = () =>
   );
 
 export async function GET() {
-  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
-  if (!companyId) {
-    const { data: c0 } = await sb().from("companies").select("id").order("created_at", { ascending: true }).limit(1);
-    companyId = c0?.[0]?.id;
+  let companyId;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    companyId = res.companyId;
+  } catch (err) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!companyId) return NextResponse.json({ active: null });
 

@@ -1,3 +1,4 @@
+import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
@@ -8,10 +9,12 @@ import OpenAI from 'openai';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 async function getCompanyId(supabase: any) {
-  let companyId = process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID;
-  if (!companyId) {
-    const { data } = await supabase.from("companies").select("id").order("created_at", { ascending: true }).limit(1);
-    companyId = data?.[0]?.id;
+  let companyId;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    companyId = res.companyId;
+  } catch (err) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   return companyId;
 }

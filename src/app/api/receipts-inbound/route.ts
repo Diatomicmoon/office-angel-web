@@ -26,6 +26,17 @@ FOR JOB NUMBER OR PO (Receipts only): Carefully scan the receipt/invoice for a "
 
 FOR SUPPLIER NAME (Receipts only): Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). Ensure "JH Larson" and similar companies are ALWAYS placed here in 'supplier_name', never in 'job_number_or_po'. If the receipt was forwarded, look at the original sender's email address domain.
 
+FOR LINE ITEMS (Receipts only): You must translate supplier part numbers into clean, common 'Trade Names' or everyday electrician slang. Do not just spit back the raw barcode/catalog numbers. The description should be immediately readable by a field worker.
+
+CRITICAL PARSING RULES FOR WHOLESALE RECEIPTS (like JH Larson, CED, Viking):
+1. **Multi-line Rows**: Wholesale receipts often split a single item across multiple lines. The part number (e.g., 'LTN AYCL-153P-WH', 'HND RA-1588') is usually on the first line, and the text description is directly below it in the SAME 'Description' column. Do NOT treat the part number and the description as two separate items. Combine them into one line item.
+2. **Pricing Units (/ea, /c, /m)**: Pay extreme attention to the unit pricing column. 
+   - '/ea' means price per each. 
+   - '/c' means price per 100 (e.g., $28.52 /c = $0.2852 per each). 
+   - '/m' means price per 1000 (e.g., $60.00 /m = $0.06 per each). 
+   Always calculate and output the true 'unit_price' for a single item (1 unit) in standard dollars (e.g. 0.28, 0.06, 25.00), not the bulk unit price.
+3. **Quantity**: Look at 'SHIP QTY' or 'ORDER QTY' to get the exact integer quantity.
+
 Extract the details into this exact JSON structure. Return ONLY valid JSON, no markdown.
 
 {
@@ -37,7 +48,7 @@ Extract the details into this exact JSON structure. Return ONLY valid JSON, no m
   "job_number_or_po": "string or null",
   "invoice_date": "string or null",
   "line_items": [
-    { "description": "string", "quantity": number or null, "unit_price": number or null, "total": number or null }
+    { "trade_name": "string", "original_part_number": "string or null", "quantity": number or null, "unit_price": number or null, "total": number or null }
   ],
   
   "customer_name": "string or null",
@@ -104,11 +115,12 @@ ${emailText}`;
       let matchedJobId = null;
       let autoLinked = false;
       if (parsed.job_number_or_po) {
+        const searchStr = parsed.job_number_or_po.substring(0, 15).trim();
         const { data: possibleJobs } = await supabase
           .from('jobs')
           .select('id, title')
           .eq('company_id', companyId)
-          .ilike('title', `%${parsed.job_number_or_po.substring(0, 10)}%`)
+          .or(`title.ilike.%${searchStr}%,address.ilike.%${searchStr}%`)
           .limit(1);
         
         if (possibleJobs && possibleJobs.length > 0) {

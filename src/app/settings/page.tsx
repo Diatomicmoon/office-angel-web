@@ -2,12 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock, User, LogOut, Key } from "lucide-react";
-import { createClient } from "@supabase/supabase-js";
-
-// Client-side fallback for Settings page. It uses the anon key and user's session if available.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { createClient } from "@/lib/supabase";
+const supabase = createClient();
 
 export type Settings = {
   id: string;
@@ -29,6 +25,7 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [forwardPhone, setForwardPhone] = useState("");
+  const [companyPhone, setCompanyPhone] = useState("");
   const [schedStart, setSchedStart] = useState("08:00");
   const [schedEnd, setSchedEnd] = useState("17:00");
   const [calendarWebhook, setCalendarWebhook] = useState("");
@@ -62,6 +59,7 @@ export default function SettingsPage() {
       .then((json) => {
         setSettings(json.settings);
         setForwardPhone(json.settings?.forward_to_phone || "");
+        setCompanyPhone(json.settings?.phone_number || "");
         const toHHMM = (m?: number | null, fallback = "08:00") => {
           if (typeof m !== 'number' || !Number.isFinite(m)) return fallback;
           const hh = String(Math.floor(m / 60)).padStart(2, '0');
@@ -87,6 +85,20 @@ export default function SettingsPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ai_enabled: next }),
     });
+  };
+
+  const saveCompanyPhone = async () => {
+    if (!settings) return;
+    setSaving(true);
+    await fetch("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone_number: companyPhone || "" }),
+    });
+    setSettings((s) => s ? { ...s, phone_number: companyPhone || "" } : s);
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
   };
 
   const saveForwardPhone = async () => {
@@ -237,7 +249,40 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
         </div>
       </div>
 
-      {/* Forward-to Phone (Co-Pilot mode) */}
+      
+        {/* Company Twilio Phone Number */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <Phone size={18} className="text-blue-600" /> Hard Hat / Twilio Number
+          </h2>
+          <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+            This is your company's dedicated phone number. If you change your number in Twilio, update it here so the AI knows where to intercept texts and calls.
+          </p>
+          
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input
+                type="tel"
+                value={companyPhone}
+                onChange={(e) => setCompanyPhone(e.target.value)}
+                placeholder="+16125551234"
+                className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black font-mono"
+              />
+            </div>
+            <button 
+              onClick={saveCompanyPhone}
+              disabled={saving}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 disabled:opacity-60"
+            >
+              {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/> : <Save size={16} />}
+              Save Number
+            </button>
+          </div>
+        </div>
+
+
+        {/* Forward-to Phone (Co-Pilot mode) */}
       <div className={`bg-white rounded-xl border shadow-sm overflow-hidden transition-opacity ${aiOn ? "opacity-50 pointer-events-none" : "opacity-100 border-gray-200"}`}>
         <div className="p-5 border-b border-gray-200 bg-gray-50">
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -453,6 +498,8 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
             <button 
               onClick={async () => {
                 await supabase.auth.signOut();
+                // Clear any leftover auth cookies
+                document.cookie.split(";").forEach(c => { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
                 window.location.href = '/login';
               }}
               className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 font-medium rounded-lg text-sm transition-colors"
