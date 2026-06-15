@@ -81,6 +81,8 @@ function ProfileContent() {
   const [notesVal, setNotesVal] = useState("");
   const [saving, setSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileData, setProfileData] = useState({ first_name: '', last_name: '', phone_number: '', email: '', address: '' });
 
   const load = useCallback(() => {
     if (!id) { setLoading(false); return; }
@@ -89,6 +91,13 @@ function ProfileContent() {
       .then((json) => {
         setCustomer(json.customer);
         setNotesVal(json.customer?.property_notes || "");
+        setProfileData({
+          first_name: json.customer?.first_name || '',
+          last_name: json.customer?.last_name || '',
+          phone_number: json.customer?.phone_number || '',
+          email: json.customer?.email || '',
+          address: json.customer?.address || ''
+        });
         setCalls(json.calls || []);
         setLoading(false);
       })
@@ -96,6 +105,19 @@ function ProfileContent() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  const saveProfile = async () => {
+    if (!customer) return;
+    setSaving(true);
+    await fetch("/api/customers", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: customer.id, ...profileData }),
+    });
+    setCustomer((prev) => prev ? { ...prev, ...profileData } : prev);
+    setSaving(false);
+    setEditingProfile(false);
+  };
 
   const saveNotes = async () => {
     if (!customer) return;
@@ -168,57 +190,138 @@ function ProfileContent() {
       </div>
 
       {/* Header Card */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-8 flex items-start justify-between">
-        <div className="flex gap-6">
-          <div className="h-20 w-20 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-3xl font-bold shrink-0">
-            {initials}
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3 flex-wrap">
-              {name}
-              {lifetimeCallCount >= 2 && (
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1">
-                  <Star size={12} className="fill-green-700" /> Repeat Customer
-                </span>
-              )}
-              {hasDogTag && (
-                <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded">
-                  🐕 Dog in yard
-                </span>
-              )}
-            </h1>
-            <div className="flex flex-wrap gap-5 mt-3 text-sm text-gray-600">
-              {customer?.phone_number && (
-                <a href={`tel:${customer.phone_number}`} className="flex items-center gap-1.5 text-blue-600 hover:underline">
-                  <Phone size={15} className="text-gray-400" /> {formatPhone(customer.phone_number)}
-                </a>
-              )}
-              {customer?.email && (
-                <span className="flex items-center gap-1.5">
-                  <Mail size={15} className="text-gray-400" /> {customer.email}
-                </span>
-              )}
-              {customer?.address && (
-                <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(customer.address)}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-blue-600 hover:underline"
-                >
-                  <MapPin size={15} className="text-blue-400" /> {customer.address}
-                </a>
-              )}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 md:p-6 mb-8 flex flex-col lg:flex-row items-start justify-between gap-6">
+        
+        {editingProfile ? (
+          <div className="flex-1 w-full flex flex-col md:flex-row gap-6">
+            <div className="h-16 w-16 md:h-20 md:w-20 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl md:text-3xl font-bold shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 space-y-4">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input 
+                  type="text" 
+                  placeholder="First Name" 
+                  value={profileData.first_name} 
+                  onChange={e => setProfileData({...profileData, first_name: e.target.value})}
+                  className="border border-gray-300 rounded px-3 py-2 text-sm flex-1 text-black"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Last Name" 
+                  value={profileData.last_name} 
+                  onChange={e => setProfileData({...profileData, last_name: e.target.value})}
+                  className="border border-gray-300 rounded px-3 py-2 text-sm flex-1 text-black"
+                />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <input 
+                  type="text" 
+                  placeholder="Phone" 
+                  value={profileData.phone_number} 
+                  onChange={e => setProfileData({...profileData, phone_number: e.target.value})}
+                  className="border border-gray-300 rounded px-3 py-2 text-sm flex-1 text-black"
+                />
+                <input 
+                  type="text" 
+                  placeholder="Email" 
+                  value={profileData.email} 
+                  onChange={e => setProfileData({...profileData, email: e.target.value})}
+                  className="border border-gray-300 rounded px-3 py-2 text-sm flex-1 text-black"
+                />
+              </div>
+              <input 
+                type="text" 
+                placeholder="Address" 
+                value={profileData.address} 
+                onChange={e => setProfileData({...profileData, address: e.target.value})}
+                className="border border-gray-300 rounded px-3 py-2 text-sm w-full text-black"
+              />
+              <div className="flex gap-2 pt-2">
+                <button onClick={saveProfile} disabled={saving} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium">
+                  {saving ? "Saving..." : "Save Profile"}
+                </button>
+                <button onClick={() => {
+                  setEditingProfile(false);
+                  setProfileData({
+                    first_name: customer?.first_name || '',
+                    last_name: customer?.last_name || '',
+                    phone_number: customer?.phone_number || '',
+                    email: customer?.email || '',
+                    address: customer?.address || ''
+                  });
+                }} className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm font-medium">
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-6 w-full lg:w-auto">
+            <div className="h-16 w-16 md:h-20 md:w-20 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-2xl md:text-3xl font-bold shrink-0">
+              {initials}
+            </div>
+            <div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 break-words">
+                  {name}
+                </h1>
+                {lifetimeCallCount >= 2 && (
+                  <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded flex items-center gap-1 whitespace-nowrap">
+                    <Star size={12} className="fill-green-700" /> Repeat
+                  </span>
+                )}
+                {hasDogTag && (
+                  <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
+                    🐕 Dog
+                  </span>
+                )}
+                <button onClick={() => setEditingProfile(true)} className="ml-2 p-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-md transition-colors" title="Edit Profile">
+                  <Edit3 size={16} />
+                </button>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-5 mt-3 text-sm text-gray-600">
+                {customer?.phone_number && (
+                  <a href={`tel:${customer.phone_number}`} className="flex items-center gap-1.5 text-blue-600 hover:underline">
+                    <Phone size={15} className="text-gray-400 shrink-0" /> {formatPhone(customer.phone_number)}
+                  </a>
+                )}
+                {customer?.email && (
+                  <span className="flex items-center gap-1.5 break-all">
+                    <Mail size={15} className="text-gray-400 shrink-0" /> {customer.email}
+                  </span>
+                )}
+                {customer?.address && (
+                  <a
+                    href={`https://maps.google.com/?q=${encodeURIComponent(customer.address)}`}
+                    target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-blue-600 hover:underline text-left"
+                  >
+                    <MapPin size={15} className="text-blue-400 shrink-0" /> <span className="line-clamp-2 sm:line-clamp-1">{customer.address}</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
-        <div className="text-right shrink-0">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Requests</p>
-          <p className="text-4xl font-bold text-gray-900">{lifetimeCallCount}</p>
-          <p className="text-xs text-gray-400 mt-1">Since {fmtDate(customer?.created_at)}</p>
-          <Link href={`/jobs?ghl_contact=1&name=${encodeURIComponent(name || "")}&phone=${encodeURIComponent(customer?.phone_number || "")}&address=${encodeURIComponent(customer?.address || "")}`} className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2 ml-auto">
-            <PlusCircle size={16} /> Book New Job
-          </Link>
-        </div>
+        {!editingProfile && (
+          <div className="text-left sm:text-right shrink-0 w-full lg:w-auto border-t lg:border-t-0 pt-4 lg:pt-0 mt-2 lg:mt-0">
+            <div className="flex flex-row lg:flex-col justify-between lg:justify-start items-center lg:items-end">
+              <div>
+                <p className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wider mb-1">Total Requests</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-3xl sm:text-4xl font-bold text-gray-900">{lifetimeCallCount}</p>
+                  <p className="text-xs text-gray-400 lg:mt-1">Since {fmtDate(customer?.created_at)}</p>
+                </div>
+              </div>
+              <Link href={`/jobs?ghl_contact=1&name=${encodeURIComponent(name || "")}&phone=${encodeURIComponent(customer?.phone_number || "")}&address=${encodeURIComponent(customer?.address || "")}`} className="mt-0 lg:mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2 rounded-lg text-sm font-medium transition-colors inline-flex items-center gap-2">
+                <PlusCircle size={16} /> Book Job
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Main Grid */}
