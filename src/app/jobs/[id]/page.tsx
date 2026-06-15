@@ -75,9 +75,33 @@ export default function JobDetailsPage() {
       fetch(`/api/receipts?job_id=${id}`).then((r) => r.json()),
     ])
       .then(([jobData, receiptsData]) => {
-        setJob(jobData.job);
+        const loadedJob = jobData.job;
+        setJob(loadedJob);
         setReceipts(receiptsData.receipts || []);
         setLoading(false);
+
+        // Save to recently viewed
+        if (loadedJob) {
+           try {
+              const recentStr = localStorage.getItem('oa_recent_jobs');
+              let recent = recentStr ? JSON.parse(recentStr) : [];
+              // Remove if exists
+              recent = recent.filter((j: any) => j.id !== loadedJob.id);
+              // Add to front
+              recent.unshift({
+                 id: loadedJob.id,
+                 title: loadedJob.title,
+                 address: loadedJob.address,
+                 status: loadedJob.status,
+                 customerName: loadedJob.customers ? `${loadedJob.customers.first_name || ''} ${loadedJob.customers.last_name || ''}`.trim() : null,
+                 viewedAt: new Date().toISOString()
+              });
+              // Keep only last 5
+              localStorage.setItem('oa_recent_jobs', JSON.stringify(recent.slice(0, 5)));
+           } catch (e) {
+              console.error('Failed to save recent job', e);
+           }
+        }
       })
       .catch((err) => {
         console.error(err);

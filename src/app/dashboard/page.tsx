@@ -40,8 +40,14 @@ export default function Dashboard() {
   const [ghlTotal, setGhlTotal] = useState<number>(0);
   const [ghlLoading, setGhlLoading] = useState(true);
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
 
   useEffect(() => {
+    try {
+      const stored = localStorage.getItem('oa_recent_jobs');
+      if (stored) setRecentlyViewed(JSON.parse(stored));
+    } catch(e) {}
+    
     fetch("/api/jobs?limit=4")
       .then(r => r.json())
       .then(json => setRecentJobs((json.jobs || []).slice(0, 4)))
@@ -200,6 +206,29 @@ export default function Dashboard() {
           <p className="text-sm text-gray-400 font-medium mt-2">Active scheduled jobs</p>
         </div>
       </div>
+
+      {/* Recently Viewed / Jump Back In */}
+      {recentlyViewed.length > 0 && (
+        <div className="bg-blue-50/50 rounded-xl border border-blue-100 shadow-sm overflow-hidden flex flex-col">
+          <div className="px-6 py-3 border-b border-blue-100 bg-blue-100/50 flex justify-between items-center">
+            <h2 className="text-sm font-bold text-blue-900 flex items-center gap-2 uppercase tracking-wider">
+              <Clock size={14} className="text-blue-600" /> Jump Back In
+            </h2>
+          </div>
+          <div className="p-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            {recentlyViewed.slice(0, 4).map((job: any) => (
+              <Link href={`/jobs/${job.id}`} key={job.id} className="block border border-blue-100/50 rounded-lg p-3 bg-white hover:border-blue-300 hover:shadow-md transition-all group">
+                <h4 className="font-semibold text-gray-900 text-sm truncate group-hover:text-blue-700">{job.title || "Untitled Job"}</h4>
+                <p className="text-xs text-gray-500 mt-1 truncate">{job.customerName || job.address || "No details"}</p>
+                <div className="mt-2 text-[10px] text-gray-400 flex justify-between items-center">
+                   <span>Viewed recently</span>
+                   <span className="font-medium text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{job.status || "Open"}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Grid Layout for Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
