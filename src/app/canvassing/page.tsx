@@ -575,7 +575,7 @@ export default function CanvassingPage() {
                   <Map className="h-6 w-6 text-muted-foreground" />
                 </div>
                 <h3 className="text-lg font-semibold">No visits logged yet</h3>
-                <p className="text-muted-foreground max-w-sm">When Christian's reps log house visits, they will show up here.</p>
+                <p className="text-muted-foreground max-w-sm">When your team logs house visits, they will show up here.</p>
               </div>
             ) : (
               <div className="divide-y">
