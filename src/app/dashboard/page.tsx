@@ -68,6 +68,45 @@ export default function Dashboard() {
       });
   }, []);
 
+  const isRestricted = ['field_rep', 'tech', 'apprentice', 'sales'].includes((data?.user?.role || '').toLowerCase());
+
+  if (isRestricted) {
+    return (
+      <div className="max-w-4xl mx-auto p-4 md:p-8 space-y-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+            {data.user?.firstName ? `Welcome, ${data.user.firstName}!` : "Welcome!"}
+          </h1>
+          <p className="text-gray-500 mt-2">Here is your canvassing summary.</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex items-center justify-between text-gray-500 mb-4">
+              <h3 className="font-medium text-sm">Doors Knocked</h3>
+              <div className="bg-blue-50 p-2 rounded-lg"><MapPin size={18} className="text-blue-600" /></div>
+            </div>
+            {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-4xl font-extrabold text-gray-900">{data.user?.personalStats?.knocks || 0}</p>}
+          </div>
+
+          <div className="bg-orange-50 border border-orange-100 p-6 rounded-xl shadow-sm">
+            <div className="flex items-center justify-between text-orange-700 mb-4">
+              <h3 className="font-bold text-sm">Demos Set</h3>
+              <div className="bg-orange-100 p-2 rounded-lg"><TrendingUp size={18} className="text-orange-600" /></div>
+            </div>
+            {loading ? <p className="text-3xl font-bold text-orange-300">...</p> : <p className="text-4xl font-extrabold text-orange-600">{data.user?.personalStats?.demos || 0}</p>}
+          </div>
+        </div>
+
+        <div className="mt-8">
+          <Link href="/canvassing" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors">
+            <MapPin size={20} /> Open Canvassing Map
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-4 md:p-8 space-y-6 md:space-y-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto pb-24">
 

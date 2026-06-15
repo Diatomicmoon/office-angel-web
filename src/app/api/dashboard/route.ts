@@ -41,9 +41,18 @@ export async function GET() {
 
   const { data: profileData } = await supabase
     .from("profiles")
-    .select("first_name")
+    .select("first_name, role")
     .eq("id", userId)
     .single();
+
+  const { data: memData } = await supabase
+    .from("company_memberships")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("company_id", companyId)
+    .single();
+
+  const userRole = memData?.role || profileData?.role || 'user';
 
   let qbGrossProfit = 0;
   let qbTotalExpenses = 0;
@@ -169,17 +178,27 @@ export async function GET() {
   // New Canvassing Leaderboard Fetch (for the Financials / General dashboard use)
   let canvassingLeaderboard: any[] = [];
   const { data: visits } = await supabase
-    .from('canvassing_visits')
+    .from('door_knocking_visits')
     .select('*')
     .eq('company_id', companyId);
 
+  let personalStats = { knocks: 0, demos: 0 };
   if (visits && visits.length > 0) {
     const repCounts: Record<string, { knocks: number, hot: number }> = {};
     for (const v of visits) {
-      const rep = v.rep_name || "Sales Rep"; 
+      const rep = v.sales_rep_name || "Unknown Rep";
+      const isMe = rep.includes(profileData?.first_name || "nobody");
+      
       if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
       repCounts[rep].knocks++;
-      if (v.interest_level === 'hot') repCounts[rep].hot++;
+      if (['hot', 'demo_set', 'contacted'].includes(v.interest_level)) {
+        repCounts[rep].hot++;
+      }
+      
+      if (isMe) {
+        personalStats.knocks++;
+        if (['hot', 'demo_set', 'contacted'].includes(v.interest_level)) personalStats.demos++;
+      }
     }
     canvassingLeaderboard = Object.entries(repCounts)
       .map(([name, data]) => ({ name, knocks: data.knocks, hot: data.hot }))
@@ -236,6 +255,8 @@ export async function GET() {
     actionItems: actionItemsOut.slice(0, 8),
     user: {
       firstName: profileData?.first_name || null,
+      role: userRole,
+      personalStats
     },
     company: {
       name: companyData?.name || "Your Company",

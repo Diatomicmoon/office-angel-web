@@ -78,12 +78,10 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-4 space-y-2 mt-4 pb-4">
-        {!isRestricted && (
-          <Link href="/dashboard" className={itemClass('/dashboard')}>
-            <Home size={20} />
-            <span>Dashboard</span>
-          </Link>
-        )}
+        <Link href="/dashboard" className={itemClass('/dashboard')}>
+          <Home size={20} />
+          <span>Dashboard</span>
+        </Link>
         {!isRestricted && (
           <Link href="/call-logs" className={itemClass('/call-logs')}>
             <Phone size={20} />
