@@ -23,7 +23,7 @@ export default function Navbar({ activePage }: NavbarProps) {
       <div className="px-4 md:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.jpg" alt="Hard Hat Solutions Logo" className="h-8 w-auto object-contain rounded" />
+          <img src="/logo_square.jpg" alt="Hard Hat Solutions Logo" className="h-8 w-8 shrink-0 object-contain rounded-md" />
           <span className="text-xl font-bold tracking-tight">Hard Hat Solutions</span>
         </Link>
 
