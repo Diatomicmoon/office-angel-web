@@ -69,7 +69,7 @@ export default function Sidebar() {
             <img src="https://www.onemoreyardmn.com/logo.png" alt="One More Yard" className="h-10 w-auto object-contain brightness-0 invert" />
           ) : (
             <>
-              <Activity className="text-blue-500" />
+              <img src="/logo.jpg" alt="Hard Hat Solutions" className="h-8 w-auto object-contain rounded bg-white p-0.5" />
               {companyName}
             </>
           )}
