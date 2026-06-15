@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare, Trophy, Target } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
@@ -10,34 +10,108 @@ import CanvassingMode from "./CanvassingMode";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-function CanvassingStats() {
-  const [stats, setStats] = useState({ todayKnocks: 0, totalKnocks: 0, hotLeads: 0, warmLeads: 0 });
+function CanvassingStatsComponent({ visits }: { visits: any[] }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
-  useEffect(() => {
-    fetch("/api/canvassing/stats")
-      .then(res => res.json())
-      .then(data => setStats(data))
-      .catch(console.error);
-  }, []);
+  const stats = { todayKnocks: 0, totalKnocks: 0, hotLeads: 0, warmLeads: 0 };
+  const repCounts: Record<string, { knocks: number, hot: number }> = {};
+
+  visits.forEach(v => {
+    const isNewBuild = v.interest_level === 'new_build' || (v.notes && v.notes.includes('Source: County CSV Import'));
+    const isUnknockedLead = v.interest_level === 'unknocked_lead';
+    
+    // Determine if it was actually knocked by a rep
+    const hasRepNote = v.notes?.includes('[Rep:');
+    const isManuallyLogged = !isNewBuild && !isUnknockedLead;
+
+    if (!hasRepNote && !['demo_set', 'hot', 'go_back', 'warm', 'not_interested'].includes(v.interest_level) && !isManuallyLogged) {
+      return; // Skip unknocked leads and untouched new builds
+    }
+
+    stats.totalKnocks++;
+    const vDate = new Date(v.visited_at || v.created_at);
+    if (vDate >= today) stats.todayKnocks++;
+
+    if (['demo_set', 'hot', 'contacted'].includes(v.interest_level)) stats.hotLeads++;
+    if (['go_back', 'warm'].includes(v.interest_level)) stats.warmLeads++;
+
+    let rep = v.rep_name || "Unknown Rep";
+    const match = v.notes?.match(/\[Rep:\s*(.*?)\]/);
+    if (match && match[1]) {
+      rep = match[1];
+    } else if (v.sales_rep_name) {
+      rep = v.sales_rep_name;
+    }
+
+    if (!repCounts[rep]) repCounts[rep] = { knocks: 0, hot: 0 };
+    repCounts[rep].knocks++;
+    if (['demo_set', 'hot', 'contacted'].includes(v.interest_level)) {
+      repCounts[rep].hot++;
+    }
+  });
+
+  const leaderboard = Object.entries(repCounts)
+    .map(([name, data]) => ({ name, knocks: data.knocks, hot: data.hot }))
+    .sort((a, b) => b.knocks - a.knocks);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-      <div className="bg-card border rounded-xl p-4 shadow-sm">
-        <div className="text-sm text-muted-foreground font-medium mb-1">Knocked Today</div>
-        <div className="text-2xl font-bold">{stats.todayKnocks}</div>
+    <div className="space-y-6 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
+          <div className="text-sm text-gray-500 font-medium mb-1">Knocked Today</div>
+          <div className="text-3xl font-extrabold text-gray-900">{stats.todayKnocks}</div>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
+          <div className="text-sm text-gray-500 font-medium mb-1">Total Knocks</div>
+          <div className="text-3xl font-extrabold text-gray-900">{stats.totalKnocks}</div>
+        </div>
+        <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
+          <Flame className="absolute -right-4 -bottom-4 w-16 h-16 text-orange-500/10" />
+          <div className="text-sm text-orange-700 font-bold mb-1 flex items-center gap-1.5"><Flame className="w-4 h-4"/> Demos Set</div>
+          <div className="text-3xl font-extrabold text-orange-600">{stats.hotLeads}</div>
+        </div>
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
+          <AlertCircle className="absolute -right-4 -bottom-4 w-16 h-16 text-blue-500/10" />
+          <div className="text-sm text-blue-700 font-bold mb-1 flex items-center gap-1.5"><AlertCircle className="w-4 h-4"/> Go Backs</div>
+          <div className="text-3xl font-extrabold text-blue-600">{stats.warmLeads}</div>
+        </div>
       </div>
-      <div className="bg-card border rounded-xl p-4 shadow-sm">
-        <div className="text-sm text-muted-foreground font-medium mb-1">Total Knocks</div>
-        <div className="text-2xl font-bold">{stats.totalKnocks}</div>
-      </div>
-      <div className="bg-card border rounded-xl p-4 shadow-sm bg-orange-50/50">
-        <div className="text-sm text-orange-600 font-medium mb-1 flex items-center gap-1"><Flame className="w-4 h-4"/> Demos Set</div>
-        <div className="text-2xl font-bold text-orange-700">{stats.hotLeads}</div>
-      </div>
-      <div className="bg-card border rounded-xl p-4 shadow-sm bg-blue-50/50">
-        <div className="text-sm text-blue-600 font-medium mb-1 flex items-center gap-1"><AlertCircle className="w-4 h-4"/> Go Backs</div>
-        <div className="text-2xl font-bold text-blue-700">{stats.warmLeads}</div>
-      </div>
+
+      {leaderboard.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-500" /> Rep Leaderboard
+            </h3>
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Top Performers</span>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {leaderboard.map((rep, idx) => (
+              <div key={rep.name} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${idx === 0 ? 'bg-yellow-100 text-yellow-700' : idx === 1 ? 'bg-gray-200 text-gray-700' : idx === 2 ? 'bg-amber-100 text-amber-700' : 'bg-blue-50 text-blue-600'}`}>
+                    #{idx + 1}
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">{rep.name.replace('Efficiency', '').trim() || 'Unknown Rep'}</div>
+                  </div>
+                </div>
+                <div className="flex gap-6 text-right">
+                  <div>
+                    <div className="text-xs text-gray-500 font-medium uppercase">Doors Hit</div>
+                    <div className="font-bold text-gray-900">{rep.knocks}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-orange-600 font-medium uppercase flex items-center gap-1"><Target className="w-3 h-3"/> Demos Set</div>
+                    <div className="font-bold text-orange-600">{rep.hot}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -270,7 +344,7 @@ export default function CanvassingPage() {
           </div>
         </div>
 
-        <CanvassingStats />
+        <CanvassingStatsComponent visits={visits} />
 
         {showAdd && (
           <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">
