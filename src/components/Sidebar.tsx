@@ -4,17 +4,17 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 export default function Sidebar() {
-  const [role, setRole] = useState<string>('owner');
+  const [role, setRole] = useState<string>('loading');
   const [companyName, setCompanyName] = useState<string>('Hard Hat Solutions');
   const [isDemo, setIsDemo] = useState(false);
   
   useEffect(() => {
     async function fetchRoleAndCompany() {
       try {
-        const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
+        const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
         const { data: userRes } = await supabase.auth.getUser();
         if (userRes?.user) {
           // Check company_memberships first
@@ -53,7 +53,10 @@ export default function Sidebar() {
   }, []);
   
   // Define restrictive roles based on user request (apprentice, tech, sales, field_rep, etc.)
-  const isRestricted = ['field_rep', 'tech', 'apprentice', 'sales'].includes(role?.toLowerCase());
+  const isFieldRep = role === 'loading' ? true : ['field_rep', 'tech', 'apprentice'].includes(role?.toLowerCase());
+  const isSales = role?.toLowerCase() === 'sales';
+  const isRestricted = isFieldRep;
+  const isAdmin = ['owner', 'admin'].includes(role?.toLowerCase());
 
   const pathname = usePathname();
   const itemClass = (href: string) => {
@@ -119,7 +122,7 @@ export default function Sidebar() {
             <span>Job Archive</span>
           </Link>
         )}
-        {!isRestricted && (
+        {!isRestricted && !isSales && (
           <Link href="/timesheets" className={itemClass('/timesheets')}>
             <Clock size={20} />
             <span>Timesheets & Payroll</span>
@@ -143,7 +146,7 @@ export default function Sidebar() {
             <span>Permits & Inspections</span>
           </Link>
         )}
-        {!isRestricted && (
+        {!isRestricted && !isSales && (
           <Link href="/pricing" className={itemClass('/pricing')}>
             <DollarSign size={20} />
             <span>Material Cost Engine</span>
@@ -165,19 +168,19 @@ export default function Sidebar() {
             <span>SEO & Marketing</span>
           </Link>
         )}
-        {!isRestricted && (
+        {!isRestricted && !isSales && (
           <Link href="/receipts" className={itemClass('/receipts')}>
             <FileText size={20} />
             <span>Receipt Inbox</span>
           </Link>
         )}
-        {!isRestricted && (
+        {!isRestricted && !isSales && (
           <Link href="/supply-runner" className={itemClass('/supply-runner')}>
             <Truck size={20} />
             <span>Supply Runner</span>
           </Link>
         )}
-        {!isRestricted && (
+        {!isRestricted && !isSales && (
           <Link href="/financials" className={itemClass('/financials')}>
             <DollarSign size={20} />
             <span>Financial Command</span>
@@ -185,7 +188,7 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {!isRestricted && (
+      {!isRestricted && !isSales && (
         <div className="p-4 border-t border-gray-800">
           <Link href="/settings" className={itemClass('/settings')}>
             <Settings size={20} />
