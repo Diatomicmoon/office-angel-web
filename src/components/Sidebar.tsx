@@ -119,10 +119,12 @@ export default function Sidebar() {
             <span>Job Archive</span>
           </Link>
         )}
-        <Link href="/timesheets" className={itemClass('/timesheets')}>
-          <Clock size={20} />
-          <span>Timesheets & Payroll</span>
-        </Link>
+        {!isRestricted && (
+          <Link href="/timesheets" className={itemClass('/timesheets')}>
+            <Clock size={20} />
+            <span>Timesheets & Payroll</span>
+          </Link>
+        )}
         {!isRestricted && (
           <Link href="/dispatch" className={itemClass('/dispatch')}>
             <Calendar size={20} />
