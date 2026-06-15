@@ -94,9 +94,9 @@ export default function JobArchive() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-hidden flex flex-col">
-        {/* Table Header */}
-        <div className="grid grid-cols-12 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 flex flex-col overflow-hidden">
+        {/* Table Header (Desktop Only) */}
+        <div className="hidden lg:grid grid-cols-12 gap-4 p-4 border-b border-gray-200 bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider sticky top-0 z-10">
           <div className="col-span-3">Customer</div>
           <div className="col-span-3">Address</div>
           <div className="col-span-2">Calls / Last Contact</div>
@@ -120,62 +120,77 @@ export default function JobArchive() {
               const hasDog = c.tags?.includes("dog in yard") || (c.property_notes || "").toLowerCase().includes("dog");
 
               return (
-                <div key={c.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors group">
-                  {/* Customer */}
-                  <div className="col-span-3 flex items-center gap-3">
-                    <div className="h-10 w-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">
-                      {c.first_name !== "New" ? initials(c.first_name, c.last_name) : <User size={18} />}
+                <div key={c.id} className="flex flex-col lg:grid lg:grid-cols-12 gap-4 p-4 hover:bg-gray-50 transition-colors group">
+                  {/* Customer (Header row on mobile) */}
+                  <div className="lg:col-span-3 flex items-start sm:items-center justify-between lg:justify-start gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-blue-100 text-blue-700 rounded-lg flex items-center justify-center font-bold text-sm shrink-0">
+                        {c.first_name !== "New" ? initials(c.first_name, c.last_name) : <User size={18} />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-gray-900">{name}</p>
+                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                          <Phone size={11} /> {formatPhone(c.phone_number)}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900">{name}</p>
-                      <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
-                        <Phone size={11} /> {formatPhone(c.phone_number)}
-                      </p>
+                    
+                    {/* Mobile-only profile link top right */}
+                    <div className="lg:hidden">
+                      <Link
+                        href={`/projects/customer-profile?id=${c.id}`}
+                        className="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full flex items-center gap-1"
+                      >
+                        Profile <ChevronRight size={13} />
+                      </Link>
                     </div>
                   </div>
 
                   {/* Address */}
-                  <div className="col-span-3">
+                  <div className="lg:col-span-3 flex items-start lg:items-center">
                     {c.address ? (
-                      <p className="text-sm text-gray-700 flex items-start gap-1.5">
-                        <MapPin size={13} className="text-gray-400 mt-0.5 shrink-0" />
-                        <span className="leading-snug">{c.address}</span>
+                      <p className="text-sm text-gray-700 flex items-start gap-1.5 w-full">
+                        <MapPin size={13} className="text-gray-400 mt-0.5 shrink-0 hidden lg:block" />
+                        <span className="leading-snug line-clamp-2 lg:line-clamp-none">{c.address}</span>
                       </p>
                     ) : (
                       <span className="text-xs text-gray-400">No address on file</span>
                     )}
                   </div>
 
-                  {/* Calls */}
-                  <div className="col-span-2">
-                    <div className="flex items-center gap-2">
-                      {hasEmergency ? (
-                        <AlertCircle size={14} className="text-red-500 shrink-0" />
-                      ) : (
-                        <FolderOpen size={14} className="text-gray-400 shrink-0" />
-                      )}
-                      <span className="text-sm font-semibold text-gray-900">{callCount} call{callCount !== 1 ? "s" : ""}</span>
+                  {/* Calls and Tags - Grouped on Mobile */}
+                  <div className="flex flex-row lg:contents justify-between items-center lg:items-start gap-4">
+                    {/* Calls */}
+                    <div className="lg:col-span-2 flex flex-col justify-center">
+                      <div className="flex items-center gap-2">
+                        {hasEmergency ? (
+                          <AlertCircle size={14} className="text-red-500 shrink-0" />
+                        ) : (
+                          <FolderOpen size={14} className="text-gray-400 shrink-0" />
+                        )}
+                        <span className="text-sm font-semibold text-gray-900">{callCount} call{callCount !== 1 ? "s" : ""}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5 hidden lg:block">{timeAgo(lastCall)}</p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">{timeAgo(lastCall)}</p>
+
+                    {/* Tags */}
+                    <div className="lg:col-span-2 flex flex-wrap justify-end lg:justify-start gap-1">
+                      {hasDog && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700">🐕 Dog in yard</span>
+                      )}
+                      {c.tags?.filter((t) => t !== "dog in yard").slice(0, 2).map((tag) => (
+                        <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-gray-100 text-gray-600"}`}>
+                          {tag}
+                        </span>
+                      ))}
+                      {!hasDog && (!c.tags || c.tags.length === 0) && (
+                        <span className="text-xs text-gray-400 hidden lg:block">—</span>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Tags */}
-                  <div className="col-span-2 flex flex-wrap gap-1">
-                    {hasDog && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-700">🐕 Dog in yard</span>
-                    )}
-                    {c.tags?.filter((t) => t !== "dog in yard").map((tag) => (
-                      <span key={tag} className={`text-[10px] font-bold px-2 py-0.5 rounded ${TAG_COLORS[tag] || "bg-gray-100 text-gray-600"}`}>
-                        {tag}
-                      </span>
-                    ))}
-                    {!hasDog && (!c.tags || c.tags.length === 0) && (
-                      <span className="text-xs text-gray-400">—</span>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="col-span-2 flex items-center justify-end gap-3">
+                  {/* Actions (Desktop Only) */}
+                  <div className="hidden lg:flex lg:col-span-2 items-center justify-end gap-3">
                     <button className="text-xs font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors flex items-center gap-1 border border-blue-200">
                       <PlusCircle size={13} /> New Job
                     </button>
