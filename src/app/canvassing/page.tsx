@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare, Trophy, Target } from "lucide-react";
+import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
@@ -10,12 +10,21 @@ import CanvassingMode from "./CanvassingMode";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
+import { Trophy, Target, X, MapPin, Calendar, User as UserIcon } from "lucide-react";
+
 function CanvassingStatsComponent({ visits }: { visits: any[] }) {
+  const [activeModal, setActiveModal] = useState<'today' | 'total' | 'demos' | 'gobacks' | null>(null);
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const stats = { todayKnocks: 0, totalKnocks: 0, hotLeads: 0, warmLeads: 0 };
   const repCounts: Record<string, { knocks: number, hot: number }> = {};
+  
+  const todayList: any[] = [];
+  const totalList: any[] = [];
+  const demosList: any[] = [];
+  const gobacksList: any[] = [];
 
   visits.forEach(v => {
     const isNewBuild = v.interest_level === 'new_build' || (v.notes && v.notes.includes('Source: County CSV Import'));
@@ -30,11 +39,23 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
     }
 
     stats.totalKnocks++;
+    totalList.push(v);
+    
     const vDate = new Date(v.visited_at || v.created_at);
-    if (vDate >= today) stats.todayKnocks++;
+    if (vDate >= today) {
+      stats.todayKnocks++;
+      todayList.push(v);
+    }
 
-    if (['demo_set', 'hot', 'contacted'].includes(v.interest_level)) stats.hotLeads++;
-    if (['go_back', 'warm'].includes(v.interest_level)) stats.warmLeads++;
+    if (['demo_set', 'hot', 'contacted'].includes(v.interest_level)) {
+      stats.hotLeads++;
+      demosList.push(v);
+    }
+    
+    if (['go_back', 'warm'].includes(v.interest_level)) {
+      stats.warmLeads++;
+      gobacksList.push(v);
+    }
 
     let rep = v.rep_name || "Unknown Rep";
     const match = v.notes?.match(/\[Rep:\s*(.*?)\]/);
@@ -54,28 +75,88 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
   const leaderboard = Object.entries(repCounts)
     .map(([name, data]) => ({ name, knocks: data.knocks, hot: data.hot }))
     .sort((a, b) => b.knocks - a.knocks);
+    
+  const renderModalList = (title: string, list: any[]) => {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
+            <h2 className="text-xl font-bold text-gray-900">{title} <span className="text-gray-500 text-sm ml-2">({list.length})</span></h2>
+            <button onClick={() => setActiveModal(null)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {list.length === 0 ? (
+              <p className="text-center text-gray-500 py-10">No records found.</p>
+            ) : (
+              <div className="space-y-3">
+                {list.map((v, i) => {
+                  let rep = "Unknown Rep";
+                  const match = v.notes?.match(/\[Rep:\s*(.*?)\]/);
+                  if (match && match[1]) rep = match[1];
+                  else if (v.sales_rep_name) rep = v.sales_rep_name;
+
+                  return (
+                    <div key={v.id || i} className="border border-gray-100 rounded-xl p-4 hover:border-blue-100 hover:bg-blue-50/30 transition-colors">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <div className="font-bold text-gray-900 text-base">{v.resident_name || 'Resident'}</div>
+                          <div className="flex items-center gap-1.5 text-sm text-gray-600 mt-1">
+                            <MapPin className="w-3.5 h-3.5 text-gray-400" /> {v.address}
+                          </div>
+                          {v.notes && !v.notes.includes('Source: County CSV') && (
+                            <div className="mt-2 text-sm text-gray-700 bg-gray-50 p-2 rounded-lg border border-gray-100">
+                              {v.notes.replace(/\[Rep:\s*.*?\]/, '').trim()}
+                            </div>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0">
+                          <div className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs font-semibold mb-2">
+                            <UserIcon className="w-3 h-3" /> {rep.replace('Efficiency', '').trim()}
+                          </div>
+                          <div className="flex items-center justify-end gap-1 text-xs text-gray-500">
+                            <Calendar className="w-3 h-3" /> {new Date(v.visited_at || v.created_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 mb-6">
+      {activeModal === 'today' && renderModalList("Knocked Today", todayList)}
+      {activeModal === 'total' && renderModalList("Total Knocks", totalList)}
+      {activeModal === 'demos' && renderModalList("Demos Set", demosList)}
+      {activeModal === 'gobacks' && renderModalList("Go Backs", gobacksList)}
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
-          <div className="text-sm text-gray-500 font-medium mb-1">Knocked Today</div>
-          <div className="text-3xl font-extrabold text-gray-900">{stats.todayKnocks}</div>
-        </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
-          <div className="text-sm text-gray-500 font-medium mb-1">Total Knocks</div>
-          <div className="text-3xl font-extrabold text-gray-900">{stats.totalKnocks}</div>
-        </div>
-        <div className="bg-orange-50 border border-orange-100 rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <Flame className="absolute -right-4 -bottom-4 w-16 h-16 text-orange-500/10" />
+        <button onClick={() => setActiveModal('today')} className="text-left bg-white border border-gray-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all rounded-xl p-4 shadow-sm flex flex-col justify-between group cursor-pointer">
+          <div className="text-sm text-gray-500 font-medium mb-1 group-hover:text-blue-600 transition-colors">Knocked Today</div>
+          <div className="text-3xl font-extrabold text-gray-900 group-hover:text-blue-700">{stats.todayKnocks}</div>
+        </button>
+        <button onClick={() => setActiveModal('total')} className="text-left bg-white border border-gray-200 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all rounded-xl p-4 shadow-sm flex flex-col justify-between group cursor-pointer">
+          <div className="text-sm text-gray-500 font-medium mb-1 group-hover:text-blue-600 transition-colors">Total Knocks</div>
+          <div className="text-3xl font-extrabold text-gray-900 group-hover:text-blue-700">{stats.totalKnocks}</div>
+        </button>
+        <button onClick={() => setActiveModal('demos')} className="text-left bg-orange-50 border border-orange-100 hover:border-orange-300 hover:shadow-md hover:-translate-y-0.5 transition-all rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer">
+          <Flame className="absolute -right-4 -bottom-4 w-16 h-16 text-orange-500/10 group-hover:scale-110 transition-transform duration-300" />
           <div className="text-sm text-orange-700 font-bold mb-1 flex items-center gap-1.5"><Flame className="w-4 h-4"/> Demos Set</div>
           <div className="text-3xl font-extrabold text-orange-600">{stats.hotLeads}</div>
-        </div>
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <AlertCircle className="absolute -right-4 -bottom-4 w-16 h-16 text-blue-500/10" />
+        </button>
+        <button onClick={() => setActiveModal('gobacks')} className="text-left bg-blue-50 border border-blue-100 hover:border-blue-300 hover:shadow-md hover:-translate-y-0.5 transition-all rounded-xl p-4 shadow-sm flex flex-col justify-between relative overflow-hidden group cursor-pointer">
+          <AlertCircle className="absolute -right-4 -bottom-4 w-16 h-16 text-blue-500/10 group-hover:scale-110 transition-transform duration-300" />
           <div className="text-sm text-blue-700 font-bold mb-1 flex items-center gap-1.5"><AlertCircle className="w-4 h-4"/> Go Backs</div>
           <div className="text-3xl font-extrabold text-blue-600">{stats.warmLeads}</div>
-        </div>
+        </button>
       </div>
 
       {leaderboard.length > 0 && (
