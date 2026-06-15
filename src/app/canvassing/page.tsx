@@ -233,6 +233,9 @@ export default function CanvassingPage() {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
         fetchVisits();
       })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'new_build_permits' }, () => {
+        fetchVisits();
+      })
       .subscribe();
 
     return () => {
