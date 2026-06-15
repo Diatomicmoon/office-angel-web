@@ -52,6 +52,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ timesheet: data });
     }
 
+    if (action === 'manual_entry') {
+      const { clock_in, clock_out, notes } = body;
+      const { data, error } = await supabase
+        .from('timesheets')
+        .insert([{ company_id: companyId, technician_id, clock_in, clock_out, notes, status: 'approved' }])
+        .select()
+        .single();
+      if (error) throw error;
+      return NextResponse.json({ timesheet: data });
+    }
+
     if (action === 'clock_out') {
       const { data, error } = await supabase
         .from('timesheets')

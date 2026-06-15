@@ -15,6 +15,13 @@ export default function FieldAppMockup() {
   const [editIn, setEditIn] = useState("");
   const [editOut, setEditOut] = useState("");
 
+  // Manual Entry State
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualDate, setManualDate] = useState("");
+  const [manualIn, setManualIn] = useState("");
+  const [manualOut, setManualOut] = useState("");
+  const [manualNotes, setManualNotes] = useState("");
+
   const [techId, setTechId] = useState<string>("8dcd18c7-e3d7-4422-9f4b-6bb4e6df2f10");
   const [techs, setTechs] = useState<{id: string, name: string}[]>([]);
   const [showTechPicker, setShowTechPicker] = useState(false);
@@ -118,6 +125,40 @@ export default function FieldAppMockup() {
       }
   };
 
+  const handleManualSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!manualDate || !manualIn || !manualOut) return;
+
+      const [inY, inMo, inD] = manualDate.split('-');
+      const [inH, inM] = manualIn.split(':');
+      const clockIn = new Date(parseInt(inY), parseInt(inMo) - 1, parseInt(inD), parseInt(inH), parseInt(inM), 0).toISOString();
+
+      const [outH, outM] = manualOut.split(':');
+      const clockOut = new Date(parseInt(inY), parseInt(inMo) - 1, parseInt(inD), parseInt(outH), parseInt(outM), 0).toISOString();
+
+      try {
+         await fetch('/api/timesheets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+               action: 'manual_entry', 
+               technician_id: techId, 
+               clock_in: clockIn, 
+               clock_out: clockOut,
+               notes: `Manual Entry: ${manualNotes}` 
+            })
+         });
+         setShowManualEntry(false);
+         setManualDate("");
+         setManualIn("");
+         setManualOut("");
+         setManualNotes("");
+         fetchTimesheets();
+      } catch (err) {
+         console.error(err);
+      }
+  };
+
   const saveEdit = async (entry: any) => {
       if (!editIn) return;
       
@@ -157,6 +198,38 @@ export default function FieldAppMockup() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col pb-20">
+      {showManualEntry && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 relative">
+             <button onClick={() => setShowManualEntry(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={20} /></button>
+             <h2 className="text-xl font-bold text-gray-900 mb-4">Log Manual Time</h2>
+             <form onSubmit={handleManualSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Date</label>
+                  <input type="date" required value={manualDate} onChange={e => setManualDate(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Start Time</label>
+                    <input type="time" required value={manualIn} onChange={e => setManualIn(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 uppercase mb-1">End Time</label>
+                    <input type="time" required value={manualOut} onChange={e => setManualOut(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Comment / Area</label>
+                  <textarea placeholder="e.g., Northside neighborhood canvassing..." required value={manualNotes} onChange={e => setManualNotes(e.target.value)} className="w-full border border-gray-300 rounded-lg p-2.5 text-sm min-h-[80px]" />
+                </div>
+                <button type="submit" className="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition-colors shadow-sm">
+                   Save Time Card
+                </button>
+             </form>
+          </div>
+        </div>
+      )}
+
       <div className="bg-gray-900 text-white p-4 pt-12 flex justify-between items-center shadow-md">
          <div>
            <h1 className="font-bold text-lg">Hard Hat Solutions Field App</h1>
@@ -253,9 +326,14 @@ export default function FieldAppMockup() {
                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mt-4">
                   <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                      <h2 className="font-bold text-gray-800">Your Punches</h2>
-                     <div className="flex bg-gray-200 p-1 rounded-lg">
-                        <button onClick={() => setTimeView('today')} className={`text-xs px-3 py-1 font-bold rounded-md ${timeView === 'today' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500'}`}>Today</button>
-                        <button onClick={() => setTimeView('week')} className={`text-xs px-3 py-1 font-bold rounded-md ${timeView === 'week' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500'}`}>This Week</button>
+                     <div className="flex items-center gap-3">
+                        <button onClick={() => setShowManualEntry(true)} className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors">
+                           + Manual Entry
+                        </button>
+                        <div className="flex bg-gray-200 p-1 rounded-lg">
+                           <button onClick={() => setTimeView('today')} className={`text-xs px-3 py-1 font-bold rounded-md ${timeView === 'today' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500'}`}>Today</button>
+                           <button onClick={() => setTimeView('week')} className={`text-xs px-3 py-1 font-bold rounded-md ${timeView === 'week' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-500'}`}>This Week</button>
+                        </div>
                      </div>
                   </div>
                   {visibleEntries.length === 0 ? (
