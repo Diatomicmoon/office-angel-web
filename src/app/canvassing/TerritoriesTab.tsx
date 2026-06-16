@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Plus, Trash2, Crosshair, MapPin, Smartphone, Edit2, Check } from "lucide-react";
-import dynamic from "next/dynamic";
 
 const MobileTerritoryMap = dynamic(() => import("./MobileTerritoryMap"), { ssr: false });
 
