@@ -40,8 +40,6 @@ export async function POST(req: Request) {
     
     if (aiEnabled) {
       console.log('[TWILIO VOICE] AI Auto-Pilot enabled. Routing call to Vapi SIP.');
-      // Dialing the Vapi Phone Number via SIP properly authenticates the call to your Org's wallet
-      // and triggers the Phone Number's server.url (the assistant-request webhook).
       const sipTarget = toPhone || '+16123245110';
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -51,10 +49,14 @@ export async function POST(req: Request) {
 </Response>`;
       return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml' } });
     } else if (forwardPhone) {
-      console.log(`[TWILIO VOICE] AI disabled. Forwarding to human: ${forwardPhone}`);
+      console.log(`[TWILIO VOICE] AI disabled (Co-Pilot Mode). Forwarding to human: ${forwardPhone} with recording enabled.`);
+      
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.hardhat-solutions.com";
+      const recordingCallbackUrl = `${baseUrl}/api/twilio-recording`;
+      
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Dial>
+  <Dial record="record-from-answer-dual" recordingStatusCallback="${recordingCallbackUrl}">
     <Number>${forwardPhone}</Number>
   </Dial>
 </Response>`;
