@@ -200,7 +200,7 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
 
 export default function CanvassingPage() {
   const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
-  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "expected" | "territories">("list");
+  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories">("list");
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [searchAddress, setSearchAddress] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -439,12 +439,7 @@ export default function CanvassingPage() {
               >
                 <List className="w-4 h-4" /> New Movers
               </button>
-              <button 
-                onClick={() => setView("expected")}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "expected" ? "bg-background shadow-sm text-blue-600" : "text-muted-foreground"}`}
-              >
-                <HardHat className="w-4 h-4" /> Expected Builds
-              </button>
+
               <button 
                 onClick={() => setView("builds")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "builds" ? "bg-background shadow-sm text-red-600" : "text-muted-foreground"}`}
