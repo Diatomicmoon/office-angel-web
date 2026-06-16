@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { Plus, Trash2, Crosshair, MapPin, Smartphone, Edit2, Check } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const MobileTerritoryMap = dynamic(() => import("./MobileTerritoryMap"), { ssr: false });
 
 const TerritoryMap = dynamic(() => import("./TerritoryMap"), { ssr: false });
 
@@ -13,6 +16,7 @@ export default function TerritoriesTab() {
   const [mobileName, setMobileName] = useState("");
   const [mobileNotes, setMobileNotes] = useState("");
   const [mobileRep, setMobileRep] = useState("");
+  const [mobileGeoJSON, setMobileGeoJSON] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -119,7 +123,7 @@ export default function TerritoriesTab() {
       const res = await fetch("/api/canvassing/territories", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: mobileName, geo_json: { type: 'Point', notes: mobileNotes }, assigned_rep: mobileRep || null })
+        body: JSON.stringify({ name: mobileName, geo_json: mobileGeoJSON || { type: 'Feature', notes: mobileNotes }, assigned_rep: mobileRep || null })
       });
       const data = await res.json();
       if (data.territory) {
@@ -134,6 +138,7 @@ export default function TerritoriesTab() {
       setMobileName("");
       setMobileNotes("");
       setMobileRep("");
+      setMobileGeoJSON(null);
     } catch(err) { console.error(err); }
   };
 
@@ -160,17 +165,8 @@ export default function TerritoriesTab() {
                 <textarea value={mobileNotes} onChange={e => setMobileNotes(e.target.value)} className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[70px] resize-none" placeholder="e.g. Oak St to Main St, north of Highway 7" />
               </div>
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">Pin a Location (Optional)</label>
-                <p className="text-xs text-gray-400 mb-2">Open in Google Maps to drop a center point for this territory.</p>
-                <a
-                  href="https://maps.google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-semibold text-gray-700 transition-colors"
-                >
-                  <MapPin className="w-4 h-4 text-purple-600" /> Open Google Maps
-                </a>
-                <p className="text-xs text-gray-400 mt-2">💡 Tip: On desktop you can draw an exact polygon boundary on the map.</p>
+                <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">Draw Territory Boundary</label>
+                <MobileTerritoryMap onDrawn={(geo) => setMobileGeoJSON(geo)} />
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setShowMobileAdd(false)} className="flex-1 py-3.5 border-2 border-gray-200 rounded-xl text-sm font-bold text-gray-600">Cancel</button>
