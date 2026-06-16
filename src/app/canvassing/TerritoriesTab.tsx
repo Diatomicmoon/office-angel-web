@@ -11,11 +11,21 @@ export default function TerritoriesTab() {
   const [techs, setTechs] = useState<any[]>([]);
 
   useEffect(() => {
-    // Fetch territories from local storage
-    const saved = localStorage.getItem("oa_territories");
-    if (saved) {
-      setTerritories(JSON.parse(saved));
-    }
+    // Fetch territories from DB
+    fetch("/api/canvassing/territories")
+      .then(res => res.json())
+      .then(data => {
+        if (data.territories) {
+          // Map DB format to UI format
+          setTerritories(data.territories.map((t: any) => ({
+            id: t.id,
+            name: t.name,
+            geoJSON: t.geo_json,
+            assignedRep: t.assigned_rep
+          })));
+        }
+      })
+      .catch(console.error);
 
     // Fetch technicians (reps)
     fetch("/api/technicians")
@@ -28,35 +38,69 @@ export default function TerritoriesTab() {
       .catch(console.error);
   }, []);
 
-  const saveTerritories = (updated: any[]) => {
-    setTerritories(updated);
-    localStorage.setItem("oa_territories", JSON.stringify(updated));
+  const saveTerritoryDB = async (t: any, isNew: boolean = false) => {
+    try {
+       await fetch("/api/canvassing/territories", {
+          method: isNew ? 'POST' : 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+             id: t.id,
+             name: t.name,
+             geo_json: t.geoJSON,
+             assigned_rep: t.assignedRep
+          })
+       });
+    } catch(err) {
+       console.error("Failed to save territory:", err);
+    }
   };
 
-  const handleCreated = (layer: any) => {
+  const handleCreated = async (layer: any) => {
+    const geoJSON = layer.toGeoJSON();
     const newTerritory = {
-      id: Date.now().toString(),
       name: `Territory ${territories.length + 1}`,
-      geoJSON: layer.toGeoJSON(),
+      geoJSON: geoJSON,
       assignedRep: ""
     };
-    const updated = [...territories, newTerritory];
-    saveTerritories(updated);
+    
+    // Optimistic UI update could be tricky with missing DB ID, so we fetch the saved one back
+    try {
+      const res = await fetch("/api/canvassing/territories", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newTerritory.name, geo_json: newTerritory.geoJSON })
+      });
+      const data = await res.json();
+      if (data.territory) {
+         setTerritories([...territories, {
+            id: data.territory.id,
+            name: data.territory.name,
+            geoJSON: data.territory.geo_json,
+            assignedRep: data.territory.assigned_rep
+         }]);
+      }
+    } catch(err) {
+      console.error(err);
+    }
   };
 
-  const deleteTerritory = (id: string) => {
-    const updated = territories.filter(t => t.id !== id);
-    saveTerritories(updated);
+  const deleteTerritory = async (id: string) => {
+    setTerritories(territories.filter(t => t.id !== id));
+    await fetch(`/api/canvassing/territories?id=${id}`, { method: 'DELETE' });
   };
 
   const updateTerritoryName = (id: string, newName: string) => {
     const updated = territories.map(t => t.id === id ? { ...t, name: newName } : t);
-    saveTerritories(updated);
+    setTerritories(updated);
+    const target = updated.find(t => t.id === id);
+    if (target) saveTerritoryDB(target, false);
   };
 
   const updateTerritoryRep = (id: string, newRepId: string) => {
     const updated = territories.map(t => t.id === id ? { ...t, assignedRep: newRepId } : t);
-    saveTerritories(updated);
+    setTerritories(updated);
+    const target = updated.find(t => t.id === id);
+    if (target) saveTerritoryDB(target, false);
   };
 
   return (
