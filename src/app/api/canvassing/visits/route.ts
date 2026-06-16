@@ -102,12 +102,25 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { id, ...visitData } = body; 
     
+    let repName = visitData.sales_rep_name || 'Unknown Rep';
+    // If the frontend passed "Logged In Rep", or we want to enforce backend logic:
+    const { userId } = await resolveCompanyIdOrThrow();
+    if (userId) {
+       const { data: profile } = await supabase.from('profiles').select('first_name, last_name').eq('id', userId).single();
+       if (profile && profile.first_name) {
+          repName = `${profile.first_name} ${profile.last_name || ''}`.trim();
+       }
+    }
+    
+    // Strip out the manual rep name appending on the client side since we now append it via the server
+    const rawNotes = (visitData.notes || '').replace(/\[Rep:\s*.*?\]/g, '').trim();
+
     if (id) {
-      const { data: leadData, error: lErr } = await supabase.from('leads').update({ interest_level: visitData.interest_level, notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`, status: ['hot', 'demo_set'].includes(visitData.interest_level) ? 'contacted' : 'new' }).eq('id', id).eq('company_id', companyId).select();
+      const { data: leadData, error: lErr } = await supabase.from('leads').update({ interest_level: visitData.interest_level, notes: `[Rep: ${repName}] ${rawNotes}`, status: ['hot', 'demo_set'].includes(visitData.interest_level) ? 'contacted' : 'new' }).eq('id', id).eq('company_id', companyId).select();
       const { data: buildData, error: bErr } = await supabase.from('new_build_permits').update({ status: ['hot', 'demo_set'].includes(visitData.interest_level) ? 'contacted' : 'knocked' }).eq('id', id).eq('company_id', companyId).select();
       const { data: manualData, error: mErr } = await supabase.from('door_knocking_visits').update({
          interest_level: visitData.interest_level,
-         notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`
+         notes: `[Rep: ${repName}] ${rawNotes}`
       }).eq('id', id).eq('company_id', companyId).select();
 
     // If it was successfully updated in one of the tables, return success.
@@ -126,7 +139,7 @@ export async function POST(request: Request) {
     longitude: visitData.longitude,
     interest_level: visitData.interest_level,
     // Add sales rep name into the notes since the column doesn't exist yet
-    notes: `[Rep: ${visitData.sales_rep_name || 'Unknown'}] ${visitData.notes || ''}`,
+    notes: `[Rep: ${repName}] ${rawNotes}`,
     visited_at: new Date().toISOString()
   };
 

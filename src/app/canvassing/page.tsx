@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { Plus, Map, List, Flame, Snowflake, AlertCircle, XCircle, Phone, HardHat, Home, Search, CheckSquare } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
@@ -244,9 +245,18 @@ export default function CanvassingPage() {
   }, []);
 
   async function fetchUser() {
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || "", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "");
-    const { data: sessionRes } = await supabase.auth.getSession();
-    setCurrentUser(sessionRes?.session?.user || null);
+    const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL || "", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "");
+    const { data: sessionRes } = await supabase.auth.getUser();
+    
+    // Attempt to fetch profile name
+    if (sessionRes?.user) {
+       const { data: profile } = await supabase.from('profiles').select('first_name, last_name').eq('id', sessionRes.user.id).single();
+       if (profile && profile.first_name) {
+          setCurrentUser({ ...sessionRes.user, user_metadata: { ...sessionRes.user.user_metadata, full_name: `${profile.first_name} ${profile.last_name || ''}`.trim() } });
+          return;
+       }
+    }
+    setCurrentUser(sessionRes?.user || null);
   }
 
   async function fetchVisits() {
