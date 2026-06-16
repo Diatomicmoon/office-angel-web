@@ -666,22 +666,24 @@ export default function CanvassingPage() {
         ) : view === "list" ? (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             {loading ? (
-              <div className="p-8 text-center text-muted-foreground">Loading visits...</div>
-            ) : visits.length === 0 ? (
+              <div className="p-8 text-center text-muted-foreground">Loading new movers...</div>
+            ) : visits.filter(v => v._type === 'new_mover').length === 0 ? (
               <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
-                  <Map className="h-6 w-6 text-muted-foreground" />
+                  <List className="h-6 w-6 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold">No visits logged yet</h3>
-                <p className="text-muted-foreground max-w-sm">When your team logs house visits, they will show up here.</p>
+                <h3 className="text-lg font-semibold">No New Movers Yet</h3>
+                <p className="text-muted-foreground max-w-sm">Upload Carver County or Hennepin County CSV data to populate this list with homeowners who moved in the last year.</p>
               </div>
             ) : (
-              <div className="divide-y">
-                {[...visits].sort((a, b) => {
-                  const aUnmapped = a.latitude == null ? 1 : 0;
-                  const bUnmapped = b.latitude == null ? 1 : 0;
-                  return bUnmapped - aUnmapped;
-                }).slice(0, 50).map((v) => (
+              <div>
+                <div className="px-5 py-3 bg-green-50 border-b border-green-100 flex items-center justify-between">
+                  <span className="text-sm font-bold text-green-800">🏡 {visits.filter(v => v._type === 'new_mover').length} New Homeowners — Moved Within Last 12 Months</span>
+                </div>
+                <div className="divide-y">
+                {[...visits].filter(v => v._type === 'new_mover').sort((a, b) => {
+                  return new Date(b.visited_at).getTime() - new Date(a.visited_at).getTime();
+                }).slice(0, 100).map((v) => (
                   <div key={v.id} className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-muted/50 transition-colors gap-4 cursor-pointer" onClick={() => handlePinClick(v)}>
                     <div className="flex-1">
                       <p className="font-semibold text-base text-foreground text-blue-600">
@@ -731,6 +733,7 @@ export default function CanvassingPage() {
                     </div>
                   </div>
                 ))}
+                </div>
               </div>
             )}
           </div>

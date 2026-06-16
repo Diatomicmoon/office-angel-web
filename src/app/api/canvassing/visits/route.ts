@@ -32,20 +32,28 @@ export async function GET(request: Request) {
     .select('*')
     .eq('company_id', companyId);
 
-  // Format scraped leads
-  const formattedLeads = (scrapedLeads || []).map((lead: any) => ({
+  // One year ago threshold for "new movers"
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+  // New Movers = leads from CSV/realestateapi sources with a recent sale date
+  const newMoverLeads = (scrapedLeads || []).filter((lead: any) => {
+    const isRecentSale = lead.sale_date && new Date(lead.sale_date) >= oneYearAgo;
+    return isRecentSale;
+  }).map((lead: any) => ({
     id: lead.id,
     address: lead.property_address + (lead.city ? `, ${lead.city}` : ''),
     resident_name: lead.new_owner_name,
-    interest_level: lead.interest_level || (lead.source === 'County CSV Import' ? 'new_build' : (lead.status === 'new' ? 'unknocked_lead' : 'not_interested')),
+    interest_level: lead.status === 'contacted' ? 'warm' : 'unknocked_lead',
     visited_at: lead.sale_date || lead.created_at,
-    notes: `Source: ${lead.source || 'Auto-Scraped'}\n${lead.notes ? lead.notes + '\n' : ''}Sale Date: ${lead.sale_date || 'Unknown'}\nStatus: ${lead.status.toUpperCase()}`,
+    notes: `Sale Date: ${lead.sale_date || 'Unknown'}\nSource: ${lead.source || 'County CSV'}\n${lead.notes || ''}`,
     phone: lead.phone || null,
     latitude: lead.latitude || null,
-    longitude: lead.longitude || null
+    longitude: lead.longitude || null,
+    _type: 'new_mover'
   }));
 
-  // Format new build permits specifically for the heat map
+  // Format new build permits specifically for the heat map + Expected Builds tab
   const formattedBuilds = (newBuilds || []).map((build: any) => ({
     id: build.id,
     address: build.property_address + (build.city ? `, ${build.city}` : ''),
@@ -54,15 +62,16 @@ export async function GET(request: Request) {
     visited_at: build.permit_date || build.created_at || new Date().toISOString(),
     notes: `Builder: ${build.contractor_name || 'Unknown'}\nStatus: ${build.status}\n${build.notes || ''}`,
     latitude: build.latitude || null,
-    longitude: build.longitude || null
+    longitude: build.longitude || null,
+    _type: 'new_build'
   }));
 
-  // Combine and sort by date
-  const combined = [...(manualVisits || []), ...formattedLeads, ...formattedBuilds].sort((a, b) => {
+  // Combine: manual visits + new movers + builds (for map/heatmap)
+  const combined = [...(manualVisits || []), ...newMoverLeads, ...formattedBuilds].sort((a, b) => {
     return new Date(b.visited_at).getTime() - new Date(a.visited_at).getTime();
   });
 
-  return NextResponse.json({ visits: combined });
+  return NextResponse.json({ visits: combined, newMoverCount: newMoverLeads.length, newBuildCount: formattedBuilds.length });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
