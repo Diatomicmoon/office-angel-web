@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl, ZoomControl, LayerGroup, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl, ZoomControl, LayerGroup, Marker, Polyline } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -49,6 +49,7 @@ interface Props {
   zoom?: number;
   onMapClick?: (lat: number, lng: number) => void;
   onPinClick?: (visit: Visit) => void;
+  routePins?: Visit[];
 }
 
 
@@ -100,7 +101,7 @@ function MapUpdater({ center, zoom }: { center?: [number, number], zoom?: number
   return null;
 }
 
-export default function MapView({ visits, center = [44.9778, -93.265], userLocation, zoom = 14, onMapClick, onPinClick }: Props) {
+export default function MapView({ visits, center = [44.9778, -93.265], userLocation, zoom = 14, onMapClick, onPinClick, routePins = [] }: Props) {
   const hasData = visits.length > 0;
   
   // Map State Persistence
@@ -265,7 +266,38 @@ export default function MapView({ visits, center = [44.9778, -93.265], userLocat
 
         </LayersControl>
         <MapEventsHandler onMapClick={onMapClick} />
-        
+
+        {/* Smart Route Polyline */}
+        {routePins.length > 1 && (() => {
+          const routeCoords: [number, number][] = routePins
+            .filter(p => p.latitude != null && p.longitude != null)
+            .map(p => [p.latitude!, p.longitude!]);
+          return (
+            <>
+              <Polyline
+                positions={routeCoords}
+                pathOptions={{ color: '#10b981', weight: 4, dashArray: '8 6', opacity: 0.9 }}
+              />
+              {routePins.filter(p => p.latitude != null).map((p, i) => (
+                <Marker
+                  key={`route-${p.id}-${i}`}
+                  position={[p.latitude!, p.longitude!]}
+                  icon={L.divIcon({
+                    className: '',
+                    html: `<div style="background:#10b981;color:white;font-weight:900;font-size:11px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${i + 1}</div>`,
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11]
+                  })}
+                >
+                  <Tooltip permanent={false} direction="top">
+                    <span className="text-xs font-bold">Stop {i + 1}: {p.address}</span>
+                  </Tooltip>
+                </Marker>
+              ))}
+            </>
+          );
+        })()}
+
         {/* Current user location dot (uses userLocation prop instead of center) */}
         {(userLocation || center) && (
           <Marker

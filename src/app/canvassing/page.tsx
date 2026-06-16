@@ -201,6 +201,7 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
 export default function CanvassingPage() {
   const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
   const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories">("list");
+  const [routePins, setRoutePins] = useState<any[]>([]);
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [searchAddress, setSearchAddress] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -376,37 +377,32 @@ export default function CanvassingPage() {
   }
 
   const handleGenerateRoute = () => {
-    // Filter active high-priority pins assigned to/logged by this user or general
     const highPriority = visits.filter(v => 
-       v.interest_level === 'go_back' || 
-       v.interest_level === 'hot' || 
-       v.interest_level === 'demo_set'
+       (v.interest_level === 'go_back' || v.interest_level === 'hot' || v.interest_level === 'demo_set') &&
+       v.latitude != null && v.longitude != null
     );
 
     if (highPriority.length === 0) {
-       alert("No high-priority pins (Hot, Demo Set, Go Back) found to route.");
+       alert("No high-priority pins (Hot, Demo Set, Go Back) with coordinates found to route.");
        return;
     }
 
-    // Limit to 9 waypoints (Google Maps free tier limit for optimize)
-    const routePins = highPriority.slice(0, 9);
-    
-    // Origin is the first pin, destination is the last pin
-    const origin = `${routePins[0].latitude},${routePins[0].longitude}`;
-    const dest = `${routePins[routePins.length - 1].latitude},${routePins[routePins.length - 1].longitude}`;
-    
-    // Waypoints
-    const waypoints = routePins.slice(1, routePins.length - 1)
-       .map(p => `${p.latitude},${p.longitude}`)
-       .join('|');
-       
-    // Build Google Maps Dir URL
-    let mapUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}`;
-    if (waypoints) {
-       mapUrl += `&waypoints=${waypoints}`;
+    // Simple nearest-neighbor sort starting from the first pin
+    const sorted: any[] = [highPriority[0]];
+    const remaining = highPriority.slice(1);
+    while (remaining.length > 0) {
+      const last = sorted[sorted.length - 1];
+      let nearestIdx = 0;
+      let nearestDist = Infinity;
+      remaining.forEach((p, i) => {
+        const dist = Math.hypot((p.latitude - last.latitude), (p.longitude - last.longitude));
+        if (dist < nearestDist) { nearestDist = dist; nearestIdx = i; }
+      });
+      sorted.push(remaining.splice(nearestIdx, 1)[0]);
     }
-    
-    window.open(mapUrl, "_blank");
+
+    setRoutePins(sorted.slice(0, 20));
+    setView("map");
   };
 
   return (
@@ -459,11 +455,19 @@ export default function CanvassingPage() {
                 <Map className="w-4 h-4" /> D2D Map
               </button>
             </div>
-            <button onClick={handleGenerateRoute}
-              className="bg-emerald-600 text-white hover:bg-emerald-700 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm shadow-sm"
-            >
-              <MapPin className="w-4 h-4" /> Smart Route
-            </button>
+            {routePins.length > 0 ? (
+              <button onClick={() => setRoutePins([])}
+                className="bg-gray-700 text-white hover:bg-gray-800 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm shadow-sm"
+              >
+                ✕ Clear Route ({routePins.length} stops)
+              </button>
+            ) : (
+              <button onClick={handleGenerateRoute}
+                className="bg-emerald-600 text-white hover:bg-emerald-700 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm shadow-sm"
+              >
+                <MapPin className="w-4 h-4" /> Smart Route
+              </button>
+            )}
             <button onClick={() => setCanvassingActive(true)}
               className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md font-medium flex items-center gap-2 text-sm shadow-sm"
             >
@@ -772,7 +776,8 @@ export default function CanvassingPage() {
               zoom={mapZoom}
               visits={visits} 
               onMapClick={handleMapClick} 
-              onPinClick={handlePinClick} 
+              onPinClick={handlePinClick}
+              routePins={routePins}
             />
           </div>
         )}
