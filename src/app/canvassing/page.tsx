@@ -11,7 +11,7 @@ import CanvassingMode from "./CanvassingMode";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-import { Trophy, Target, X, MapPin, Calendar, User as UserIcon } from "lucide-react";
+import { Trophy, Target, X, XCircle, MapPin, Calendar, User as UserIcon } from "lucide-react";
 
 function CanvassingStatsComponent({ visits }: { visits: any[] }) {
   const [activeModal, setActiveModal] = useState<'today' | 'total' | 'demos' | 'gobacks' | null>(null);
@@ -486,63 +486,103 @@ export default function CanvassingPage() {
         <CanvassingStatsComponent visits={visits} />
 
         {showAdd && (
-          <div className="fixed inset-0 z-[10000] bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">
-            <div className="bg-white dark:bg-card border rounded-xl p-6 shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 relative">
-              <button 
-                onClick={() => setShowAdd(false)}
-                className="absolute top-4 right-4 text-gray-500 hover:bg-gray-100 p-1 rounded-full"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-              <h2 className="font-semibold mb-4 text-lg">Log House Visit</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Address *</label>
-                    <input required className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="123 Example St" value={newVisit.address} onChange={e => setNewVisit({...newVisit, address: e.target.value})} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Resident Name</label>
-                    <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Current Resident" value={newVisit.resident_name} onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})} />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-gray-500">Rep Name (Auto-Assigned)</label>
-                    <input disabled className="w-full flex h-10 rounded-md border border-input bg-gray-50 px-3 py-2 text-sm text-gray-600 font-medium" value={(newVisit as any).sales_rep_name || ''} />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Interest Level</label>
-                    <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.interest_level} onChange={e => setNewVisit({...newVisit, interest_level: e.target.value})}>
-                      
-                      
-                      <option value="demo_set">📅 Demo Set</option>
-                      <option value="go_back">✅ Go Back</option>
-                      <option value="not_home">🏠 Not Home</option>
-                      <option value="not_interested">❄️ Not Interested</option>
-                      <option value="do_not_knock">🚫 Do Not Knock</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Property Status</label>
-                    <select className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={newVisit.existing_system} onChange={e => setNewVisit({...newVisit, existing_system: e.target.value})}>
-                      <option value="">Select...</option>
-                      <option value="Unknown">Unknown</option>
-                      <option value="Older Home">Older Home (Likely needs updates)</option>
-                      <option value="Remodeling">Actively Remodeling</option>
-                      <option value="New Build">New Construction</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Water Hardness (Test Results)</label>
-                    <input className="w-full flex h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="e.g. 15 GPG or High Iron" value={newVisit.water_hardness} onChange={e => setNewVisit({...newVisit, water_hardness: e.target.value})} />
-                  </div>
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">General Notes / Follow Up Time</label>
-                    <textarea className="w-full flex min-h-[80px] rounded-md border border-input bg-background px-3 py-2 text-sm" placeholder="Any details from the conversation..." value={newVisit.notes} onChange={e => setNewVisit({...newVisit, notes: e.target.value})} />
+          <div className="fixed inset-0 z-[10000] bg-black/70 backdrop-blur-sm flex justify-end md:justify-center items-end md:items-center p-0 md:p-4">
+            <div className="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-2xl shadow-2xl animate-in slide-in-from-bottom md:zoom-in-95 max-h-[95vh] overflow-y-auto">
+              
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">Log House Visit</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Rep auto-stamped from your account</p>
+                </div>
+                <button onClick={() => setShowAdd(false)} className="text-gray-400 hover:text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 rounded-full transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
+
+                {/* Interest Level - Big Tap Buttons */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 block">What happened at the door?</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { value: 'demo_set', label: 'Demo Set', emoji: '📅', color: 'border-orange-400 bg-orange-50 text-orange-700' },
+                      { value: 'go_back', label: 'Go Back', emoji: '✅', color: 'border-blue-400 bg-blue-50 text-blue-700' },
+                      { value: 'not_home', label: 'Not Home', emoji: '🏠', color: 'border-yellow-400 bg-yellow-50 text-yellow-700' },
+                      { value: 'not_interested', label: 'Not Interested', emoji: '❄️', color: 'border-gray-300 bg-gray-50 text-gray-600' },
+                      { value: 'do_not_knock', label: 'Do Not Knock', emoji: '🚫', color: 'border-red-400 bg-red-50 text-red-700' },
+                    ].map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setNewVisit({...newVisit, interest_level: opt.value})}
+                        className={`flex items-center gap-2 px-3 py-3 rounded-xl border-2 font-semibold text-sm transition-all active:scale-95 ${
+                          newVisit.interest_level === opt.value
+                            ? opt.color + ' shadow-sm scale-[1.02]'
+                            : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300'
+                        }`}
+                      >
+                        <span className="text-lg">{opt.emoji}</span>
+                        {opt.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 pt-4 border-t mt-4">
-                  <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium shadow-sm">Save Visit</button>
+
+                {/* Address + Resident */}
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">Address *</label>
+                    <input
+                      required
+                      className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                      placeholder="123 Example St"
+                      value={newVisit.address}
+                      onChange={e => setNewVisit({...newVisit, address: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">Resident Name</label>
+                    <input
+                      className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                      placeholder="Current Resident"
+                      value={newVisit.resident_name}
+                      onChange={e => setNewVisit({...newVisit, resident_name: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                {/* Water Hardness */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">Water Hardness (Test Results)</label>
+                  <input
+                    className="w-full h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+                    placeholder="e.g. 15 GPG or High Iron"
+                    value={newVisit.water_hardness}
+                    onChange={e => setNewVisit({...newVisit, water_hardness: e.target.value})}
+                  />
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">Notes / Follow Up Time</label>
+                  <textarea
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition min-h-[80px] resize-none"
+                    placeholder="Any details from the conversation..."
+                    value={newVisit.notes}
+                    onChange={e => setNewVisit({...newVisit, notes: e.target.value})}
+                  />
+                </div>
+
+                {/* Submit */}
+                <div className="flex gap-3 pt-2 pb-2">
+                  <button type="button" onClick={() => setShowAdd(false)} className="flex-1 py-3.5 border-2 border-gray-200 rounded-xl text-sm font-bold text-gray-600 hover:bg-gray-50 transition-colors">
+                    Cancel
+                  </button>
+                  <button type="submit" className="flex-2 flex-grow-[2] py-3.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white rounded-xl text-sm font-bold shadow-sm transition-all">
+                    Save Visit ✓
+                  </button>
                 </div>
               </form>
             </div>
