@@ -452,6 +452,12 @@ export default function CanvassingPage() {
                 <Home className="w-4 h-4" /> New Builds
               </button>
               <button 
+                onClick={() => setView("territories")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "territories" ? "bg-background shadow-sm text-purple-600" : "text-muted-foreground"}`}
+              >
+                <MapPin className="w-4 h-4" /> Territories
+              </button>
+              <button 
                 onClick={() => setView("map")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "map" ? "bg-background shadow-sm text-orange-600" : "text-muted-foreground"}`}
               >
