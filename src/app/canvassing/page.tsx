@@ -11,7 +11,7 @@ import CanvassingMode from "./CanvassingMode";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-import { Trophy, Target, X, XCircle, MapPin, Calendar, User as UserIcon } from "lucide-react";
+import { Trophy, Target, X, MapPin, Calendar, User as UserIcon } from "lucide-react";
 
 function CanvassingStatsComponent({ visits }: { visits: any[] }) {
   const [activeModal, setActiveModal] = useState<'today' | 'total' | 'demos' | 'gobacks' | null>(null);
