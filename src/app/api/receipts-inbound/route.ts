@@ -138,6 +138,54 @@ ${emailText}`;
         line_items: parsed.line_items || []
       }]);
 
+      // Auto-build internal material cost database from receipt line items
+      if (parsed.line_items && Array.isArray(parsed.line_items)) {
+        for (const item of parsed.line_items) {
+          if (!item.description || !item.unit_price) continue;
+          const name = item.description.trim().toLowerCase();
+          const price = parseFloat(item.unit_price);
+          if (isNaN(price) || price <= 0) continue;
+
+          // Upsert: if item+supplier combo exists, update running stats
+          const { data: existing } = await supabase
+            .from('material_costs')
+            .select('*')
+            .eq('company_id', companyId)
+            .ilike('item_name', name)
+            .eq('supplier', parsed.supplier_name || 'Unknown')
+            .single();
+
+          if (existing) {
+            const newCount = (existing.price_count || 1) + 1;
+            const newAvg = ((existing.avg_price * existing.price_count) + price) / newCount;
+            await supabase.from('material_costs').update({
+              last_price: price,
+              avg_price: Math.round(newAvg * 100) / 100,
+              min_price: Math.min(existing.min_price || price, price),
+              max_price: Math.max(existing.max_price || price, price),
+              price_count: newCount,
+              last_seen: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }).eq('id', existing.id);
+          } else {
+            await supabase.from('material_costs').insert([{
+              company_id: companyId,
+              item_name: item.description.trim(),
+              unit: item.unit || 'each',
+              last_price: price,
+              avg_price: price,
+              min_price: price,
+              max_price: price,
+              price_count: 1,
+              supplier: parsed.supplier_name || 'Unknown',
+              category: item.category || null,
+              source: 'receipt',
+              last_seen: new Date().toISOString()
+            }]);
+          }
+        }
+      }
+
       await supabase.from('messages').insert([{ company_id: companyId, channel: 'email', direction: 'inbound', from_value: sender || 'Unknown', body: `🧾 Receipt: $${parsed.total_amount || 0} from ${parsed.supplier_name} (via Make.com webhook)` }]);
     }
 

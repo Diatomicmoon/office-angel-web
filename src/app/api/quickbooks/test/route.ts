@@ -1,6 +1,7 @@
 import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { qbFetch } from "@/lib/quickbooks";
 
 export async function GET(req: Request) {
   const supabase = createClient(
