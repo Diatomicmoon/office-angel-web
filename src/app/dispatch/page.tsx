@@ -6,8 +6,8 @@ import dynamic from "next/dynamic";
 import { createBrowserClient } from "@supabase/ssr";
 
 const supabase = createBrowserClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "https://ztknhbilfergfwoxjzvb.supabase.co",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp0a25oYmlsZmVyZ2Z3b3hqenZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc2Nzc2OTksImV4cCI6MjA5MzI1MzY5OX0.e6tR6oPxi6KS8bmYG0e9zKbwOVbg5rw-tARrD9Ptcdo"
+  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 );
 
 const DispatchMap = dynamic(() => import("@/components/DispatchMap"), { ssr: false });
