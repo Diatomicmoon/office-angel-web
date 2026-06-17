@@ -76,7 +76,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-screen md:sticky md:top-0">
+    <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-[100dvh] md:h-screen md:sticky md:top-0">
       <div className="p-6">
         <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white flex items-center gap-2">
           {companyName.includes("Yard") ? (
@@ -205,7 +205,7 @@ export default function Sidebar() {
         )}
       </nav>
 
-      <div className="p-4 border-t border-gray-800 space-y-2">
+      <div className="p-4 pb-12 md:pb-4 border-t border-gray-800 space-y-2">
         {!isRestricted && !isSales && (
           <Link href="/settings" className={itemClass('/settings')}>
             <Settings size={20} />
