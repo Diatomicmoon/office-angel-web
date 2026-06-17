@@ -13,49 +13,12 @@ export default function Sidebar() {
   useEffect(() => {
     async function fetchRole() {
       try {
-        const supabase = createBrowserClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-        );
-        const { data: userRes } = await supabase.auth.getUser();
-        if (!userRes?.user) { setRole('unknown'); return; }
-
-        let foundRole: string | null = null;
-        let foundCompany: string | null = null;
-
-        const { data: memData } = await supabase
-          .from('company_memberships')
-          .select('role, company_id')
-          .eq('user_id', userRes.user.id)
-          .limit(1);
-
-        if (memData && memData.length > 0) {
-          foundRole = memData[0].role;
-          foundCompany = memData[0].company_id;
-        }
-
-        if (!foundRole) {
-          const { data: profData } = await supabase
-            .from('profiles')
-            .select('role, company_id')
-            .eq('id', userRes.user.id)
-            .limit(1);
-          if (profData && profData.length > 0) {
-            foundRole = profData[0].role;
-            foundCompany = profData[0].company_id;
-          }
-        }
-
-        setRole(foundRole || 'unknown');
-
-        if (foundCompany) {
-          const { data: comp } = await supabase
-            .from('companies')
-            .select('name')
-            .eq('id', foundCompany)
-            .single();
-          if (comp?.name) setCompanyName(comp.name);
-        }
+        // Use the /api/me route which uses the service role key to bypass RLS
+        const res = await fetch('/api/me');
+        if (!res.ok) { setRole('unknown'); return; }
+        const data = await res.json();
+        setRole(data.role || 'unknown');
+        if (data.companyName) setCompanyName(data.companyName);
       } catch (err) {
         console.error('Sidebar role fetch failed:', err);
         setRole('unknown');
