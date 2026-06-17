@@ -8,6 +8,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
+import WeeklyReportTab from "./WeeklyReportTab";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
@@ -200,7 +201,7 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
 
 export default function CanvassingPage() {
   const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
-  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories">("list");
+  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories" | "report">("list");
   const [routePins, setRoutePins] = useState<any[]>([]);
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [searchAddress, setSearchAddress] = useState("");
@@ -454,6 +455,12 @@ export default function CanvassingPage() {
               >
                 <Map className="w-4 h-4" /> D2D Map
               </button>
+              <button
+                onClick={() => setView("report")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "report" ? "bg-background shadow-sm text-blue-600" : "text-muted-foreground"}`}
+              >
+                <Calendar className="w-4 h-4" /> Weekly Report
+              </button>
             </div>
             {routePins.length > 0 ? (
               <button onClick={() => setRoutePins([])}
@@ -592,6 +599,8 @@ export default function CanvassingPage() {
           <NewBuildsTab onLocateOnMap={handleLocateOnMap} />
         ) : view === "territories" ? (
           <TerritoriesTab />
+        ) : view === "report" ? (
+          <WeeklyReportTab visits={visits} />
         ) : view === "logged" ? (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden">
             {loading ? (
