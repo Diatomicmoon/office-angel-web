@@ -17,16 +17,18 @@ export default function Sidebar() {
         const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
         const { data: userRes } = await supabase.auth.getUser();
         if (userRes?.user) {
-          // Check company_memberships first
           let foundRole = null;
           let foundCompany = null;
 
+          // Check company_memberships first (most reliable source)
           const { data: memData } = await supabase.from('company_memberships').select('role, company_id').eq('user_id', userRes.user.id).limit(1);
           if (memData && memData.length > 0) {
             foundRole = memData[0].role;
             foundCompany = memData[0].company_id;
-          } else {
-            // Fallback to profiles table
+          }
+
+          // Fallback to profiles table
+          if (!foundRole) {
             const { data: profData } = await supabase.from('profiles').select('role, company_id').eq('id', userRes.user.id).limit(1);
             if (profData && profData.length > 0) {
               foundRole = profData[0].role;
@@ -34,10 +36,10 @@ export default function Sidebar() {
             }
           }
 
-          if (foundRole) {
-            setRole(foundRole);
-          } else {
-            setRole('unknown'); // No role found — treat as regular user, not field_rep
+          // Always set a definitive role — never leave as 'loading' after fetch completes
+          setRole(foundRole || 'unknown');
+
+          if (foundCompany) {
             const { data: comp } = await supabase.from('companies').select('name').eq('id', foundCompany).single();
             if (comp?.name) {
               setCompanyName(comp.name);
