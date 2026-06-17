@@ -12,13 +12,13 @@ export function HaloWidget() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const publicRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret", "/privacy-policy", "/terms"];
-  const isPublicPage = publicRoutes.includes(pathname);
+  const hiddenRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret", "/privacy-policy", "/terms", "/canvassing", "/field-app"];
+  const isHiddenPage = hiddenRoutes.includes(pathname);
 
   // Ctrl+K / Cmd+K listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isPublicPage) return;
+      if (isHiddenPage) return;
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setIsOpen((prev) => {
@@ -29,7 +29,7 @@ export function HaloWidget() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isPublicPage]);
+  }, [isHiddenPage]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -38,7 +38,7 @@ export function HaloWidget() {
     }
   }, [messages, loading]);
 
-  if (isPublicPage) return null;
+  if (isHiddenPage) return null;
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
