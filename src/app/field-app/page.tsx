@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Clock, MapPin, Truck, CheckCircle2, Navigation, Briefcase, Calendar, Edit2, X, Check } from "lucide-react";
+import { Clock, MapPin, Truck, CheckCircle2, Navigation, Briefcase, Calendar, Edit2, X, Check, LogOut } from "lucide-react";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function FieldAppMockup() {
   const [activeTab, setActiveTab] = useState<'jobs' | 'timecard'>('timecard');
@@ -26,6 +27,16 @@ export default function FieldAppMockup() {
   const [techs, setTechs] = useState<{id: string, name: string}[]>([]);
   const [showTechPicker, setShowTechPicker] = useState(false);
   const [selectedTechName, setSelectedTechName] = useState<string>("Steve");
+
+  const handleLogout = async () => {
+    const supabase = createBrowserClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+    );
+    await supabase.auth.signOut();
+    window.location.href = "/login";
+  };
+
 
   useEffect(() => {
     // Load technician list and restore saved selection
@@ -269,8 +280,10 @@ export default function FieldAppMockup() {
              👷 {selectedTechName || "Select Tech"} ›
            </button>
          </div>
-         <div className="flex gap-2">
-           <Truck size={20} className="text-gray-400" />
+         <div className="flex gap-4 items-center">
+           <button onClick={handleLogout} className="text-gray-400 hover:text-white transition-colors" title="Log Out">
+             <LogOut size={20} />
+           </button>
          </div>
       </div>
 
