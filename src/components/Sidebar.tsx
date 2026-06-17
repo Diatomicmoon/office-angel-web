@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock } from 'lucide-react';
+import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock, BarChart2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
@@ -184,6 +184,12 @@ export default function Sidebar() {
           <Link href="/financials" className={itemClass('/financials')}>
             <DollarSign size={20} />
             <span>Financial Command</span>
+          </Link>
+        )}
+        {!isRestricted && !isSales && (
+          <Link href="/weekly-recap" className={itemClass('/weekly-recap')}>
+            <BarChart2 size={20} />
+            <span>Weekly Recap</span>
           </Link>
         )}
       </nav>

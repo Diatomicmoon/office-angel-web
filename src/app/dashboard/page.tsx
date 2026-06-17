@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText, Users, Tag } from "lucide-react";
+import { PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText, Users, Tag, BarChart2 } from "lucide-react";
 import { VapiCallButton } from "@/components/VapiCallButton";
 import Link from "next/link";
 
@@ -113,8 +113,24 @@ export default function Dashboard() {
     );
   }
 
+  const isFriday = new Date().getDay() === 5;
+
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-4 md:p-8 space-y-6 md:space-y-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto pb-24">
+
+      {/* Friday Weekly Recap Banner */}
+      {isFriday && (
+        <Link href="/weekly-recap" className="flex items-center justify-between gap-4 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-2xl px-5 py-4 shadow-md hover:shadow-lg transition-all group">
+          <div className="flex items-center gap-3">
+            <BarChart2 className="w-5 h-5 flex-shrink-0" />
+            <div>
+              <p className="font-bold text-sm">📊 Your Weekly Recap is ready.</p>
+              <p className="text-yellow-100 text-xs mt-0.5">See how this week stacked up — jobs, calls, spend, and more.</p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+        </Link>
+      )}
 
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
