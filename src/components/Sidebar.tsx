@@ -36,6 +36,8 @@ export default function Sidebar() {
 
           if (foundRole) {
             setRole(foundRole);
+          } else {
+            setRole('unknown'); // No role found — treat as regular user, not field_rep
             const { data: comp } = await supabase.from('companies').select('name').eq('id', foundCompany).single();
             if (comp?.name) {
               setCompanyName(comp.name);
@@ -53,9 +55,10 @@ export default function Sidebar() {
   }, []);
   
   // Only field_rep/tech/apprentice get restricted sidebar. Everyone else (including loading) gets full access.
-  const safeRole = role ? role.toLowerCase() : '';
+  const safeRole = role ? role.toLowerCase() : 'loading';
   const isFieldRep = safeRole === 'field_rep' || safeRole === 'tech' || safeRole === 'apprentice';
   const isSales = safeRole === 'sales';
+  // Show full menu while loading (avoids flash). Restrict ONLY confirmed field_rep roles.
   const isRestricted = isFieldRep;
   const isAdmin = ['owner', 'admin'].includes(safeRole);
 
