@@ -81,9 +81,13 @@ export default function Sidebar() {
   };
 
   const safeRole = (role || '').toLowerCase();
-  const isFieldRep = ['field_rep', 'tech', 'apprentice'].includes(safeRole);
+  // Safe default: if we don't explicitly know you are an owner/admin, you get restricted.
+  const isOwnerOrAdmin = ['owner', 'admin'].includes(safeRole);
   const isSales = safeRole === 'sales';
-  const isRestricted = isFieldRep;
+  const isFieldRep = ['field_rep', 'tech', 'apprentice'].includes(safeRole);
+  
+  // If you aren't an owner/admin, you are restricted by default.
+  const isRestricted = !isOwnerOrAdmin;
 
   return (
     <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-[100dvh] md:h-screen md:sticky md:top-0">
