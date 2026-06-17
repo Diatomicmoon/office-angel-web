@@ -1,5 +1,30 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/inbound-email/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  },
   "crons": [
+    {
+      "path": "/api/cron/scrape-waconia",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/cross-reference-builds",
+      "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/cron/scrape-permits",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/generate-bids",
+      "schedule": "0 4 * * *"
+    },
     {
       "path": "/api/cron/daily-leaderboard",
       "schedule": "0 20 * * *"

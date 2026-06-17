@@ -15,8 +15,8 @@ export default function Login() {
   
   // We instantiate here to avoid Next.js build-time prerendering issues if env vars aren't injected at build
   const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder.supabase.co",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "placeholder"
   );
 
   const handleLogin = async (e: React.FormEvent) => {
