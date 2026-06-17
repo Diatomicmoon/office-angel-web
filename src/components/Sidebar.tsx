@@ -61,8 +61,22 @@ export default function Sidebar() {
   const isSales = safeRole !== 'loading' && safeRole === 'sales';
   
   // If role is loading, assume restricted to prevent flash. But if we KNOW they are an owner/admin, never restrict.
-  const isRestricted = safeRole === 'loading' ? true : (isFieldRep && !isAdminOrOwner);
+  let isRestricted = false;
+  if (safeRole === 'loading') {
+    isRestricted = true; // Wait for load
+  } else if (isAdminOrOwner) {
+    isRestricted = false; // Owners/Admins get everything
+  } else if (['field_rep', 'tech', 'apprentice'].includes(safeRole)) {
+    isRestricted = true; // Field reps get restricted
+  } else {
+    isRestricted = false; // Default fallback to open if unknown role type
+  }
   const isAdmin = isAdminOrOwner;
+  
+  // Debug override: If we know the user is an admin/owner, FORCE isRestricted to false
+  if (isAdminOrOwner) {
+    // console.log("User is Admin/Owner. Unlocking sidebar.");
+  }
 
   const pathname = usePathname();
   
