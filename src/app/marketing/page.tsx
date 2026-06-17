@@ -52,7 +52,7 @@ export default function Marketing() {
             <Globe size={18} /> Connect Facebook
           </button>
           <button 
-            onClick={() => window.location.href = '/api/auth/google?companyId=1'}
+            onClick={() => window.location.href = '/api/google-marketing/auth?companyId=1'}
             className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-5 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
           >
             <Globe size={18} /> Connect Google
