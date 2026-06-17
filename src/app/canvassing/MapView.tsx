@@ -6,6 +6,8 @@ import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+const DEFAULT_CENTER: [number, number] = [44.9778, -93.265];
+
 const colorMap: Record<string, string> = {
   hot: "#f97316", // Orange (Hot Lead)
   warm: "#3b82f6", // Blue (Warm/Follow Up)
@@ -101,7 +103,7 @@ function MapUpdater({ center, zoom }: { center?: [number, number], zoom?: number
   return null;
 }
 
-export default function MapView({ visits, center = [44.9778, -93.265], userLocation, zoom = 14, onMapClick, onPinClick, routePins = [] }: Props) {
+export default function MapView({ visits, center = DEFAULT_CENTER, userLocation, zoom = 14, onMapClick, onPinClick, routePins = [] }: Props) {
   const hasData = visits.length > 0;
   
   // Map State Persistence
