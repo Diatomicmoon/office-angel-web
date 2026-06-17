@@ -53,11 +53,16 @@ export default function Sidebar() {
   }, []);
   
   // Define restrictive roles based on user request (apprentice, tech, sales, field_rep, etc.)
-  const isFieldRep = role !== 'loading' && ['field_rep', 'tech', 'apprentice'].includes(role?.toLowerCase());
-  const isSales = role !== 'loading' && role?.toLowerCase() === 'sales';
-  // If role is still loading, default to restricted so the UI doesn't flash admin tools
-  const isRestricted = role === 'loading' ? true : isFieldRep;
-  const isAdmin = role !== 'loading' && ['owner', 'admin'].includes(role?.toLowerCase());
+  // Treat "owner" and "admin" exactly the same and never restrict them
+  const safeRole = role ? role.toLowerCase() : 'loading';
+  const isAdminOrOwner = ['owner', 'admin'].includes(safeRole);
+  
+  const isFieldRep = safeRole !== 'loading' && ['field_rep', 'tech', 'apprentice'].includes(safeRole);
+  const isSales = safeRole !== 'loading' && safeRole === 'sales';
+  
+  // If role is loading, assume restricted to prevent flash. But if we KNOW they are an owner/admin, never restrict.
+  const isRestricted = safeRole === 'loading' ? true : (isFieldRep && !isAdminOrOwner);
+  const isAdmin = isAdminOrOwner;
 
   const pathname = usePathname();
   
