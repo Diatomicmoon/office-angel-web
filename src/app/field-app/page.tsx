@@ -270,26 +270,10 @@ export default function FieldAppMockup() {
          
          {activeTab === 'jobs' && (
             <div className="space-y-4">
-               {/* Today's Schedule */}
-               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                  <div className="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
-                     <h2 className="font-bold text-gray-800">Current Job</h2>
-                     <span className="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-1 rounded">1:00 PM</span>
-                  </div>
-                  <div className="p-4 space-y-3">
-                     <div>
-                     <h3 className="font-bold text-gray-900 text-lg">Standard Deep Clean</h3>
-                     <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
-                        <MapPin size={14} /> 123 Main Street, Edina MN
-                     </p>
-                     </div>
-                     <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded border border-gray-100">
-                     "Customer requested extra attention on the master bathroom grout."
-                     </p>
-                     <button className="w-full mt-2 py-2 bg-blue-600 text-white rounded-lg font-medium flex items-center justify-center gap-2">
-                        <Navigation size={18} /> Get Directions
-                     </button>
-                  </div>
+               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+                  <Briefcase size={32} className="mx-auto text-gray-300 mb-3" />
+                  <h3 className="font-bold text-gray-800 text-lg">No active jobs</h3>
+                  <p className="text-gray-500 text-sm mt-1">You have no scheduled jobs at this time.</p>
                </div>
             </div>
          )}
