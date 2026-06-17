@@ -16,8 +16,18 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Hard Hat Solutions | Command Center",
-  description: "AI automation suite for trade contractors.",
+  title: "Hard Hat Solutions | AI Software for Electrical & Trade Contractors",
+  description: "The ultimate AI automation suite for trade contractors. Auto-schedule jobs, map door-to-door sales, track permits, and automate wholesale material orders.",
+  keywords: ["electrical contractor software", "trade contractor CRM", "AI answering service for contractors", "roofing CRM", "door to door canvassing app", "contractor dispatch software", "Hard Hat Solutions"],
+  authors: [{ name: "Hardhat Holdings LLC" }],
+  openGraph: {
+    title: "Hard Hat Solutions | AI for Trades",
+    description: "Automate your trade business with AI dispatching, phone answering, and material tracking.",
+    url: "https://hardhat-solutions.com",
+    siteName: "Hard Hat Solutions",
+    locale: "en_US",
+    type: "website",
+  },
   manifest: "/manifest.json",
 };
 
