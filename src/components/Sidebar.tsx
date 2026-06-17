@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock, BarChart2 } from 'lucide-react';
+import { Home, Phone, Users, Calendar, Settings, Activity, Mic, Archive, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, Clock, BarChart2, LogOut } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
@@ -59,6 +59,17 @@ export default function Sidebar() {
   const isAdmin = ['owner', 'admin'].includes(role?.toLowerCase());
 
   const pathname = usePathname();
+  
+  const handleLogout = async () => {
+    try {
+      const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '');
+      await supabase.auth.signOut();
+      window.location.href = "/login";
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const itemClass = (href: string) => {
     const active = pathname === href;
     return `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${active ? 'text-white bg-gray-800' : 'text-gray-400 hover:text-white hover:bg-gray-800/50'}`;
@@ -194,14 +205,18 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {!isRestricted && !isSales && (
-        <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-gray-800 space-y-2">
+        {!isRestricted && !isSales && (
           <Link href="/settings" className={itemClass('/settings')}>
             <Settings size={20} />
             <span>Settings</span>
           </Link>
-        </div>
-      )}
+        )}
+        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-gray-400 hover:text-white hover:bg-gray-800/50">
+          <LogOut size={20} />
+          <span>Log Out</span>
+        </button>
+      </div>
     </div>
   );
 }
