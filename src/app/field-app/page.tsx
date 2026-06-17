@@ -42,6 +42,38 @@ export default function FieldAppMockup() {
     fetchTimesheets();
   }, []);
 
+  // Background GPS Pinger
+  useEffect(() => {
+    if (!techId) return;
+
+    let watchId: number;
+
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          fetch('/api/technicians/location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              technician_id: techId,
+              lat: pos.coords.latitude,
+              lng: pos.coords.longitude,
+              accuracy: pos.coords.accuracy
+            })
+          }).catch(err => console.error("GPS Ping Error:", err));
+        },
+        (err) => console.warn("GPS tracking error:", err),
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    return () => {
+      if (watchId !== undefined && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [techId]);
+
   const fetchTimesheets = async () => {
     try {
       const res = await fetch('/api/timesheets');
