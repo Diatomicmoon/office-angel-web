@@ -422,7 +422,7 @@ export default function CanvassingPage() {
             <h1 className="text-2xl font-bold tracking-tight">Door-to-Door CRM</h1>
             <p className="text-muted-foreground">Track field visits and predictive heat maps.</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="bg-muted p-1 rounded-lg flex flex-wrap items-center">
               <button 
                 onClick={() => setView("logged")}
@@ -649,7 +649,7 @@ export default function CanvassingPage() {
                       )}
                     </div>
                     <div className="shrink-0 flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {v.interest_level === 'demo_set' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Demo Set</span>}
                         {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
                         {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
@@ -722,7 +722,7 @@ export default function CanvassingPage() {
                       )}
                     </div>
                     <div className="shrink-0 flex flex-col items-end gap-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {v.interest_level === 'demo_set' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Demo Set</span>}
                         {v.interest_level === 'hot' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700"><Flame className="w-3.5 h-3.5"/> Hot</span>}
                         {v.interest_level === 'warm' && <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700"><AlertCircle className="w-3.5 h-3.5"/> Warm</span>}
