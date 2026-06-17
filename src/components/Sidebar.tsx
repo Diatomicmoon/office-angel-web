@@ -52,31 +52,12 @@ export default function Sidebar() {
     fetchRoleAndCompany();
   }, []);
   
-  // Define restrictive roles based on user request (apprentice, tech, sales, field_rep, etc.)
-  // Treat "owner" and "admin" exactly the same and never restrict them
-  const safeRole = role ? role.toLowerCase() : 'loading';
-  const isAdminOrOwner = ['owner', 'admin'].includes(safeRole);
-  
-  const isFieldRep = safeRole !== 'loading' && ['field_rep', 'tech', 'apprentice'].includes(safeRole);
-  const isSales = safeRole !== 'loading' && safeRole === 'sales';
-  
-  // If role is loading, assume restricted to prevent flash. But if we KNOW they are an owner/admin, never restrict.
-  let isRestricted = false;
-  if (safeRole === 'loading') {
-    isRestricted = true; // Wait for load
-  } else if (isAdminOrOwner) {
-    isRestricted = false; // Owners/Admins get everything
-  } else if (['field_rep', 'tech', 'apprentice'].includes(safeRole)) {
-    isRestricted = true; // Field reps get restricted
-  } else {
-    isRestricted = false; // Default fallback to open if unknown role type
-  }
-  const isAdmin = isAdminOrOwner;
-  
-  // Debug override: If we know the user is an admin/owner, FORCE isRestricted to false
-  if (isAdminOrOwner) {
-    // console.log("User is Admin/Owner. Unlocking sidebar.");
-  }
+  // Only field_rep/tech/apprentice get restricted sidebar. Everyone else (including loading) gets full access.
+  const safeRole = role ? role.toLowerCase() : '';
+  const isFieldRep = safeRole === 'field_rep' || safeRole === 'tech' || safeRole === 'apprentice';
+  const isSales = safeRole === 'sales';
+  const isRestricted = isFieldRep;
+  const isAdmin = ['owner', 'admin'].includes(safeRole);
 
   const pathname = usePathname();
   
