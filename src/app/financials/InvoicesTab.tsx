@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { FileText, Plus, DollarSign, Send, CheckCircle, Clock, AlertCircle, Building2, User, Search, Download } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 
-export default function InvoicesPage() {
+export default function InvoicesTab() {
   const [view, setView] = useState<"list" | "create">("list");
   const [invoices, setInvoices] = useState<any[]>([]);
 

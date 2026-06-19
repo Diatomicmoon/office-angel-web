@@ -3,11 +3,14 @@
 import { useState, useEffect } from "react";
 import { DollarSign, TrendingUp, TrendingDown, Users, CreditCard, PieChart, FileText, AlertCircle, PhoneMissed, Truck, Clock } from "lucide-react";
 import Link from "next/link";
+import InvoicesTab from "./InvoicesTab";
+import { FileText as FileTextIcon } from "lucide-react";
 
 export default function FinancialsPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [ghlStats, setGhlStats] = useState<any>(null);
+  const [view, setView] = useState<"overview" | "invoices">("overview");
 
   useEffect(() => {
     fetch("/api/quickbooks/test")
@@ -31,6 +34,22 @@ export default function FinancialsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Financial Command</h1>
           <p className="text-gray-500 mt-2">Accounts Receivable, Profitability, and Cash Flow.</p>
         </div>
+        
+        {/* Navigation Pills */}
+        <div className="flex bg-gray-100 p-1 rounded-xl items-center mr-auto ml-4 md:ml-8 hidden md:flex">
+          <button 
+            onClick={() => setView('overview')}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition ${view === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            Overview
+          </button>
+          <button 
+            onClick={() => setView('invoices')}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 ${view === 'invoices' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <FileTextIcon className="w-4 h-4" /> Invoices
+          </button>
+        </div>
         <div className="flex gap-3 items-center">
           {data?.error ? (
              <div className="bg-red-50 text-red-800 text-xs font-bold px-3 py-1.5 rounded-md border border-red-200 flex items-center gap-2">
@@ -44,8 +63,8 @@ export default function FinancialsPage() {
           <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">
             Manage Accounting
           </Link>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
-            <DollarSign className="w-4 h-4" /> Create Invoice
+          <button onClick={() => setView('invoices')} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
+            <DollarSign className="w-4 h-4" /> Invoices
           </button>
         </div>
       </div>
