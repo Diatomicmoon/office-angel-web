@@ -9,6 +9,8 @@ import NewBuildsTab from "@/components/dashboard/NewBuildsTab";
 import TerritoriesTab from "./TerritoriesTab";
 import CanvassingMode from "./CanvassingMode";
 import WeeklyReportTab from "./WeeklyReportTab";
+import PermitWalletTab from "./PermitWalletTab";
+import { ShieldCheck } from "lucide-react";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
@@ -201,7 +203,7 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
 
 export default function CanvassingPage() {
   const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
-  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories" | "report">("list");
+  const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories" | "report" | "permits">("list");
   const [routePins, setRoutePins] = useState<any[]>([]);
   const [canvassingActive, setCanvassingActive] = useState(false);
   const [searchAddress, setSearchAddress] = useState("");
@@ -461,6 +463,12 @@ export default function CanvassingPage() {
               >
                 <Calendar className="w-4 h-4" /> Weekly Report
               </button>
+              <button 
+                onClick={() => setView("permits")}
+                className={`px-3 py-1.5 text-sm font-medium rounded-md flex items-center gap-2 ${view === "permits" ? "bg-background shadow-sm text-blue-600" : "text-muted-foreground"}`}
+              >
+                <ShieldCheck className="w-4 h-4" /> Permits
+              </button>
             </div>
             {routePins.length > 0 ? (
               <button onClick={() => setRoutePins([])}
@@ -595,7 +603,9 @@ export default function CanvassingPage() {
           </div>
         )}
 
-        {view === "builds" ? (
+        {view === "permits" ? (
+          <PermitWalletTab />
+        ) : view === "builds" ? (
           <NewBuildsTab onLocateOnMap={handleLocateOnMap} />
         ) : view === "territories" ? (
           <TerritoriesTab />
