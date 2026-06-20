@@ -42,11 +42,11 @@ export default function RootLayout({
         <meta name="theme-color" content="#000000" />
       </head>
       <body className={`${inter.className} bg-gray-50 text-gray-900`}>
-        <div className="flex min-h-screen">
+        <div className="flex h-[100dvh] overflow-hidden">
           <SidebarClientWrapper />
           
           
-          <main className="flex-1 min-w-0 flex flex-col min-h-screen w-full">
+          <main className="flex-1 min-w-0 flex flex-col h-[100dvh] w-full overflow-y-auto">
             <div className="flex-1 mt-14 md:mt-0">
               <RoleGuard>{children}</RoleGuard>
             </div>
