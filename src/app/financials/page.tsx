@@ -71,6 +71,8 @@ export default function FinancialsPage() {
 
       {loading ? (
          <div className="py-20 text-center text-gray-500">Loading financial data...</div>
+      ) : view === 'invoices' ? (
+        <InvoicesTab />
       ) : (
         <>
           {/* GHL Pipeline Banner */}
