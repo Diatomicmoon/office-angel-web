@@ -36,7 +36,7 @@ export default function FinancialsPage() {
         </div>
         
         {/* Navigation Pills */}
-        <div className="flex bg-gray-100 p-1 rounded-xl items-center mr-auto ml-4 md:ml-8 hidden md:flex">
+        <div className="flex bg-gray-100 p-1 rounded-xl items-center mr-auto ml-4 md:ml-8 flex-1 md:flex">
           <button 
             onClick={() => setView('overview')}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition ${view === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
