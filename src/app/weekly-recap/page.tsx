@@ -203,7 +203,7 @@ export default function WeeklyRecapPage() {
           icon={FileText}
           label="Receipts Logged"
           value={stats.totalReceipts}
-          sub="via Office Angel"
+          sub="via Hard Hat Solutions"
           color="bg-teal-50 text-teal-600"
         />
         <StatCard
