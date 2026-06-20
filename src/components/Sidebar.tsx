@@ -69,7 +69,7 @@ export default function Sidebar() {
         </div>
       ) : (
         <>
-          <nav className="flex-1 overflow-y-auto px-3 pb-6 space-y-1 custom-scrollbar">
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 pt-2 pb-6 space-y-1 custom-scrollbar min-h-0">
             
             <Link href="/dashboard" className={itemClass('/dashboard')}>
               <Home size={18} /><span>Dashboard</span>
