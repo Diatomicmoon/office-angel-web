@@ -594,9 +594,11 @@ export default function CRM() {
       .catch(() => setLoading(false));
   }, []);
 
-  const captured = leads.filter((l) => l.status === "captured");
+  const captured = leads.filter((l) => l.status === "captured" || !l.status);
   const estimating = leads.filter((l) => l.status === "estimating");
-  const scheduled = leads.filter((l) => l.status === "scheduled");
+  const quote_sent = leads.filter((l) => l.status === "quote_sent");
+  const follow_up = leads.filter((l) => l.status === "follow_up");
+  const scheduled = leads.filter((l) => l.status === "scheduled" || l.status === "won");
 
   const LeadCard = ({ lead }: { lead: Lead }) => (
     <div
@@ -752,9 +754,10 @@ export default function CRM() {
           <div className="flex-1 flex items-center justify-center text-gray-500">Loading leads...</div>
         ) : viewMode === "board" ? (
           <div className="flex-1 flex gap-6 overflow-x-auto pb-4">
-            <Column title="AI Captured" color="bg-blue-500" items={captured} />
-            <Column title="Estimating" color="bg-yellow-500" items={estimating} />
-            <Column title="Scheduled" color="bg-green-500" items={scheduled} />
+            <Column title="New Lead" color="bg-blue-500" items={captured} />
+            <Column title="Quote Sent" color="bg-purple-500" items={quote_sent} />
+            <Column title="Follow-Up Needed" color="bg-orange-500" items={follow_up} />
+            <Column title="Won / Scheduled" color="bg-green-500" items={scheduled} />
           </div>
         ) : (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm flex-1 overflow-hidden flex flex-col">

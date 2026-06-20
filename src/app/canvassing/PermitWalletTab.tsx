@@ -25,7 +25,7 @@ export default function PermitWalletTab() {
     if (!user) return;
 
     // Grab company_id from users table if available, else omit filtering for now if unlinked
-    const { data: userData } = await supabase.from('users').select('company_id').eq('id', user.id).single();
+    const { data: userData } = await supabase.from('profiles').select('company_id').eq('id', user.id).single();
     if (userData && userData.company_id) setCompanyId(userData.company_id);
 
     const query = supabase.from('canvassing_permits').select('*').order('created_at', { ascending: false });

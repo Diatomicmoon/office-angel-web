@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { DollarSign, TrendingUp, TrendingDown, Users, CreditCard, PieChart, FileText, AlertCircle, PhoneMissed, Truck, Clock } from "lucide-react";
 import Link from "next/link";
 import InvoicesTab from "./InvoicesTab";
+import ManualLedgerModal from "./ManualLedgerModal";
+import { PlusCircle } from "lucide-react";
 import { FileText as FileTextIcon } from "lucide-react";
 
 export default function FinancialsPage() {
@@ -11,6 +13,7 @@ export default function FinancialsPage() {
   const [loading, setLoading] = useState(true);
   const [ghlStats, setGhlStats] = useState<any>(null);
   const [view, setView] = useState<"overview" | "invoices">("overview");
+  const [showManualModal, setShowManualModal] = useState(false);
 
   useEffect(() => {
     fetch("/api/quickbooks/test")
@@ -26,6 +29,8 @@ export default function FinancialsPage() {
   }, []);
 
   return (
+    <>
+      {showManualModal && <ManualLedgerModal onClose={() => setShowManualModal(false)} onSuccess={() => { setShowManualModal(false); /* Ideally fetch data again */ }} />}
     <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto">
 
       {/* Header */}
@@ -60,7 +65,10 @@ export default function FinancialsPage() {
                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div> Live Sync Active
              </div>
           )}
-          <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all">
+          <button onClick={() => setShowManualModal(true)} className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all flex items-center gap-2">
+            <PlusCircle size={16} /> Log Manual
+          </button>
+          <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all hidden lg:flex">
             Manage Accounting
           </Link>
           <button onClick={() => setView('invoices')} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
@@ -329,5 +337,6 @@ export default function FinancialsPage() {
         </>
       )}
     </div>
+    </>
   );
 }

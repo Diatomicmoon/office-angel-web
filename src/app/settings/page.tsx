@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock, User, LogOut, Key } from "lucide-react";
 import { createClient } from "@/lib/supabase";
+import TeamTab from "./TeamTab";
+import { Users } from "lucide-react";
 const supabase = createClient();
 
 export type Settings = {
@@ -35,6 +37,7 @@ export default function SettingsPage() {
 
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"general" | "team">("general");
   // Removed local createClient to use top-level instance
 
   useEffect(() => {
@@ -185,7 +188,45 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
   const aiOn = settings.ai_enabled !== false;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 space-y-8">
+    <div className="max-w-4xl mx-auto p-8 space-y-8">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4 mb-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Settings</h1>
+          <p className="text-gray-500 mt-2">Manage your company, team, and integrations.</p>
+        </div>
+        <div className="flex bg-gray-100 p-1 rounded-xl items-center hidden md:flex">
+          <button 
+            onClick={() => setActiveTab('general')}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition ${activeTab === 'general' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            General Settings
+          </button>
+          <button 
+            onClick={() => setActiveTab('team')}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 ${activeTab === 'team' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <Users className="w-4 h-4" /> Team & Roles
+          </button>
+        </div>
+      </div>
+      
+      <div className="md:hidden flex bg-gray-100 p-1 rounded-xl items-center mb-6">
+          <button 
+            onClick={() => setActiveTab('general')}
+            className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${activeTab === 'general' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+          >
+            General
+          </button>
+          <button 
+            onClick={() => setActiveTab('team')}
+            className={`flex-1 py-2 text-sm font-medium rounded-lg transition flex items-center justify-center gap-2 ${activeTab === 'team' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
+          >
+            <Users className="w-4 h-4" /> Team
+          </button>
+      </div>
+      
+      {activeTab === 'team' ? <TeamTab /> : (
+      <>
       {qbMessage && (
         <div className={`p-4 rounded-xl border flex items-start gap-3 ${qbMessage.type === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'}`}>
           {qbMessage.type === 'success' ? <CheckCircle2 className="mt-0.5 shrink-0 text-green-600" size={20} /> : <AlertTriangle className="mt-0.5 shrink-0 text-red-600" size={20} />}
@@ -540,6 +581,8 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
         </div>
       </div>
 
+      </>
+      )}
     </div>
   );
 }
