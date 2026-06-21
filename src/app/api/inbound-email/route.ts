@@ -20,7 +20,7 @@ CRITICAL CLASSIFICATION RULES:
 2. If the email contains a photo or attachment that looks like an invoice, a receipt from a store, or a packing slip (from places like Home Depot, JH Larson, CED, Viking Electric), you MUST classify it as "receipt". If the image is a receipt, ignore the fact that the email body might be empty.
 3. If the email is a customer asking for work, an online form submission, or a new work order, classify it as "lead". DO NOT classify emails from supply houses (JH Larson, CED, etc.) as leads.
 
-FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). DO NOT just copy the raw cryptic part numbers into the description. Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
+FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). For each line item, you MUST attempt to extract a precise "sku" (the exact part number/model number shown) and the "unit_of_measure" (e.g., "BOX", "FT", "EA", "ROLL"). If a formal SKU is not present, you can use the expanded description as the SKU, but prioritize actual part numbers. DO NOT just copy the raw cryptic part numbers into the "item_name" (description). Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
 
 FOR JOB NUMBER OR PO (Receipts only): Carefully scan the receipt/invoice for a "PO Number", "Job Name", "Ship To", "Project", or handwritten notes indicating which job this material was purchased for. If you find one, extract it into 'job_number_or_po'. CRITICAL: Do NOT extract the supplier/store name (like "JH Larson", "CED", "Home Depot", "Viking Electric") as the Job/PO Name! The job name is usually an address, a person's name, or a specific project name, not the wholesale house you bought it from.
 
@@ -37,7 +37,7 @@ Extract the details into this exact JSON structure. Return ONLY valid JSON, no m
   "job_number_or_po": "string or null",
   "invoice_date": "string or null",
   "line_items": [
-    { "description": "string", "quantity": number or null, "unit_price": number or null, "total": number or null }
+    { "sku": "string or null", "item_name": "string", "quantity": number or null, "unit_price": number or null, "unit_of_measure": "string or null", "total": number or null }
   ],
   
   "customer_name": "string or null",
@@ -259,12 +259,13 @@ export async function POST(req: Request) {
     if (parsed.line_items && parsed.line_items.length > 0) {
       const catalogUpserts = parsed.line_items.map((item: any) => ({
         company_id: companyId,
-        sku: item.description, // We use the plain English description from AI as the SKU for estimating ease
-        description: item.description,
-        latest_cost: item.unit_price,
-        supplier_name: parsed.supplier_name || sender,
+        sku: item.sku || item.item_name || item.description, // Prioritize AI-extracted SKU, fallback to item_name/description
+        item_name: item.item_name || item.description, // Use AI's plain English name
+        unit_price: item.unit_price || 0,
+        unit_of_measure: item.unit_of_measure || 'EA', // Default to Each
+        supplier: parsed.supplier_name || sender,
         last_updated: new Date().toISOString()
-      })).filter((item: any) => item.latest_cost > 0);
+      })).filter((item: any) => item.unit_price > 0 && item.sku);
 
       if (catalogUpserts.length > 0) {
         // Upsert into material_catalog (updates if company_id + sku exists, inserts if new)
