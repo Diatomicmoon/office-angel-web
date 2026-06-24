@@ -46,47 +46,47 @@ export default function FinancialsPage() {
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
-        <div>
+        <div className="w-full md:w-auto">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">Financial Command</h1>
           <p className="text-gray-500 mt-2">Accounts Receivable, Profitability, and Cash Flow.</p>
         </div>
         
         {/* Navigation Pills */}
-        <div className="flex bg-gray-100 p-1 rounded-xl items-center mr-auto ml-4 md:ml-8 flex-1 md:flex">
+        <div className="flex bg-gray-100 p-1 rounded-xl items-center w-full md:w-auto md:mr-auto md:ml-8">
           <button 
             onClick={() => setView('overview')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition ${view === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 md:flex-none px-4 py-2 text-sm font-medium rounded-lg transition ${view === 'overview' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
           >
             Overview
           </button>
           <button 
             onClick={() => setView('invoices')}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 ${view === 'invoices' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`flex-1 md:flex-none justify-center px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 ${view === 'invoices' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
           >
             <FileTextIcon className="w-4 h-4" /> Invoices
           </button>
         </div>
-        <div className="flex gap-3 items-center">
+        <div className="flex flex-wrap gap-3 items-center w-full md:w-auto">
           {data?.error ? (
-             <div className="bg-red-50 text-red-800 text-xs font-bold px-3 py-1.5 rounded-md border border-red-200 flex items-center gap-2">
-               <AlertCircle size={14} /> QuickBooks Error: {data.error.substring(0,30)}...
+             <div className="bg-red-50 text-red-800 text-xs font-bold px-3 py-1.5 rounded-md border border-red-200 flex items-center gap-2 whitespace-nowrap">
+               <AlertCircle size={14} /> <span className="hidden sm:inline">QuickBooks Error: {data.error.substring(0,30)}...</span><span className="sm:hidden">QB Error</span>
              </div>
           ) : (
-             <div className="bg-green-50 text-green-800 text-xs font-bold px-3 py-1.5 rounded-md border border-green-200 flex items-center gap-2">
+             <div className="bg-green-50 text-green-800 text-xs font-bold px-3 py-1.5 rounded-md border border-green-200 flex items-center gap-2 whitespace-nowrap">
                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div> Live Sync Active
              </div>
           )}
-          <button onClick={() => setShowManualModal(true)} className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all flex items-center gap-2">
+          <button onClick={() => setShowManualModal(true)} className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
             <PlusCircle size={16} /> Log Manual
           </button>
-          <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all hidden lg:flex">
+          <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all hidden lg:flex whitespace-nowrap">
             Manage Accounting
           </Link>
-          <button onClick={() => setView('invoices')} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
+          <button onClick={() => setView('invoices')} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
             <DollarSign className="w-4 h-4" /> Invoices
           </button>
           {isDevAccount && (
-            <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex items-center gap-2">
+            <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
               Connect Stripe
             </a>
           )}
