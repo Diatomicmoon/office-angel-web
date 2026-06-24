@@ -5,14 +5,13 @@ import { cookies } from 'next/headers';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key';
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const stripe = new Stripe(stripeSecretKey || 'sk_test_placeholder', {
-  apiVersion: '2023-10-16' as any,
-});
 
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: '2023-10-16' as any,
+  });
   try {
     const { company_id, customer_name, customer_email, customer_phone, items } = await req.json();
 
