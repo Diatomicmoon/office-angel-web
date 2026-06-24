@@ -1,8 +1,25 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMapEvents, useMap, LayersControl, ZoomControl, LayerGroup, Marker, Polyline } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
+
+// Haversine distance function
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371e3; // metres
+  const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // in metres
+};
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -105,6 +122,72 @@ function MapUpdater({ center, zoom }: { center?: [number, number], zoom?: number
 
 export default function MapView({ visits, center = DEFAULT_CENTER, userLocation, zoom = 14, onMapClick, onPinClick, routePins = [] }: Props) {
   const hasData = visits.length > 0;
+
+  const { ghostTrailCoords, hitlistCoords } = useMemo(() => {
+    const knockedVisits = visits.filter(
+      (v) =>
+        v.latitude != null &&
+        v.longitude != null &&
+        v.interest_level !== 'new_build' &&
+        v.interest_level !== 'unknocked_lead'
+    ).map(v => [v.latitude!, v.longitude!] as [number, number]);
+
+    const unknockedLeads = visits.filter(
+      (v) =>
+        v.latitude != null &&
+        v.longitude != null &&
+        (v.interest_level === 'new_build' || v.interest_level === 'unknocked_lead')
+    ).map(v => ({ lat: v.latitude!, lng: v.longitude!, id: v.id }));
+
+    const ghostTrailCoords = knockedVisits;
+
+    const hitlistCoords: [number, number][] = [];
+    if (unknockedLeads.length > 0) {
+      let currentPosition: [number, number] | null = userLocation || null;
+      if (!currentPosition) {
+        // If no user location, start with the first unknocked lead's location
+        currentPosition = [unknockedLeads[0].lat, unknockedLeads[0].lng];
+        hitlistCoords.push(currentPosition);
+        unknockedLeads.shift(); // Remove the first lead if it was used as start
+      } else {
+        // Always add userLocation if available to start the route
+        hitlistCoords.push(currentPosition);
+      }
+      
+      let remainingLeads = [...unknockedLeads];
+
+      while (remainingLeads.length > 0 && currentPosition) {
+        let nearestLeadIndex = -1;
+        let minDistance = Infinity;
+
+        for (let i = 0; i < remainingLeads.length; i++) {
+          const lead = remainingLeads[i];
+          const distance = haversineDistance(
+            currentPosition[0],
+            currentPosition[1],
+            lead.lat,
+            lead.lng
+          );
+          if (distance < minDistance) {
+            minDistance = distance;
+            nearestLeadIndex = i;
+          }
+        }
+
+        if (nearestLeadIndex !== -1) {
+          const nearestLead = remainingLeads[nearestLeadIndex];
+          hitlistCoords.push([nearestLead.lat, nearestLead.lng]);
+          currentPosition = [nearestLead.lat, nearestLead.lng];
+          remainingLeads.splice(nearestLeadIndex, 1);
+        } else {
+          // Should not happen if remainingLeads is not empty, but good for safety
+          break;
+        }
+      }
+    }
+
+    return { ghostTrailCoords, hitlistCoords };
+  }, [visits, userLocation]);
   
   // Map State Persistence
   const [initialCenter, setInitialCenter] = useState<[number, number]>(center);
@@ -268,6 +351,22 @@ export default function MapView({ visits, center = DEFAULT_CENTER, userLocation,
 
         </LayersControl>
         <MapEventsHandler onMapClick={onMapClick} />
+
+        {/* Ghost Trail */}
+        {ghostTrailCoords.length > 1 && (
+          <Polyline
+            positions={ghostTrailCoords}
+            pathOptions={{ color: 'gray', weight: 3, dashArray: '10, 10', opacity: 0.5 }}
+          />
+        )}
+
+        {/* Hitlist Route */}
+        {hitlistCoords.length > 1 && (
+          <Polyline
+            positions={hitlistCoords}
+            pathOptions={{ color: '#3b82f6', weight: 4, dashArray: '10, 10' }}
+          />
+        )}
 
         {/* Smart Route Polyline */}
         {routePins.length > 1 && (() => {
