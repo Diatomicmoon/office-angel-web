@@ -9,24 +9,36 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', { apiVersion: '2023-10-16' as any });
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
     try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        const cookieStore = await cookies();
+        const oaCookie = cookieStore.get('oa_company_id');
+        
+        let userId = null;
+        let companyId = oaCookie?.value;
 
-        // Get the user's company
-        const { data: membership } = await supabase
-            .from('company_memberships')
-            .select('company_id')
-            .eq('user_id', user.id)
-            .single();
-            
-        if (!membership) return NextResponse.json({ error: 'No company attached to user' }, { status: 400 });
+        // Try getting user if possible
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            userId = user.id;
+        }
+
+        // If no company ID cookie, try fetching from user membership
+        if (!companyId && userId) {
+             const { data: membership } = await supabase
+                .from('company_memberships')
+                .select('company_id')
+                .eq('user_id', userId)
+                .single();
+             if (membership) companyId = membership.company_id;
+        }
+
+        if (!companyId) return new NextResponse('Unauthorized: No company found', { status: 401 });
 
         const { data: company } = await supabase
             .from('companies')
             .select('*')
-            .eq('id', membership.company_id)
+            .eq('id', companyId)
             .single();
 
         let accountId = company.stripe_account_id;
@@ -55,9 +67,10 @@ export async function POST(req: Request) {
             type: 'account_onboarding',
         });
 
-        return NextResponse.json({ url: accountLink.url });
+        // Redirect directly to the Stripe URL
+        return NextResponse.redirect(accountLink.url);
     } catch (error: any) {
         console.error('Stripe Onboard Error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return new NextResponse(`Error: ${error.message}`, { status: 500 });
     }
 }
