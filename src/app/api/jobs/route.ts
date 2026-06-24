@@ -5,6 +5,8 @@ import { createClient } from "@supabase/supabase-js";
 import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import twilio from "twilio";
 
+import { draftInvoiceForJob } from "./draftInvoice";
+
 const DISPLAY_TZ = "America/Chicago";
 
 function fmtTimeRange(startIso?: string | null, endIso?: string | null) {
@@ -291,6 +293,15 @@ export async function POST(req: Request) {
               updated_at: data.updated_at,
             }),
           }).catch(() => {});
+        }
+      } catch {}
+
+      // Auto-draft invoice on job completion
+      try {
+        const wasCompleted = String(before?.status).toLowerCase() === "completed";
+        const nowCompleted = String(data?.status).toLowerCase() === "completed";
+        if (!wasCompleted && nowCompleted) {
+           await draftInvoiceForJob(supabase, data, companyId);
         }
       } catch {}
 

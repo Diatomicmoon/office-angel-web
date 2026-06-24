@@ -1,20 +1,37 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { getCookie } from 'cookies-next';
 import { FileText, Plus, DollarSign, Send, CheckCircle, Clock, AlertCircle, Building2, User, Search, Download } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 
 export default function InvoicesTab() {
   const [view, setView] = useState<"list" | "create">("list");
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [stats, setStats] = useState({ totalCollected: 0, outstanding: 0, overdue: 0 });
+  
+  const companyId = getCookie("oa_company_id");
+  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a";
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-  // Mock initial state for the demo
+  const fetchInvoices = useCallback(async () => {
+    const { data, error } = await supabase.from('invoices').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error fetching invoices:', error);
+    } else {
+      setInvoices(data || []);
+      const totalCollected = data.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.amount, 0);
+      const outstanding = data.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + inv.amount, 0);
+      const overdue = data.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + inv.amount, 0);
+      setStats({ totalCollected, outstanding, overdue });
+    }
+  }, [supabase]);
+
   useEffect(() => {
-    setInvoices([
-      { id: "INV-2024-001", customer: "Sarah Jenkins", amount: 650.00, status: "paid", date: "Oct 12, 2024" },
-      { id: "INV-2024-002", customer: "Mark Robinson", amount: 1200.00, status: "pending", date: "Oct 15, 2024" },
-      { id: "INV-2024-003", customer: "Emily Clark", amount: 340.00, status: "overdue", date: "Sep 28, 2024" },
-    ]);
-  }, []);
+    fetchInvoices();
+  }, [fetchInvoices]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -26,7 +43,7 @@ export default function InvoicesTab() {
   };
 
   if (view === "create") {
-    return <InvoiceBuilder onCancel={() => setView("list")} onSave={() => setView("list")} />;
+    return <InvoiceBuilder onCancel={() => setView("list")} onSave={() => { setView("list"); fetchInvoices(); }} />;
   }
 
   return (
@@ -54,7 +71,7 @@ export default function InvoicesTab() {
             <h3 className="text-gray-500 font-medium">Total Collected</h3>
             <div className="p-2 bg-green-50 rounded-lg"><DollarSign className="w-5 h-5 text-green-600" /></div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">$18,450.00</p>
+          <p className="text-3xl font-bold text-gray-900">${stats.totalCollected.toFixed(2)}</p>
           <p className="text-sm text-green-600 font-medium mt-2">+12% from last month</p>
         </div>
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
@@ -62,7 +79,7 @@ export default function InvoicesTab() {
             <h3 className="text-gray-500 font-medium">Outstanding</h3>
             <div className="p-2 bg-yellow-50 rounded-lg"><Clock className="w-5 h-5 text-yellow-600" /></div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">$3,200.00</p>
+          <p className="text-3xl font-bold text-gray-900">${stats.outstanding.toFixed(2)}</p>
           <p className="text-sm text-gray-500 font-medium mt-2">4 invoices pending</p>
         </div>
         <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
@@ -70,7 +87,7 @@ export default function InvoicesTab() {
             <h3 className="text-gray-500 font-medium">Overdue</h3>
             <div className="p-2 bg-red-50 rounded-lg"><AlertCircle className="w-5 h-5 text-red-600" /></div>
           </div>
-          <p className="text-3xl font-bold text-gray-900">$840.00</p>
+          <p className="text-3xl font-bold text-gray-900">${stats.overdue.toFixed(2)}</p>
           <p className="text-sm text-red-600 font-medium mt-2">Action required</p>
         </div>
       </div>
@@ -101,14 +118,14 @@ export default function InvoicesTab() {
             <tbody className="divide-y divide-gray-100">
               {invoices.map((inv, idx) => (
                 <tr key={idx} className="hover:bg-gray-50/50 transition">
-                  <td className="p-4 pl-6 font-medium text-gray-900">{inv.id}</td>
+                  <td className="p-4 pl-6 font-medium text-gray-900">{inv.id.substring(0, 8)}</td>
                   <td className="p-4 text-gray-600 flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
-                      {inv.customer.charAt(0)}
+                      {inv.customer_name.charAt(0)}
                     </div>
-                    {inv.customer}
+                    {inv.customer_name}
                   </td>
-                  <td className="p-4 text-gray-500">{inv.date}</td>
+                  <td className="p-4 text-gray-500">{new Date(inv.created_at).toLocaleDateString()}</td>
                   <td className="p-4 font-medium text-gray-900">${inv.amount.toFixed(2)}</td>
                   <td className="p-4">{getStatusBadge(inv.status)}</td>
                   <td className="p-4 text-right pr-6">
@@ -127,19 +144,78 @@ export default function InvoicesTab() {
 }
 
 function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: () => void }) {
-  const [items, setItems] = useState([{ desc: "", qty: 1, rate: 0 }]);
-  const [customer, setCustomer] = useState("");
-  
-  const subtotal = items.reduce((acc, item) => acc + (item.qty * item.rate), 0);
-  const tax = subtotal * 0.07; // 7% mock tax
-  const total = subtotal + tax;
+  const companyId = getCookie("oa_company_id");
+  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a";
+  const [customerName, setCustomerName] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [items, setItems] = useState<{ desc: string, qty: number, rate: number }[]>([{ desc: '', qty: 1, rate: 0 }]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const addItem = () => setItems([...items, { desc: "", qty: 1, rate: 0 }]);
-  
-  const updateItem = (index: number, field: string, value: any) => {
+  const subtotal = items.reduce((acc, item) => acc + (item.qty * item.rate), 0);
+  const total = subtotal; // Tax removed for now, Stripe will handle it if needed
+
+  const addItem = () => setItems([...items, { desc: '', qty: 1, rate: 0 }]);
+
+  const updateItem = (index: number, field: keyof typeof items[0], value: any) => {
     const newItems = [...items];
     (newItems[index] as any)[field] = value;
     setItems(newItems);
+  };
+
+  const handleSendInvoice = async () => {
+    setError(null);
+    setLoading(true);
+
+    const company_id = getCookie('oa_company_id');
+
+    if (!company_id) {
+      setError('Company ID not found. Please log in to a company.');
+      setLoading(false);
+      return;
+    }
+
+    if (!customerName || !customerEmail || items.some(item => !item.desc || item.qty <= 0 || item.rate <= 0)) {
+      setError('Please fill in all customer details and ensure all invoice items have a description, quantity, and rate.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/stripe/invoice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          company_id,
+          customer_name: customerName,
+          customer_email: customerEmail,
+          customer_phone: customerPhone,
+          items,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || 'Failed to create invoice');
+        return;
+      }
+
+      if (result.stripe_session_url) {
+        window.location.href = result.stripe_session_url; // Redirect to Stripe Checkout
+      } else {
+        alert(result.message || 'Invoice created successfully!');
+        onSave(); // Go back to list view and refresh
+      }
+    } catch (err) {
+      console.error('Error sending invoice:', err);
+      setError('An unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -163,8 +239,8 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
                 <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name / Company</label>
                 <input 
                   type="text" 
-                  value={customer}
-                  onChange={(e) => setCustomer(e.target.value)}
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="e.g. John Doe" 
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none"
                 />
@@ -172,11 +248,23 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email (for payment link)</label>
-                  <input type="email" placeholder="john@example.com" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none" />
+                  <input 
+                    type="email" 
+                    value={customerEmail}
+                    onChange={(e) => setCustomerEmail(e.target.value)}
+                    placeholder="john@example.com" 
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none" 
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number (Optional)</label>
-                  <input type="tel" placeholder="(555) 123-4567" className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none" />
+                  <input 
+                    type="tel" 
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="(555) 123-4567" 
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none" 
+                  />
                 </div>
               </div>
             </div>
@@ -243,10 +331,7 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
                 <span>Subtotal</span>
                 <span className="font-medium text-gray-900">${subtotal.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between">
-                <span>Tax (7%)</span>
-                <span className="font-medium text-gray-900">${tax.toFixed(2)}</span>
-              </div>
+
               <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
                 <span className="text-base font-bold text-gray-900">Total Due</span>
                 <span className="text-2xl font-bold text-gray-900">${total.toFixed(2)}</span>
@@ -254,15 +339,20 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
             </div>
           </div>
 
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative" role="alert">
+              <span className="block sm:inline">{error}</span>
+            </div>
+          )}
           <button 
-            onClick={onSave}
-            className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 hover:bg-gray-800 transition shadow-md shadow-gray-900/10"
+            onClick={handleSendInvoice}
+            disabled={loading}
+            className="w-full bg-gray-900 text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 hover:bg-gray-800 transition shadow-md shadow-gray-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <Send className="w-5 h-5" />
-            Send Invoice via Stripe
+            {loading ? 'Sending...' : (isDevAccount ? 'Send Invoice via Stripe' : 'Save Invoice')}
           </button>
           <p className="text-xs text-center text-gray-500">
-            A secure payment link will be emailed to the customer.
+            {isDevAccount ? 'A secure payment link will be emailed to the customer.' : 'This invoice will be saved for your records.'}
           </p>
         </div>
 

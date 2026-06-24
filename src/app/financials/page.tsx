@@ -7,6 +7,7 @@ import InvoicesTab from "./InvoicesTab";
 import ManualLedgerModal from "./ManualLedgerModal";
 import { PlusCircle } from "lucide-react";
 import { FileText as FileTextIcon } from "lucide-react";
+import { getCookie } from "cookies-next";
 
 export default function FinancialsPage() {
   const [data, setData] = useState<any>(null);
@@ -14,6 +15,8 @@ export default function FinancialsPage() {
   const [ghlStats, setGhlStats] = useState<any>(null);
   const [view, setView] = useState<"overview" | "invoices">("overview");
   const [showManualModal, setShowManualModal] = useState(false);
+  const companyId = getCookie("oa_company_id");
+  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a";
 
   useEffect(() => {
     fetch("/api/quickbooks/test")
@@ -74,6 +77,11 @@ export default function FinancialsPage() {
           <button onClick={() => setView('invoices')} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2">
             <DollarSign className="w-4 h-4" /> Invoices
           </button>
+          {isDevAccount && (
+            <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex items-center gap-2">
+              Connect Stripe
+            </a>
+          )}
         </div>
       </div>
 
