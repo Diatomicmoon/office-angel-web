@@ -66,27 +66,27 @@ export default function FinancialsPage() {
             <FileTextIcon className="w-4 h-4" /> Invoices
           </button>
         </div>
-        <div className="flex flex-wrap gap-3 items-center w-full md:w-auto">
+        <div className="grid grid-cols-2 gap-2 w-full md:flex md:flex-wrap md:w-auto md:gap-3 md:items-center">
           {data?.error ? (
-             <div className="bg-red-50 text-red-800 text-xs font-bold px-3 py-1.5 rounded-md border border-red-200 flex items-center gap-2 whitespace-nowrap">
+             <div className="col-span-2 md:col-span-1 bg-red-50 text-red-800 text-xs font-bold px-3 py-2 rounded-md border border-red-200 flex justify-center items-center gap-2 whitespace-nowrap">
                <AlertCircle size={14} /> <span className="hidden sm:inline">QuickBooks Error: {data.error.substring(0,30)}...</span><span className="sm:hidden">QB Error</span>
              </div>
           ) : (
-             <div className="bg-green-50 text-green-800 text-xs font-bold px-3 py-1.5 rounded-md border border-green-200 flex items-center gap-2 whitespace-nowrap">
+             <div className="col-span-2 md:col-span-1 bg-green-50 text-green-800 text-xs font-bold px-3 py-2 rounded-md border border-green-200 flex justify-center items-center gap-2 whitespace-nowrap">
                <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div> Live Sync Active
              </div>
           )}
-          <button onClick={() => setShowManualModal(true)} className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
-            <PlusCircle size={16} /> Log Manual
+          <button onClick={() => setShowManualModal(true)} className="flex-1 bg-white border border-gray-200 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
+            <PlusCircle size={16} /> <span className="hidden sm:inline">Log Manual</span><span className="sm:hidden">Log</span>
+          </button>
+          <button onClick={() => setView('invoices')} className="flex-1 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
+            <DollarSign className="w-4 h-4" /> <span className="hidden sm:inline">Invoices</span><span className="sm:hidden">Invoice</span>
           </button>
           <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all hidden lg:flex whitespace-nowrap">
             Manage Accounting
           </Link>
-          <button onClick={() => setView('invoices')} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
-            <DollarSign className="w-4 h-4" /> Invoices
-          </button>
           {isDevAccount && (
-            <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex items-center gap-2 whitespace-nowrap">
+            <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="col-span-2 bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
               Connect Stripe
             </a>
           )}
