@@ -8,7 +8,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholde
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY || '';
 
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const stripe = new Stripe(stripeSecretKey, {
+const stripe = new Stripe(stripeSecretKey || 'sk_test_placeholder', {
   apiVersion: '2023-10-16' as any,
 });
 
