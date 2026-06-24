@@ -15,10 +15,18 @@ export default function FinancialsPage() {
   const [ghlStats, setGhlStats] = useState<any>(null);
   const [view, setView] = useState<"overview" | "invoices">("overview");
   const [showManualModal, setShowManualModal] = useState(false);
-  const companyId = getCookie("oa_company_id");
-  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a" || companyId === "a293eb4c-6a95-40b8-8324-bc493ec6b227";
+  const [isDevAccount, setIsDevAccount] = useState(false);
 
   useEffect(() => {
+    fetch("/api/companies/mine")
+      .then(res => res.json())
+      .then(json => {
+        const ids = json.companies?.map((c: any) => c.id) || [];
+        const isDev = ids.includes("5341bfb2-8fce-4c7a-9a30-20e6aba60a8a") || ids.includes("a293eb4c-6a95-40b8-8324-bc493ec6b227");
+        setIsDevAccount(isDev);
+      })
+      .catch(() => {});
+
     fetch("/api/quickbooks/test")
       .then(res => res.json())
       .then(json => {

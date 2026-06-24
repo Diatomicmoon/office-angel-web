@@ -8,9 +8,19 @@ export default function InvoicesTab() {
   const [view, setView] = useState<"list" | "create">("list");
   const [invoices, setInvoices] = useState<any[]>([]);
   const [stats, setStats] = useState({ totalCollected: 0, outstanding: 0, overdue: 0 });
-  
-  const companyId = getCookie("oa_company_id");
-  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a" || companyId === "a293eb4c-6a95-40b8-8324-bc493ec6b227";
+  const [isDevAccount, setIsDevAccount] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/companies/mine")
+      .then(res => res.json())
+      .then(json => {
+        const ids = json.companies?.map((c: any) => c.id) || [];
+        const isDev = ids.includes("5341bfb2-8fce-4c7a-9a30-20e6aba60a8a") || ids.includes("a293eb4c-6a95-40b8-8324-bc493ec6b227");
+        setIsDevAccount(isDev);
+      })
+      .catch(() => {});
+  }, []);
+
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -144,8 +154,19 @@ export default function InvoicesTab() {
 }
 
 function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: () => void }) {
-  const companyId = getCookie("oa_company_id");
-  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a" || companyId === "a293eb4c-6a95-40b8-8324-bc493ec6b227";
+  const [isDevAccount, setIsDevAccount] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/companies/mine")
+      .then(res => res.json())
+      .then(json => {
+        const ids = json.companies?.map((c: any) => c.id) || [];
+        const isDev = ids.includes("5341bfb2-8fce-4c7a-9a30-20e6aba60a8a") || ids.includes("a293eb4c-6a95-40b8-8324-bc493ec6b227");
+        setIsDevAccount(isDev);
+      })
+      .catch(() => {});
+  }, []);
+
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
