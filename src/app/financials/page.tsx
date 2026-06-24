@@ -16,7 +16,7 @@ export default function FinancialsPage() {
   const [view, setView] = useState<"overview" | "invoices">("overview");
   const [showManualModal, setShowManualModal] = useState(false);
   const companyId = getCookie("oa_company_id");
-  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a";
+  const isDevAccount = companyId === "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a" || companyId === "a293eb4c-6a95-40b8-8324-bc493ec6b227";
 
   useEffect(() => {
     fetch("/api/quickbooks/test")
