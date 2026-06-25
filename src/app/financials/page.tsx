@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { DollarSign, TrendingUp, TrendingDown, Users, CreditCard, PieChart, FileText, AlertCircle, PhoneMissed, Truck, Clock } from "lucide-react";
 import Link from "next/link";
 import InvoicesTab from "./InvoicesTab";
+import EstimatesTab from "./EstimatesTab";
 import ManualLedgerModal from "./ManualLedgerModal";
 import { PlusCircle } from "lucide-react";
 import { FileText as FileTextIcon } from "lucide-react";
@@ -13,7 +14,7 @@ export default function FinancialsPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [ghlStats, setGhlStats] = useState<any>(null);
-  const [view, setView] = useState<"overview" | "invoices">("overview");
+  const [view, setView] = useState<"overview" | "estimates" | "invoices">("overview");
   const [showManualModal, setShowManualModal] = useState(false);
   const [isDevAccount, setIsDevAccount] = useState(false);
   const [hasStripe, setHasStripe] = useState(false);
@@ -66,10 +67,16 @@ export default function FinancialsPage() {
             Overview
           </button>
           <button 
+            onClick={() => setView('estimates')}
+            className={`flex-1 md:flex-none justify-center px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 ${view === 'estimates' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <FileTextIcon className="w-4 h-4" /> Estimates
+          </button>
+          <button 
             onClick={() => setView('invoices')}
             className={`flex-1 md:flex-none justify-center px-4 py-2 text-sm font-medium rounded-lg transition flex items-center gap-2 ${view === 'invoices' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
           >
-            <FileTextIcon className="w-4 h-4" /> Invoices
+            <DollarSign className="w-4 h-4" /> Invoices
           </button>
         </div>
         <div className="grid grid-cols-2 gap-2 w-full md:flex md:flex-wrap md:w-auto md:gap-3 md:items-center">
@@ -108,6 +115,8 @@ export default function FinancialsPage() {
          <div className="py-20 text-center text-gray-500">Loading financial data...</div>
       ) : view === 'invoices' ? (
         <InvoicesTab />
+      ) : view === 'estimates' ? (
+        <EstimatesTab />
       ) : (
         <>
           {/* GHL Pipeline Banner */}
