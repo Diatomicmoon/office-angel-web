@@ -1,0 +1,9 @@
+--- src/app/api/inbound-email/route.ts
++++ src/app/api/inbound-email/route.ts
+@@ -201,3 +201,3 @@
+   catch (err) {
+     console.error(err);
+-    return NextResponse.json({ success: false }, { status: 500 });
++    return NextResponse.json({ success: false, note: "returning 200 to prevent sendgrid retries" }, { status: 200 });
+   }
+ }

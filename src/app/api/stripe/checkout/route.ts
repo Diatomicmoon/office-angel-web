@@ -21,7 +21,8 @@ export async function POST(req: Request) {
         const { data: company } = await supabase.from('companies').select('stripe_account_id').eq('id', job.company_id).single();
         if (!company?.stripe_account_id) throw new Error('Company has not connected a Stripe account yet.');
 
-        const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        const requestUrl = new URL(req.url);
+        const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin || 'https://hardhat-solutions.com';
 
         // 1. Create invoice record in our DB first
         const { data: invoice, error: invoiceError } = await supabase.from('invoices').insert({

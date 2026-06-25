@@ -5,7 +5,9 @@ const supabase = createClient(
 );
 async function run() {
   const { data, error } = await supabase.rpc('exec_sql', { 
-    sql: `NOTIFY pgrst, 'reload schema';`
+    sql: `
+      ALTER TABLE invoice_items ADD COLUMN IF NOT EXISTS amount NUMERIC;
+    `
   });
   console.log(data, error);
 }

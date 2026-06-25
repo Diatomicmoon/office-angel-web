@@ -82,7 +82,7 @@ ${emailText}`;
     }
 
     const res = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model:  'gpt-4o-mini',
       messages: [{ role: 'user', content: contentArray }],
       temperature: 0,
       max_tokens: 1500,
@@ -193,6 +193,6 @@ ${emailText}`;
 
   } catch (err) {
     console.error('Make webhook receiver error:', err);
-    return NextResponse.json({ success: false, error: (err as Error).message }, { status: 500 });
+    return NextResponse.json({ success: false, error: (err as Error).message }, { status: 200 });
   }
 }

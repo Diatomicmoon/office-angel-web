@@ -87,7 +87,7 @@ export async function POST(req: Request) {
     const conversation = [systemPrompt, ...messages];
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model:  "gpt-4o-mini",
       messages: conversation,
       tools: TOOLS as any,
       tool_choice: "auto",
@@ -164,7 +164,7 @@ export async function POST(req: Request) {
 
     // Second call to get the synthesized response
     const finalResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model:  "gpt-4o-mini",
       messages: conversation,
     });
 

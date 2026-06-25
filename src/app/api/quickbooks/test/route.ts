@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { qbFetch } from "@/lib/quickbooks";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -45,7 +47,41 @@ export async function GET(req: Request) {
   }
 
   if (error || !company || !company.quickbooks_access_token) {
-    return NextResponse.json({ error: "QuickBooks is not connected for this company", canvassingLeaderboard }, { status: 400 });
+    // Fallback to internal invoices if QuickBooks is not connected
+    const { data: invoices } = await supabase.from('invoices').select('*').eq('company_id', companyId);
+    let grossProfit = 0;
+    let accountsReceivable = 0;
+    
+    if (invoices) {
+      grossProfit = invoices.filter((i: any) => i.status === 'paid').reduce((sum: number, i: any) => sum + Number(i.amount || 0), 0);
+      accountsReceivable = invoices.filter((i: any) => i.status === 'pending' || i.status === 'overdue').reduce((sum: number, i: any) => sum + Number(i.amount || 0), 0);
+    }
+
+    const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
+    const rescuedCalls = calls ? calls.length : 0;
+    const rescuedValue = rescuedCalls * 150;
+
+    const { data: receipts } = await supabase.from("receipts").select("id").eq("company_id", companyId).or('supplier_name.ilike.%home depot%,supplier_name.ilike.%lowe%');
+    const materialRuns = receipts ? receipts.length : 0;
+    const lostLaborValue = materialRuns * 150;
+
+    return NextResponse.json({ 
+       success: true, 
+       source: "internal_invoices",
+       canvassingLeaderboard,
+       report: {
+         grossProfit,
+         totalExpenses: 0,
+         netIncome: grossProfit,
+         accountsReceivable,
+         openInvoicesCount: invoices?.filter((i: any) => i.status === 'pending').length || 0,
+         profitByCrew: [], 
+         topExpenseCategories: [],
+         aiRescued: { calls: rescuedCalls, value: rescuedValue },
+         materialBleed: { runs: materialRuns, lostLaborValue: lostLaborValue },
+         permitDrag: { avgDays: 0, adminCost: 0 }
+       }
+    }, { status: 200 });
   }
 
   // Intuit Sandbox Base URL

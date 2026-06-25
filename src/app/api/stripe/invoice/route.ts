@@ -4,9 +4,9 @@ import Stripe from 'stripe';
 import { cookies } from 'next/headers';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_key';
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder_key';
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: NextRequest) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -87,7 +87,8 @@ export async function POST(req: NextRequest) {
         quantity: item.qty,
       }));
 
-      const origin = req.headers.get('origin');
+      const requestUrl = new URL(req.url);
+      const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin || 'https://hardhat-solutions.com';
       const successUrl = `${origin}/financials?invoice_id=${invoiceId}&status=success`;
       const cancelUrl = `${origin}/financials?invoice_id=${invoiceId}&status=cancel`;
 

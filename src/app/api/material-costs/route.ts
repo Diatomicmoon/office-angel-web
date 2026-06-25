@@ -93,7 +93,7 @@ export async function POST(req: Request) {
       // Use GPT-4o to parse and rank the results
       if (results.length > 0) {
         const completion = await openai.chat.completions.create({
-          model: 'gpt-4o',
+          model:  'gpt-4o-mini',
           messages: [{
             role: 'user',
             content: `You are a ${tradeType || 'contractor'} materials pricing assistant. The user searched for: "${searchQuery}". Here are the live retail results:\n\n${JSON.stringify(results, null, 2)}\n\nReturn ONLY valid JSON array of the top 5 best matches sorted by relevance:\n[{"store": "...", "title": "...", "price": "...", "link": "...", "match_score": 1-10, "note": "why this matches"}]`

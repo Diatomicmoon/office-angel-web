@@ -56,7 +56,8 @@ export async function GET(req: Request) {
                 .eq('id', company.id);
         }
 
-        const origin = req.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+        const requestUrl = new URL(req.url);
+        const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin || 'https://hardhat-solutions.com';
 
         // Generate the onboarding link
         const accountLink = await stripe.accountLinks.create({

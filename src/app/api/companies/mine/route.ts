@@ -14,7 +14,7 @@ export async function GET() {
       );
       const { data: company } = await supabase
         .from("companies")
-        .select("id,name,phone_number,created_at")
+        .select("id,name,phone_number,created_at,stripe_account_id")
         .eq("id", process.env.HARD_HAT_COMPANY_ID || process.env.OFFICE_ANGEL_COMPANY_ID!)
         .single();
       return NextResponse.json({ companies: company ? [company] : [] });
@@ -37,7 +37,7 @@ export async function GET() {
 
     const { data: companies, error: cErr } = await admin
       .from("companies")
-      .select("id,name,phone_number,created_at")
+      .select("id,name,phone_number,created_at,stripe_account_id")
       .in("id", ids);
 
     if (cErr) return NextResponse.json({ companies: [], error: cErr }, { status: 400 });

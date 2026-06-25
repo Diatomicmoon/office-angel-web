@@ -65,7 +65,7 @@ Output a JSON object with the rough estimated totals. Do not include markdown fo
 
       try {
         const response = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model:  "gpt-4o-mini",
           messages: [{ role: "user", content: prompt }],
           response_format: { type: "json_object" }
         });

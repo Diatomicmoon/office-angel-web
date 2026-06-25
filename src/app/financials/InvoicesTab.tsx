@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
 import { getCookie } from 'cookies-next';
-import { FileText, Plus, DollarSign, Send, CheckCircle, Clock, AlertCircle, Building2, User, Search, Download } from "lucide-react";
+  import { FileText, Plus, DollarSign, Send, CheckCircle, Clock, AlertCircle, Building2, User, Search, Download, Trash2, Sparkles } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 
 export default function InvoicesTab() {
@@ -27,17 +27,20 @@ export default function InvoicesTab() {
   );
 
   const fetchInvoices = useCallback(async () => {
-    const { data, error } = await supabase.from('invoices').select('*').order('created_at', { ascending: false });
-    if (error) {
-      console.error('Error fetching invoices:', error);
-    } else {
-      setInvoices(data || []);
-      const totalCollected = data.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.amount, 0);
-      const outstanding = data.filter(inv => inv.status === 'pending').reduce((sum, inv) => sum + inv.amount, 0);
-      const overdue = data.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + inv.amount, 0);
-      setStats({ totalCollected, outstanding, overdue });
+    try {
+      const res = await fetch('/api/invoices');
+      const json = await res.json();
+      if (json.invoices) {
+        setInvoices(json.invoices);
+        const totalCollected = json.invoices.filter((inv: any) => inv.status === 'paid').reduce((sum: number, inv: any) => sum + Number(inv.amount || 0), 0);
+        const outstanding = json.invoices.filter((inv: any) => inv.status === 'pending').reduce((sum: number, inv: any) => sum + Number(inv.amount || 0), 0);
+        const overdue = json.invoices.filter((inv: any) => inv.status === 'overdue').reduce((sum: number, inv: any) => sum + Number(inv.amount || 0), 0);
+        setStats({ totalCollected, outstanding, overdue });
+      }
+    } catch (err) {
+      console.error('Error fetching invoices:', err);
     }
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
     fetchInvoices();
@@ -170,14 +173,46 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
-  const [items, setItems] = useState<{ desc: string, qty: number, rate: number }[]>([{ desc: '', qty: 1, rate: 0 }]);
+  const [items, setItems] = useState<{ desc: string, qty: number | '', rate: number | '' }[]>([{ desc: '', qty: 1, rate: '' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [magicPrompt, setMagicPrompt] = useState('');
+  const [magicLoading, setMagicLoading] = useState(false);
 
-  const subtotal = items.reduce((acc, item) => acc + (item.qty * item.rate), 0);
+  const subtotal = items.reduce((acc, item) => acc + ((Number(item.qty) || 0) * (Number(item.rate) || 0)), 0);
   const total = subtotal; // Tax removed for now, Stripe will handle it if needed
 
-  const addItem = () => setItems([...items, { desc: '', qty: 1, rate: 0 }]);
+  const addItem = () => setItems([...items, { desc: '', qty: 1, rate: '' }]);
+
+  const handleMagicWrite = async () => {
+    if (!magicPrompt) return;
+    setMagicLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/ai/invoice-magic', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: magicPrompt })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to generate items');
+      if (data.items && data.items.length > 0) {
+        setItems(data.items);
+        setMagicPrompt(''); // clear after success
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError('AI could not generate invoice: ' + err.message);
+    } finally {
+      setMagicLoading(false);
+    }
+  };
+
+  const removeItem = (index: number) => {
+    if (items.length > 1) {
+      setItems(items.filter((_, idx) => idx !== index));
+    }
+  };
 
   const updateItem = (index: number, field: keyof typeof items[0], value: any) => {
     const newItems = [...items];
@@ -197,8 +232,26 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
       return;
     }
 
-    if (!customerName || !customerEmail || items.some(item => !item.desc || item.qty <= 0 || item.rate <= 0)) {
-      setError('Please fill in all customer details and ensure all invoice items have a description, quantity, and rate.');
+    if (!customerName) {
+      setError('Please provide a Customer Name or Company.');
+      setLoading(false);
+      return;
+    }
+    
+    if (!customerEmail) {
+      setError('Customer Email is required to send the Stripe payment link.');
+      setLoading(false);
+      return;
+    }
+
+    if (items.some(item => !item.desc)) {
+      setError('All invoice items must have a description.');
+      setLoading(false);
+      return;
+    }
+
+    if (items.some(item => Number(item.qty) <= 0 || Number(item.rate) <= 0)) {
+      setError('All invoice items must have a valid quantity and rate greater than 0.');
       setLoading(false);
       return;
     }
@@ -292,43 +345,99 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" /> Line Items
-            </h2>
+             <div className="flex justify-between items-center mb-4">
+               <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                 <FileText className="w-5 h-5 text-blue-600" /> Line Items
+               </h2>
+             </div>
+
+             {/* Magic AI Generator */}
+             <div className="mb-6 p-4 bg-indigo-50 border border-indigo-100 rounded-xl">
+               <div className="flex items-start gap-3">
+                 <Sparkles className="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0" />
+                 <div className="flex-1">
+                   <label className="block text-sm font-semibold text-indigo-900 mb-1">
+                     Magic Write with AI
+                   </label>
+                   <p className="text-xs text-indigo-700 mb-3">
+                     Type a rough description of the job and price. The AI will instantly generate professional line items for you.
+                   </p>
+                   <div className="flex gap-2">
+                     <input 
+                       type="text" 
+                       value={magicPrompt}
+                       onChange={(e) => setMagicPrompt(e.target.value)}
+                       placeholder="e.g. Cleared lot, removed 3 stumps, hauled debris. $800 total" 
+                       className="flex-1 px-4 py-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm"
+                       onKeyDown={(e) => e.key === 'Enter' && handleMagicWrite()}
+                     />
+                     <button 
+                       onClick={handleMagicWrite}
+                       disabled={magicLoading || !magicPrompt}
+                       className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
+                     >
+                       {magicLoading ? 'Writing...' : 'Generate'}
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
             
+            <div className="grid grid-cols-12 gap-3 mb-2 px-1 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:grid">
+              <div className="col-span-5">Description</div>
+              <div className="col-span-2">Qty</div>
+              <div className="col-span-2">Rate</div>
+              <div className="col-span-3 text-right pr-6">Amount</div>
+            </div>
+
             <div className="space-y-3">
               {items.map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="flex-1">
+                <div key={idx} className="flex flex-col sm:flex-row items-start gap-3">
+                  <div className="w-full sm:flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Description</label>
                     <input 
                       type="text" 
-                      placeholder="Description (e.g. Spring Cleanup)"
+                      placeholder="e.g. Spring Cleanup"
                       value={item.desc}
                       onChange={(e) => updateItem(idx, 'desc', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
                     />
                   </div>
-                  <div className="w-24">
+                  <div className="w-full sm:w-24">
+                    <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Qty</label>
                     <input 
                       type="number" 
                       placeholder="Qty"
                       value={item.qty}
-                      onChange={(e) => updateItem(idx, 'qty', Number(e.target.value))}
+                      onChange={(e) => updateItem(idx, 'qty', e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
                     />
                   </div>
-                  <div className="w-32 relative">
-                    <span className="absolute left-3 top-2 text-gray-400">$</span>
+                  <div className="w-full sm:w-32 relative">
+                    <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Rate</label>
+                    <span className="absolute left-3 top-2 sm:top-2 text-gray-400 mt-5 sm:mt-0">$</span>
                     <input 
                       type="number" 
                       placeholder="Rate"
-                      value={item.rate || ""}
-                      onChange={(e) => updateItem(idx, 'rate', Number(e.target.value))}
+                      value={item.rate}
+                      onChange={(e) => updateItem(idx, 'rate', e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none"
                     />
                   </div>
-                  <div className="w-24 pt-2 text-right font-medium text-gray-900">
-                    ${(item.qty * item.rate).toFixed(2)}
+                  <div className="w-full sm:w-32 pt-2 sm:pt-2 text-right font-medium text-gray-900 flex items-center justify-end gap-2">
+                    <span className="sm:hidden text-gray-500 font-normal mr-2">Amount:</span>
+                    ${((Number(item.qty) || 0) * (Number(item.rate) || 0)).toFixed(2)}
+                    {items.length > 1 ? (
+                      <button 
+                        onClick={() => removeItem(idx)}
+                        className="text-red-400 hover:text-red-600 p-1 ml-2 transition bg-red-50 hover:bg-red-100 rounded-md"
+                        title="Remove item"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <div className="w-8"></div>
+                    )}
                   </div>
                 </div>
               ))}

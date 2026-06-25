@@ -171,7 +171,7 @@ export async function POST(req: Request) {
       }
     }
 
-    if (!companyId) return NextResponse.json({ success: false, error: 'No company found' }, { status: 200 });
+    if (!companyId) return NextResponse.json({ success: false, error: 'No company found' }, { status: 400 });
 
     if (parsed.type === 'lead') {
       const { data: job } = await supabase.from('jobs').insert([{
@@ -283,6 +283,6 @@ export async function POST(req: Request) {
 
   } catch (err) {
     console.error(err);
-    return NextResponse.json({ success: false, note: "returning 200 to prevent sendgrid retries" }, { status: 200 });
+    return NextResponse.json({ success: false }, { status: 500 });
   }
 }

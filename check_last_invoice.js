@@ -4,9 +4,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 async function run() {
-  const { data, error } = await supabase.rpc('exec_sql', { 
-    sql: `NOTIFY pgrst, 'reload schema';`
-  });
-  console.log(data, error);
+  const { data, error } = await supabase.from('invoices').select('*').order('created_at', { ascending: false }).limit(3);
+  console.log(data);
 }
 run();

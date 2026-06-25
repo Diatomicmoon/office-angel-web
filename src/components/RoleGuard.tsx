@@ -14,7 +14,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    if (publicRoutes.includes(pathname)) {
+    if (publicRoutes.includes(pathname) || pathname.startsWith("/portal")) {
       setLoading(false);
       return;
     }
@@ -63,7 +63,7 @@ export default function RoleGuard({ children }: { children: React.ReactNode }) {
     checkRole();
   }, [pathname, router]);
 
-  if (loading && !publicRoutes.includes(pathname)) {
+  if (loading && !publicRoutes.includes(pathname) && !pathname.startsWith("/portal")) {
     return <div className="p-12 text-center text-gray-500">Loading...</div>;
   }
 

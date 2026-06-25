@@ -5,7 +5,11 @@ const supabase = createClient(
 );
 async function run() {
   const { data, error } = await supabase.rpc('exec_sql', { 
-    sql: `NOTIFY pgrst, 'reload schema';`
+    sql: `
+      ALTER TABLE invoices ADD COLUMN IF NOT EXISTS customer_email TEXT;
+      ALTER TABLE invoices ADD COLUMN IF NOT EXISTS customer_phone TEXT;
+      ALTER TABLE invoices ADD COLUMN IF NOT EXISTS customer_name TEXT;
+    `
   });
   console.log(data, error);
 }

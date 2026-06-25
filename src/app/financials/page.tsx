@@ -16,14 +16,20 @@ export default function FinancialsPage() {
   const [view, setView] = useState<"overview" | "invoices">("overview");
   const [showManualModal, setShowManualModal] = useState(false);
   const [isDevAccount, setIsDevAccount] = useState(false);
+  const [hasStripe, setHasStripe] = useState(false);
 
   useEffect(() => {
     fetch("/api/companies/mine")
       .then(res => res.json())
       .then(json => {
+        const devIds = ["5341bfb2-8fce-4c7a-9a30-20e6aba60a8a", "a293eb4c-6a95-40b8-8324-bc493ec6b227"];
         const ids = json.companies?.map((c: any) => c.id) || [];
-        const isDev = ids.includes("5341bfb2-8fce-4c7a-9a30-20e6aba60a8a") || ids.includes("a293eb4c-6a95-40b8-8324-bc493ec6b227");
+        const isDev = devIds.some(id => ids.includes(id));
         setIsDevAccount(isDev);
+        
+        // Check if any of the user's companies have a connected Stripe account
+        const hasConnectedStripe = json.companies?.some((c: any) => c.stripe_account_id != null);
+        setHasStripe(hasConnectedStripe);
       })
       .catch(() => {});
 
@@ -85,10 +91,15 @@ export default function FinancialsPage() {
           <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all hidden lg:flex whitespace-nowrap">
             Manage Accounting
           </Link>
-          {isDevAccount && (
+          {isDevAccount && !hasStripe && (
             <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="col-span-2 bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
               Connect Stripe
             </a>
+          )}
+          {isDevAccount && hasStripe && (
+            <div className="col-span-2 bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
+              <span className="h-2 w-2 bg-indigo-500 rounded-full"></span> Stripe Connected
+            </div>
           )}
         </div>
       </div>

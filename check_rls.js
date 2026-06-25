@@ -4,9 +4,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 async function run() {
-  const { data, error } = await supabase.rpc('exec_sql', { 
-    sql: `NOTIFY pgrst, 'reload schema';`
-  });
-  console.log(data, error);
+  const { data, error } = await supabase.rpc('exec_sql', { sql: `
+    SELECT * FROM pg_policies WHERE tablename = 'invoices';
+  `});
+  console.log(data);
 }
 run();
