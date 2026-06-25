@@ -59,6 +59,8 @@ interface Visit {
   lat?: number;
   notes?: string;
   lng?: number;
+  visited_at?: string | Date;
+  created_at?: string | Date;
 }
 
 interface Props {
@@ -136,7 +138,10 @@ export default function MapView({ visits, center = DEFAULT_CENTER, userLocation,
     if (timeFilter === 'today') {
       const startOfDay = new Date();
       startOfDay.setHours(0, 0, 0, 0);
-      knockedVisits = knockedVisits.filter(v => new Date(v.visited_at || v.created_at) >= startOfDay);
+      knockedVisits = knockedVisits.filter(v => {
+        const dateVal = v.visited_at || v.created_at;
+        return dateVal ? new Date(dateVal) >= startOfDay : false;
+      });
     } else if (timeFilter === 'yesterday') {
       const startOfYesterday = new Date();
       startOfYesterday.setDate(startOfYesterday.getDate() - 1);
@@ -144,7 +149,9 @@ export default function MapView({ visits, center = DEFAULT_CENTER, userLocation,
       const endOfYesterday = new Date();
       endOfYesterday.setHours(0, 0, 0, 0);
       knockedVisits = knockedVisits.filter(v => {
-        const d = new Date(v.visited_at || v.created_at);
+        const dateVal = v.visited_at || v.created_at;
+        if (!dateVal) return false;
+        const d = new Date(dateVal);
         return d >= startOfYesterday && d < endOfYesterday;
       });
     }
