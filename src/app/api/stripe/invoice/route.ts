@@ -121,6 +121,22 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Failed to update invoice with Stripe session' }, { status: 500 });
       }
 
+      // Try to send SMS if Twilio credentials exist
+      if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && customer_phone) {
+        try {
+          const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+          await twilioClient.messages.create({
+            body: `Hi ${customer_name}, here is your invoice from Hard Hat Solutions for $${totalAmount.toFixed(2)}. You can pay securely online here: ${session.url}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: customer_phone.startsWith('+1') ? customer_phone : `+1${customer_phone}`
+          });
+          console.log(`Sent SMS invoice to ${customer_phone}`);
+        } catch (smsError) {
+          console.error('Failed to send SMS via Twilio:', smsError);
+          // Don't fail the request if just SMS fails
+        }
+      }
+
       return NextResponse.json({ invoice: invoiceData, stripe_session_url: session.url });
     } else {
       // No Stripe integration, return manual invoice
