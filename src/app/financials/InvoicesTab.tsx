@@ -319,7 +319,7 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:outline-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Email (for payment link)</label>
                   <input 
@@ -362,7 +362,7 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
                    <p className="text-xs text-indigo-700 mb-3">
                      Type a rough description of the job and price. The AI will instantly generate professional line items for you.
                    </p>
-                   <div className="flex gap-2">
+                   <div className="flex flex-col sm:flex-row gap-2 mt-2">
                      <input 
                        type="text" 
                        value={magicPrompt}
@@ -374,7 +374,7 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
                      <button 
                        onClick={handleMagicWrite}
                        disabled={magicLoading || !magicPrompt}
-                       className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center gap-2"
+                       className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex items-center justify-center gap-2"
                      >
                        {magicLoading ? 'Writing...' : 'Generate'}
                      </button>
@@ -390,9 +390,9 @@ function InvoiceBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: ()
               <div className="col-span-3 text-right pr-6">Amount</div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4 sm:space-y-3">
               {items.map((item, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row items-start gap-3">
+                <div key={idx} className="flex flex-col sm:flex-row items-start gap-3 bg-gray-50 sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-none border-gray-100">
                   <div className="w-full sm:flex-1">
                     <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Description</label>
                     <input 

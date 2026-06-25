@@ -227,7 +227,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number (For SMS Link)</label>
                   <input 
@@ -260,7 +260,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                    <label className="block text-sm font-semibold text-indigo-900 mb-1">
                      Magic Write Estimate
                    </label>
-                   <div className="flex gap-2">
+                   <div className="flex flex-col sm:flex-row gap-2 mt-2">
                      <input 
                        type="text" 
                        value={magicPrompt}
@@ -272,7 +272,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                      <button 
                        onClick={handleMagicWrite}
                        disabled={magicLoading || !magicPrompt}
-                       className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50"
+                       className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition disabled:opacity-50 whitespace-nowrap"
                      >
                        {magicLoading ? 'Writing...' : 'Generate'}
                      </button>
@@ -281,10 +281,11 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                </div>
              </div>
 
-            <div className="space-y-3">
+            <div className="space-y-4 sm:space-y-3">
               {items.map((item, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row items-start gap-3">
+                <div key={idx} className="flex flex-col sm:flex-row items-start gap-3 bg-gray-50 sm:bg-transparent p-3 sm:p-0 rounded-xl sm:rounded-none border sm:border-none border-gray-100">
                   <div className="w-full sm:flex-1">
+                    <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Description</label>
                     <input 
                       type="text" 
                       placeholder="Description"
@@ -294,6 +295,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                     />
                   </div>
                   <div className="w-full sm:w-24">
+                    <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Qty</label>
                     <input 
                       type="number" 
                       placeholder="Qty"
@@ -303,7 +305,8 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                     />
                   </div>
                   <div className="w-full sm:w-32 relative">
-                    <span className="absolute left-3 top-2 text-gray-400">$</span>
+                    <label className="block text-xs font-medium text-gray-500 mb-1 sm:hidden">Rate</label>
+                    <span className="absolute left-3 top-2 sm:top-2 text-gray-400 mt-5 sm:mt-0">$</span>
                     <input 
                       type="number" 
                       placeholder="Rate"
@@ -312,10 +315,13 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
                       className="w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     />
                   </div>
-                  <div className="w-full sm:w-32 pt-2 text-right font-medium text-gray-900 flex justify-end items-center">
+                  <div className="w-full sm:w-32 pt-2 text-right font-medium text-gray-900 flex justify-end items-center gap-2">
+                    <span className="sm:hidden text-gray-500 font-normal mr-2">Amount:</span>
                     ${((Number(item.qty) || 0) * (Number(item.rate) || 0)).toFixed(2)}
                     {items.length > 1 && (
-                      <button onClick={() => removeItem(idx)} className="text-red-400 hover:text-red-600 ml-2"><Trash2 className="w-4 h-4"/></button>
+                      <button onClick={() => removeItem(idx)} className="text-red-400 hover:text-red-600 ml-2 bg-red-50 hover:bg-red-100 p-1 rounded-md transition">
+                        <Trash2 className="w-4 h-4"/>
+                      </button>
                     )}
                   </div>
                 </div>
