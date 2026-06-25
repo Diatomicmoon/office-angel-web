@@ -202,7 +202,7 @@ function CanvassingStatsComponent({ visits }: { visits: any[] }) {
 }
 
 export default function CanvassingPage() {
-  const [mapFilter, setMapFilter] = useState<'all' | 'unknocked' | 'knocked'>('all');
+  const [timeFilter, setTimeFilter] = useState<'all' | 'today' | 'yesterday'>('all');
   const [view, setView] = useState<"list" | "logged" | "map" | "builds" | "territories" | "report" | "permits">("list");
   const [routePins, setRoutePins] = useState<any[]>([]);
   const [canvassingActive, setCanvassingActive] = useState(false);
@@ -416,6 +416,8 @@ export default function CanvassingPage() {
           onLogVisit={handleMapClick}
           onPinClick={handlePinClick} 
           visits={visits}
+          timeFilter={timeFilter}
+          setTimeFilter={setTimeFilter}
         />
       )}
       <div className="max-w-6xl mx-auto space-y-6">
@@ -757,7 +759,29 @@ export default function CanvassingPage() {
           </div>
         ) : (
           <div className="bg-card border rounded-xl shadow-sm overflow-hidden h-[600px] flex flex-col relative">
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] w-full max-w-md px-4 flex flex-col gap-2">
+            {/* Route Filter Toggles */}
+            <div className="absolute top-4 left-4 z-[2000] flex flex-col gap-1.5 bg-white p-1.5 rounded-xl shadow-md border border-gray-100">
+              <button 
+                onClick={() => setTimeFilter('today')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors text-left ${timeFilter === 'today' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Today's Route
+              </button>
+              <button 
+                onClick={() => setTimeFilter('yesterday')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors text-left ${timeFilter === 'yesterday' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                Yesterday's Route
+              </button>
+              <button 
+                onClick={() => setTimeFilter('all')}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors text-left ${timeFilter === 'all' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+              >
+                All Time Routes
+              </button>
+            </div>
+
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[2000] w-full max-w-md px-4 flex flex-col gap-2 ml-16 md:ml-0">
               <div className="relative w-full shadow-lg rounded-xl bg-white">
                 <div className="flex items-center px-3 border-b border-gray-100">
                   <Search className="w-5 h-5 text-gray-400" />
@@ -797,6 +821,7 @@ export default function CanvassingPage() {
               onMapClick={handleMapClick} 
               onPinClick={handlePinClick}
               routePins={routePins}
+              timeFilter={timeFilter}
             />
           </div>
         )}

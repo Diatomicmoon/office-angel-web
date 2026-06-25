@@ -6,7 +6,7 @@ import { X, Crosshair, MapPin } from "lucide-react";
 
 const MapView = dynamic(() => import("./MapView"), { ssr: false });
 
-export default function CanvassingMode({ onExit, onLogVisit, onPinClick, visits }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void, onPinClick?: (visit: any) => void, visits: any[] }) {
+export default function CanvassingMode({ onExit, onLogVisit, onPinClick, visits, timeFilter, setTimeFilter }: { onExit: () => void, onLogVisit: (lat: number, lng: number) => void, onPinClick?: (visit: any) => void, visits: any[], timeFilter: 'all' | 'today' | 'yesterday', setTimeFilter: (v: 'all' | 'today' | 'yesterday') => void }) {
   const [center, setCenter] = useState<[number, number]>([44.9778, -93.265]);
   const [userLoc, setUserLoc] = useState<[number, number] | null>(null);
   const [zoom, setZoom] = useState(18);
@@ -57,8 +57,30 @@ export default function CanvassingMode({ onExit, onLogVisit, onPinClick, visits 
       </div>
 
       <div className="flex-1 relative overflow-hidden bg-gray-100">
+        {/* Route Filter Toggles */}
+        <div className="absolute top-4 left-4 z-[1000] flex flex-col gap-1.5 bg-white/90 backdrop-blur-sm p-1.5 rounded-xl shadow-md border border-gray-200">
+          <button 
+            onClick={() => setTimeFilter('today')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors text-left ${timeFilter === 'today' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+          >
+            Today
+          </button>
+          <button 
+            onClick={() => setTimeFilter('yesterday')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors text-left ${timeFilter === 'yesterday' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+          >
+            Yesterday
+          </button>
+          <button 
+            onClick={() => setTimeFilter('all')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-colors text-left ${timeFilter === 'all' ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'}`}
+          >
+            All Time
+          </button>
+        </div>
+
         {/* Pass userLoc to MapView so it can render the blue dot without recentering the map */}
-        <MapView visits={visits} center={center} userLocation={userLoc} zoom={zoom} onMapClick={onLogVisit} onPinClick={onPinClick} />
+        <MapView visits={visits} center={center} userLocation={userLoc} zoom={zoom} onMapClick={onLogVisit} onPinClick={onPinClick} timeFilter={timeFilter} />
         
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-4 items-center w-full max-w-sm px-6">
           <button 

@@ -69,6 +69,7 @@ interface Props {
   onMapClick?: (lat: number, lng: number) => void;
   onPinClick?: (visit: Visit) => void;
   routePins?: Visit[];
+  timeFilter?: 'all' | 'today' | 'yesterday';
 }
 
 
@@ -120,17 +121,35 @@ function MapUpdater({ center, zoom }: { center?: [number, number], zoom?: number
   return null;
 }
 
-export default function MapView({ visits, center = DEFAULT_CENTER, userLocation, zoom = 14, onMapClick, onPinClick, routePins = [] }: Props) {
+export default function MapView({ visits, center = DEFAULT_CENTER, userLocation, zoom = 14, onMapClick, onPinClick, routePins = [], timeFilter = 'all' }: Props) {
   const hasData = visits.length > 0;
 
   const { ghostTrailCoords, hitlistCoords } = useMemo(() => {
-    const knockedVisits = visits.filter(
+    let knockedVisits = visits.filter(
       (v) =>
         v.latitude != null &&
         v.longitude != null &&
         v.interest_level !== 'new_build' &&
         v.interest_level !== 'unknocked_lead'
-    ).map(v => [v.latitude!, v.longitude!] as [number, number]);
+    );
+
+    if (timeFilter === 'today') {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      knockedVisits = knockedVisits.filter(v => new Date(v.visited_at || v.created_at) >= startOfDay);
+    } else if (timeFilter === 'yesterday') {
+      const startOfYesterday = new Date();
+      startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+      startOfYesterday.setHours(0, 0, 0, 0);
+      const endOfYesterday = new Date();
+      endOfYesterday.setHours(0, 0, 0, 0);
+      knockedVisits = knockedVisits.filter(v => {
+        const d = new Date(v.visited_at || v.created_at);
+        return d >= startOfYesterday && d < endOfYesterday;
+      });
+    }
+
+    const ghostTrailCoords = knockedVisits.map(v => [v.latitude!, v.longitude!] as [number, number]);
 
     const unknockedLeads = visits.filter(
       (v) =>
@@ -138,8 +157,6 @@ export default function MapView({ visits, center = DEFAULT_CENTER, userLocation,
         v.longitude != null &&
         (v.interest_level === 'new_build' || v.interest_level === 'unknocked_lead')
     ).map(v => ({ lat: v.latitude!, lng: v.longitude!, id: v.id }));
-
-    const ghostTrailCoords = knockedVisits;
 
     const hitlistCoords: [number, number][] = [];
     if (unknockedLeads.length > 0) {
