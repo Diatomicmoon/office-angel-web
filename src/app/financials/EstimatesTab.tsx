@@ -157,6 +157,53 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
     setItems(newItems);
   };
 
+  const handleSaveDraft = async () => {
+    setError(null);
+    setLoading(true);
+
+    const company_id = getCookie('oa_company_id');
+
+    if (!company_id) {
+      setError('Company ID not found. Please log in.');
+      setLoading(false);
+      return;
+    }
+
+    if (!customerName) {
+      setError('Please provide a Customer Name.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/estimates/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          company_id,
+          customer_name: customerName,
+          customer_email: customerEmail,
+          customer_phone: customerPhone,
+          items,
+          isDraft: true, // we tell backend not to send SMS
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || 'Failed to save draft');
+        return;
+      }
+
+      onSave(); // go back to list
+    } catch (err) {
+      setError('An unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSendEstimate = async () => {
     setError(null);
     setLoading(true);
@@ -344,13 +391,28 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
 
           {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl">{error}</div>}
           
-          <button 
-            onClick={handleSendEstimate}
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 hover:bg-blue-700 transition shadow-md disabled:opacity-50"
-          >
-            {loading ? 'Sending...' : <><Send className="w-4 h-4" /> Send via SMS Magic Link</>}
-          </button>
+          <div className="flex flex-col gap-3">
+            <button 
+              onClick={() => {
+                // We'll just call the same save logic but maybe mark it as draft
+                // For now, let's just save it exactly the same without sending SMS
+                const isDraft = true;
+                handleSaveDraft();
+              }}
+              disabled={loading}
+              className="w-full bg-white border-2 border-gray-200 text-gray-700 py-3 rounded-xl font-bold flex justify-center items-center gap-2 hover:bg-gray-50 transition shadow-sm disabled:opacity-50"
+            >
+              {loading ? 'Saving...' : 'Save to Drafts'}
+            </button>
+
+            <button 
+              onClick={handleSendEstimate}
+              disabled={loading}
+              className="w-full bg-[#3E70A1] text-white py-3 rounded-xl font-bold flex justify-center items-center gap-2 hover:bg-[#2c537a] transition shadow-md disabled:opacity-50"
+            >
+              {loading ? 'Sending...' : <><Send className="w-4 h-4" /> Send to Client</>}
+            </button>
+          </div>
         </div>
       </div>
     </div>

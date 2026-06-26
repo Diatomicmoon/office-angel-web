@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: NextRequest) {
   try {
-    const { company_id, customer_name, customer_email, customer_phone, items } = await req.json();
+    const { company_id, customer_name, customer_email, customer_phone, items, isDraft } = await req.json();
 
     if (!company_id || !customer_name || !items || items.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -64,8 +64,8 @@ export async function POST(req: NextRequest) {
     const origin = process.env.NEXT_PUBLIC_SITE_URL || requestUrl.origin || 'https://hardhat-solutions.com';
     const magicLink = `${origin}/portal/estimate/${estimateId}`;
 
-    // Send SMS via Twilio if configured and phone is provided
-    if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && customer_phone) {
+    // Send SMS via Twilio if configured and phone is provided and it's NOT a draft
+    if (!isDraft && process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && customer_phone) {
       try {
         const twilioClient = require('twilio')(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
         await twilioClient.messages.create({
