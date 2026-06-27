@@ -9,7 +9,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: NextRequest) {
   try {
-    const { company_id, customer_name, customer_email, customer_phone, items, isDraft } = await req.json();
+    const { company_id, customer_name, customer_email, customer_phone, items, isDraft, job_id } = await req.json();
 
     if (!company_id || !customer_name || !items || items.length === 0) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -20,17 +20,23 @@ export async function POST(req: NextRequest) {
       totalAmount += item.qty * item.rate;
     }
 
+    const estimatePayload: any = {
+      company_id,
+      customer_name,
+      customer_email,
+      customer_phone,
+      amount: totalAmount,
+      status: 'pending',
+    };
+
+    if (job_id) {
+      estimatePayload.id = job_id;
+    }
+
     // Insert estimate
     const { data: estimateData, error: estimateError } = await supabase
       .from('estimates')
-      .insert({
-        company_id,
-        customer_name,
-        customer_email,
-        customer_phone,
-        amount: totalAmount,
-        status: 'pending',
-      })
+      .insert(estimatePayload)
       .select()
       .single();
 

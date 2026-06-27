@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, MapPin, User, BadgeDollarSign, CalendarClock, Receipt, Package, Truck, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, User, BadgeDollarSign, CalendarClock, Receipt, Package, Truck, ExternalLink, Copy, Check } from "lucide-react";
 
 type Job = {
   id: string;
@@ -68,6 +68,16 @@ export default function JobDetailsPage() {
   const [job, setJob] = useState<Job | null>(null);
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
+
+  const copyPortalLink = () => {
+    if (typeof window !== "undefined") {
+      const url = `${window.location.origin}/portal/${id}`;
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   useEffect(() => {
     Promise.all([
@@ -153,7 +163,23 @@ export default function JobDetailsPage() {
           </div>
           <div className="text-right">
             <p className="text-sm text-gray-500 mb-1">Quoted Amount</p>
-            <p className="text-xl font-bold text-gray-900">{fmtMoney(job.quoted_amount)}</p>
+            <p className="text-xl font-bold text-gray-900 mb-4">{fmtMoney(job.quoted_amount)}</p>
+            <button
+              onClick={copyPortalLink}
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors shadow-sm"
+            >
+              {copied ? (
+                <>
+                  <Check size={14} className="text-green-600" />
+                  <span className="text-green-600">Copied Link</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={14} className="text-gray-500" />
+                  Copy Portal Link
+                </>
+              )}
+            </button>
           </div>
         </div>
         <div className="p-6 grid grid-cols-2 gap-6 bg-gray-50">

@@ -111,6 +111,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
   const [customerName, setCustomerName] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [jobId, setJobId] = useState('');
   const [items, setItems] = useState<{ desc: string, qty: number | '', rate: number | '' }[]>([{ desc: '', qty: 1, rate: '' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -184,6 +185,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
           customer_name: customerName,
           customer_email: customerEmail,
           customer_phone: customerPhone,
+          job_id: jobId.trim() || undefined,
           items,
           isDraft: true, // we tell backend not to send SMS
         }),
@@ -231,6 +233,7 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
           customer_name: customerName,
           customer_email: customerEmail,
           customer_phone: customerPhone,
+          job_id: jobId.trim() || undefined,
           items,
         }),
       });
@@ -264,15 +267,27 @@ function EstimateBuilder({ onCancel, onSave }: { onCancel: () => void, onSave: (
           <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
             <h2 className="text-lg font-bold text-gray-900 mb-4">Customer Details</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name / Company</label>
-                <input 
-                  type="text" 
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="e.g. John Doe" 
-                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Customer Name / Company</label>
+                  <input 
+                    type="text" 
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="e.g. John Doe" 
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Job ID (Optional, for Portal Link)</label>
+                  <input 
+                    type="text" 
+                    value={jobId}
+                    onChange={(e) => setJobId(e.target.value)}
+                    placeholder="e.g. 550e8400-e29b-..." 
+                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono text-sm"
+                  />
+                </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

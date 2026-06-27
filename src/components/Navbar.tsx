@@ -33,6 +33,7 @@ export default function Navbar({ activePage }: NavbarProps) {
           <Link href="/pricing" className={linkClass("pricing")}>Pricing</Link>
           <Link href="/about" className={linkClass("about")}>About</Link>
           <Link href="/contact" className={linkClass("contact")}>Contact</Link>
+          <Link href="/portal" className="text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors">View Portal</Link>
           <Link href="/login" className={linkClass("login")}>Login</Link>
           <Link
             href="/#demo"
@@ -89,6 +90,13 @@ export default function Navbar({ activePage }: NavbarProps) {
             className="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Login
+          </Link>
+          <Link
+            href="/portal"
+            onClick={() => setOpen(false)}
+            className="px-3 py-2.5 rounded-lg text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors"
+          >
+            View Portal
           </Link>
           <div className="pt-2 mt-1 border-t border-gray-100">
             <Link

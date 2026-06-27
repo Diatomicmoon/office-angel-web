@@ -1,8 +1,13 @@
 'use client';
 import { MapPin, Phone, MessageSquare, Star, Wrench, ShieldCheck, FileText, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function CustomerPortalDashboard() {
+  const params = useParams();
+  const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const displayId = id ? id.substring(0, 6).toUpperCase() : '4829';
+
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
@@ -14,7 +19,7 @@ export default function CustomerPortalDashboard() {
           <span className="font-bold text-gray-900 text-lg tracking-tight">Hard Hat Electric</span>
         </div>
         <div className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-          Job #4829
+          Job #{displayId}
         </div>
       </div>
 
