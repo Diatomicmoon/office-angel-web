@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bot, Menu, X } from "lucide-react";
 
 interface NavbarProps {
-  activePage?: "features" | "pricing" | "about" | "login";
+  activePage?: "features" | "pricing" | "about" | "login" | "contact";
 }
 
 export default function Navbar({ activePage }: NavbarProps) {
@@ -32,6 +32,7 @@ export default function Navbar({ activePage }: NavbarProps) {
           <Link href="/#features" className={linkClass("features")}>Features</Link>
           <Link href="/pricing" className={linkClass("pricing")}>Pricing</Link>
           <Link href="/about" className={linkClass("about")}>About</Link>
+          <Link href="/contact" className={linkClass("contact")}>Contact</Link>
           <Link href="/login" className={linkClass("login")}>Login</Link>
           <Link
             href="/#demo"
@@ -74,6 +75,13 @@ export default function Navbar({ activePage }: NavbarProps) {
             className="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
             About
+          </Link>
+          <Link
+            href="/contact"
+            onClick={() => setOpen(false)}
+            className="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Contact
           </Link>
           <Link
             href="/login"
