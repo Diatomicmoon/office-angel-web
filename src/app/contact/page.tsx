@@ -10,7 +10,7 @@ export default function ContactPage() {
             Contact Us
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Need help with your electrical service? Reach out to our team.
+            Want to see Hard Hat Solutions in action? Reach out to our team to book a demo.
           </p>
         </div>
         <form className="mt-8 space-y-6" action="#" method="POST">
@@ -36,7 +36,7 @@ export default function ContactPage() {
             <div className="ml-3 text-sm">
               <label htmlFor="sms-consent" className="font-medium text-gray-700">SMS Opt-In Consent</label>
               <p className="text-gray-500 text-xs mt-1">
-                By checking this box, you agree to receive SMS text messages from Hard Hat Solutions regarding your service request, scheduling, and dispatch updates. Message and data rates may apply. Reply STOP to opt out.
+                By checking this box, you agree to receive SMS text messages from Hard Hat Solutions regarding your inquiry and account. Message and data rates may apply. Message frequency varies. Reply STOP to opt out. View our <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link> and <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link>.
               </p>
             </div>
           </div>
