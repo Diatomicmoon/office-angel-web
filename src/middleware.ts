@@ -61,7 +61,7 @@ export async function middleware(request: NextRequest) {
 
   // Define public routes that don't require authentication
   // Root ('/') is now the public landing page, '/login' is auth, etc.
-  const publicRoutes = ['/login', '/signup-secret', '/privacy-policy', '/terms', '/about', '/pricing', '/portal', '/$']
+  const publicRoutes = ['/login', '/signup-secret', '/privacy-policy', '/terms', '/contact', '/about', '/pricing', '/portal', '/$']
   const isPublicRoute = 
     request.nextUrl.pathname === '/' || 
     publicRoutes.some(route => route !== '/$' && request.nextUrl.pathname.startsWith(route))

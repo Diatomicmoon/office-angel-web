@@ -36,6 +36,7 @@ export default function Terms() {
             </p>
             <div className="bg-gray-50 border border-gray-200 p-5 rounded-lg mt-4">
               <ul className="list-disc pl-6 space-y-2">
+                <li><strong>Privacy & Data Sharing:</strong> No mobile information will be shared with third parties/affiliates for marketing/promotional purposes. All other categories exclude text messaging originator opt-in data and consent; this information will not be shared with any third parties.</li>
                 <li><strong>Carrier Disclaimers:</strong> Message and data rates may apply. Message frequency varies based on your usage. Carriers are not liable for delayed or undelivered messages.</li>
                 <li><strong>Opting Out:</strong> You can cancel the SMS service at any time by texting "STOP". Upon texting "STOP", we will send one confirmation message, after which SMS communications will cease.</li>
                 <li><strong>Help:</strong> Reply "HELP" for assistance or contact our main business line.</li>
