@@ -8,7 +8,7 @@ import { Menu, X } from "lucide-react";
 export default function SidebarClientWrapper() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const publicRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret", "/privacy-policy", "/terms"];
+  const publicRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret", "/privacy-policy", "/terms", "/contact"];
   const isPublicPage = publicRoutes.includes(pathname) || pathname.startsWith("/portal");
 
   // Close sidebar automatically on navigation in mobile view
