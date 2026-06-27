@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+import { ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+
 export default function CustomerPortalLogin() {
   const [portalId, setPortalId] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading'>('idle');
@@ -19,11 +22,17 @@ export default function CustomerPortalLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Customer Portal
-        </h2>
+    <div className="min-h-screen bg-gray-50 flex flex-col py-12 sm:px-6 lg:px-8 relative">
+      <Link href="/" className="absolute top-8 left-8 flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors">
+        <ArrowLeft className="w-5 h-5" />
+        <span className="font-medium">Back to site</span>
+      </Link>
+
+      <div className="flex-1 flex flex-col justify-center">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Customer Portal
+          </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Enter your Portal ID or Job ID to access your live dashboard.
         </p>
@@ -61,6 +70,7 @@ export default function CustomerPortalLogin() {
             </div>
           </form>
         </div>
+      </div>
       </div>
     </div>
   );

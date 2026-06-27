@@ -13,7 +13,7 @@ export function HaloWidget() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const hiddenRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret", "/privacy-policy", "/terms", "/canvassing", "/field-app"];
-  const isHiddenPage = hiddenRoutes.includes(pathname);
+  const isHiddenPage = hiddenRoutes.includes(pathname) || pathname?.startsWith("/portal") || pathname?.startsWith("/onboarding");
 
   // Ctrl+K / Cmd+K listener
   useEffect(() => {
