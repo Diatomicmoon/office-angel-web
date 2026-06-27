@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export async function GET(req: NextRequest) {
   const { data: estimate, error } = await supabase
       .from('estimates')
-      .select('*, companies(name, logo_url), estimate_items(*)')
+      .select('*, companies(name), estimate_items(*)')
       .limit(1);
       
   return NextResponse.json({ estimate, error });

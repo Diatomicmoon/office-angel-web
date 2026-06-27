@@ -13,17 +13,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { data: estimate, error } = await supabase
       .from('estimates')
-      .select('*, companies(name, logo_url), estimate_items(*)')
+      .select('*, companies(name), estimate_items(*)')
       .eq('id', id)
       .single();
 
     if (error || !estimate) {
-      return NextResponse.json({ error: 'Estimate not found' }, { status: 404 });
+      console.error("GET Estimate Error:", error);
+      return NextResponse.json({ error: error ? error.message : 'Estimate not found' }, { status: 404 });
     }
 
     return NextResponse.json({ estimate });
-  } catch (error) {
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error?.message || 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -54,7 +55,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     // We forward the payload to the stripe invoice creation endpoint
     const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin || 'https://hardhat-solutions.com';
     
-    // Map items to the format expected by the invoice endpoint
     const items = estimate.estimate_items.map((item: any) => ({
       desc: item.description,
       qty: item.quantity,
