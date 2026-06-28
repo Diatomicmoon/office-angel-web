@@ -12,7 +12,7 @@ export function HaloWidget() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const hiddenRoutes = ["/", "/login", "/pricing", "/about", "/signup-secret", "/privacy-policy", "/terms", "/canvassing", "/field-app"];
+  const hiddenRoutes = ["/", "/login", "/pricing", "/about", "/contact", "/signup-secret", "/privacy-policy", "/terms", "/canvassing", "/field-app"];
   const isHiddenPage = hiddenRoutes.includes(pathname) || pathname?.startsWith("/portal") || pathname?.startsWith("/onboarding");
 
   // Ctrl+K / Cmd+K listener
