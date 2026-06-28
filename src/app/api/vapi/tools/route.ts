@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     }
 
     const toolCalls = message.toolCalls || [];
-    let systemPhoneNumberRaw = message.call?.system?.number;
+    let systemPhoneNumberRaw = message.call?.system?.number || message.call?.phoneNumber?.number || message.phoneNumber?.number;
     let systemPhoneNumber = systemPhoneNumberRaw;
     if (systemPhoneNumberRaw && systemPhoneNumberRaw.includes('sip:')) {
       const match = systemPhoneNumberRaw.match(/sip:([^@]+)@/);
