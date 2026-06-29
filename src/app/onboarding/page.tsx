@@ -13,11 +13,30 @@ export default function OnboardingPage() {
 
   const handleComplete = async () => {
     setLoading(true);
-    // TODO: Wire this to a real API endpoint to update the company profile
+    
+    try {
+      const res = await fetch('/api/companies/mine', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: companyName,
+          // You could also pass aiMode here if the backend expects it.
+        })
+      });
+      
+      if (!res.ok) {
+        console.error('Failed to save company setup');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+
     setTimeout(() => {
       setLoading(false);
       router.push('/dashboard');
-    }, 1500);
+    }, 800);
   };
 
   return (

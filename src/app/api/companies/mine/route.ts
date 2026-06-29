@@ -47,3 +47,51 @@ export async function GET() {
     return NextResponse.json({ companies: [], error: e?.message || "error" }, { status: 401 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    const { userId, companyId } = await resolveCompanyIdOrThrow();
+    
+    const body = await req.json().catch(() => ({}));
+
+    const admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+      process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder'
+    );
+
+    // Make sure user has access to this company
+    if (userId) {
+      const { data: membership } = await admin
+        .from("company_memberships")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("company_id", companyId)
+        .single();
+        
+      if (!membership || (membership.role !== 'owner' && membership.role !== 'admin')) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+      }
+    }
+
+    const payload: any = {};
+    if (body.name !== undefined) payload.name = body.name;
+    if (body.phone_number !== undefined) payload.phone_number = body.phone_number;
+    
+    // We can also store aiMode in settings or as a direct column if it exists. 
+    // Assuming settings is a JSONB column. We will update the name for now.
+
+    const { data: updatedCompany, error: updateErr } = await admin
+      .from("companies")
+      .update(payload)
+      .eq("id", companyId)
+      .select()
+      .single();
+
+    if (updateErr) return NextResponse.json({ error: updateErr }, { status: 400 });
+
+    return NextResponse.json({ company: updatedCompany });
+
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || "error" }, { status: 401 });
+  }
+}
