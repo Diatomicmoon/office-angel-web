@@ -29,6 +29,9 @@ export const metadata: Metadata = {
     type: "website",
   },
   manifest: "/manifest.json",
+  verification: {
+    google: "eePqZT8sh9q40SpBzMN3Qfbb7u7XI7xTlyWRo38YaTY",
+  },
 };
 
 export default function RootLayout({
