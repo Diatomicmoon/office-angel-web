@@ -7,7 +7,8 @@ export async function POST() {
   const companyIds = [
     '8e53126d-d9a7-414c-8291-8657fbf43123', // Christians Demo
     '5341bfb2-8fce-4c7a-9a30-20e6aba60a8a', // Office Angel Dev / Hard Hat
-    'd335e254-2a5f-4f68-b9e4-4416bd44a67b'  // One More Yard
+    'd335e254-2a5f-4f68-b9e4-4416bd44a67b', // One More Yard
+    'a293eb4c-6a95-40b8-8324-bc493ec6b227'  // Hardhat Electric (Current Active)
   ];
 
   let allTechs: any[] = [];
