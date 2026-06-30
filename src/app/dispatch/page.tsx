@@ -597,7 +597,7 @@ export default function Dispatch() {
 
   useEffect(() => {
     const load = () => {
-      fetch("/api/technicians")
+      fetch("/api/technicians", { cache: "no-store" })
         .then((r) => r.json())
         .then((json) => {
           setTechs(json.technicians || []);
