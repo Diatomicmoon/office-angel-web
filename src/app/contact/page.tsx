@@ -107,13 +107,12 @@ export default function ContactPage() {
                   checked={formData.smsConsent}
                   onChange={(e) => setFormData({...formData, smsConsent: e.target.checked})}
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" 
-                  required 
                 />
               </div>
               <div className="ml-3 text-sm">
-                <label htmlFor="sms-consent" className="font-medium text-gray-700">SMS Opt-In Consent</label>
+                <label htmlFor="sms-consent" className="font-medium text-gray-700">SMS Opt-In Consent (Optional)</label>
                 <p className="text-gray-500 text-xs mt-1">
-                  By checking this box, you agree to receive SMS text messages from Hard Hat Solutions regarding your inquiry and account. Message and data rates may apply. Message frequency varies. Reply STOP to opt out. View our <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link> and <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link>.
+                  By checking this box, you agree to receive SMS text messages from Hard Hat Solutions. I understand that consent is not a condition of purchase. Message and data rates may apply. Reply STOP to opt out. View our <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                 </p>
               </div>
             </div>
