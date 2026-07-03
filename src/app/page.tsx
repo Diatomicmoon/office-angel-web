@@ -55,7 +55,7 @@ export default function LandingPage() {
         </section>
 
         {/* Industry Bar */}
-        <section className="bg-white border-t border-b border-gray-200 py-8 px-4 md:px-8">
+        <section className="relative bg-white/80 backdrop-blur-md border-t border-b border-gray-200 py-8 px-4 md:px-8 z-10">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-gray-500 text-sm font-medium uppercase tracking-widest mb-4">Built for home service businesses</p>
             <div className="flex flex-wrap justify-center gap-4 md:gap-4 md:p-8 text-gray-700 font-semibold text-sm md:text-base">
@@ -79,8 +79,8 @@ export default function LandingPage() {
 
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
+                <div className="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-[0_0_15px_rgba(37,99,235,0.5)]">
                   <PhoneIncoming size={24} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-3">AI Voice Dispatcher</h3>
@@ -89,8 +89,8 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
+                <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-[0_0_15px_rgba(79,70,229,0.5)]">
                   <Mic size={24} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-3">AI Co-Pilot Mode</h3>
@@ -99,8 +99,8 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
+                <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-green-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-[0_0_15px_rgba(22,163,74,0.5)]">
                   <Inbox size={24} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-3">Smart Scheduling Inbox</h3>
@@ -109,8 +109,8 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
+                <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-[0_0_15px_rgba(147,51,234,0.5)]">
                   <Calendar size={24} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-3">Auto Job Scheduling</h3>
@@ -119,8 +119,8 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
+                <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-orange-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-[0_0_15px_rgba(234,88,12,0.5)]">
                   <MapPin size={24} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-3">Live Field Tracking</h3>
@@ -129,8 +129,8 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
-                <div className="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center mb-5">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
+                <div className="w-12 h-12 bg-pink-100 text-pink-600 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-pink-600 group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-[0_0_15px_rgba(219,39,119,0.5)]">
                   <Users size={24} />
                 </div>
                 <h3 className="text-lg md:text-xl font-bold mb-3">CRM & Customer Profiles</h3>
@@ -139,7 +139,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
                 <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-5">
                   <DollarSign size={24} />
                 </div>
@@ -149,7 +149,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
                 <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center mb-5">
                   <ClipboardList size={24} />
                 </div>
@@ -159,7 +159,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm">
+              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
                 <div className="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center mb-5">
                   <ShieldCheck size={24} />
                 </div>
@@ -185,15 +185,15 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">Plugs into what you already use.</h2>
             <p className="text-gray-500 text-base md:text-lg mb-10 md:mb-12">No new hardware. No app installs for your crew. No retraining anyone.</p>
             <div className="grid sm:grid-cols-3 gap-6 text-left">
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:bg-white hover:shadow-lg hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-1">
                 <p className="font-bold text-base md:text-lg mb-2">Your existing phone number</p>
                 <p className="text-gray-600 text-sm">Overflow calls route to Hard Hat Solutions automatically. Your number stays the same.</p>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:bg-white hover:shadow-lg hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-1">
                 <p className="font-bold text-base md:text-lg mb-2">Google & Apple Calendar</p>
                 <p className="text-gray-600 text-sm">Jobs drop straight onto the calendars your crew already has on their phones.</p>
               </div>
-              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:bg-white hover:shadow-lg hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-1">
                 <p className="font-bold text-base md:text-lg mb-2">Your website & web forms</p>
                 <p className="text-gray-600 text-sm">Web leads route automatically into your scheduling inbox alongside your calls.</p>
               </div>
@@ -202,13 +202,17 @@ export default function LandingPage() {
         </section>
 
         {/* CTA / Demo */}
-        <section id="demo" className="py-16 md:py-24 bg-gray-900 text-white px-4 md:px-8">
-          <div className="max-w-4xl mx-auto text-center">
+        <section id="demo" className="relative overflow-hidden py-16 md:py-24 bg-gray-900 text-white px-4 md:px-8 border-t border-gray-800">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-full z-0 pointer-events-none">
+            <div className="absolute inset-0 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-pulse"></div>
+            <div className="absolute inset-0 bg-indigo-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse delay-75"></div>
+          </div>
+          <div className="max-w-4xl mx-auto text-center relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to scale your crew?</h2>
             <p className="text-lg md:text-xl text-gray-400 mb-10 md:mb-12">
               Stop losing $1,500 service calls to voicemail. Let us show you exactly how it works.
             </p>
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg transition-colors">
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-105">
               Get in Touch
             </Link>
           </div>
