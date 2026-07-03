@@ -10,6 +10,7 @@ export default function Sidebar() {
   const [role, setRole] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>('Hard Hat Solutions');
   const [tier, setTier] = useState<number>(1);
+  const [isTrial, setIsTrial] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchRole() {
@@ -20,6 +21,7 @@ export default function Sidebar() {
         setRole(data.role || 'unknown');
         if (data.companyName) setCompanyName(data.companyName);
         if (data.tier) setTier(data.tier);
+        if (data.isTrial) setIsTrial(data.isTrial);
       } catch (err) {
         setRole('unknown');
       }
@@ -54,6 +56,9 @@ export default function Sidebar() {
   const isSales = safeRole === 'sales';
   const isFieldRep = ['field_rep', 'tech', 'apprentice'].includes(safeRole);
   const isRestricted = !isOwnerOrAdmin;
+
+  // For 14-day Free Trial users, we hide heavy ops/financials to keep the "Aha!" moment clean
+  const showHeavyFeatures = !isTrial && !isRestricted && !isSales;
 
   return (
     <div className="w-64 shrink-0 bg-gray-900 text-white flex flex-col h-[100dvh] md:h-screen md:sticky md:top-0 shadow-xl z-10">
@@ -107,7 +112,7 @@ export default function Sidebar() {
 
             {/* SALES & CRM */}
             {sectionLabel('Sales & CRM')}
-            {!isRestricted && (
+            {(!isRestricted && !isTrial) && (
               <Link href="/crm" className={itemClass('/crm')}>
                 <Users size={18} /><span>Lead Pipeline</span>
               </Link>
@@ -117,18 +122,18 @@ export default function Sidebar() {
             </Link>
             {!isRestricted && (
               <Link href="/projects" className={itemClass('/projects')}>
-                <Briefcase size={18} /><span>Customers & Jobs</span>
+                <Briefcase size={18} /><span>{isTrial ? 'Jobs & Invoices' : 'Customers & Jobs'}</span>
               </Link>
             )}
 
             {/* OPERATIONS */}
-            {!isRestricted && sectionLabel('Operations')}
-            {!isRestricted && (
+            {showHeavyFeatures && sectionLabel('Operations')}
+            {showHeavyFeatures && (
               <Link href="/dispatch" className={itemClass('/dispatch')}>
                 <Calendar size={18} /><span>Schedule & Dispatch</span>
               </Link>
             )}
-            {!isRestricted && (
+            {showHeavyFeatures && (
               <Link href="/permits" className={itemClass('/permits')}>
                 <FileText size={18} /><span>Permits & Docs</span>
               </Link>
@@ -139,20 +144,20 @@ export default function Sidebar() {
             <Link href="/field-app" className={itemClass('/field-app')}>
               <Smartphone size={18} /><span>Mobile App</span>
             </Link>
-            {!isRestricted && !isSales && (
+            {showHeavyFeatures && (
               <Link href="/supply-runner" className={itemClass('/supply-runner')}>
                 <Truck size={18} /><span>Supply Runner</span>
               </Link>
             )}
 
             {/* FINANCIALS */}
-            {!isRestricted && !isSales && sectionLabel('Financials')}
-            {!isRestricted && !isSales && (
+            {showHeavyFeatures && sectionLabel('Financials')}
+            {showHeavyFeatures && (
               <Link href="/financials" className={itemClass('/financials')}>
                 <DollarSign size={18} /><span>Financial Command</span>
               </Link>
             )}
-            {!isRestricted && (
+            {showHeavyFeatures && (
               <Link href="/marketing" className={itemClass('/marketing')}>
                 <Share2 size={18} /><span>Marketing ROI</span>
               </Link>
@@ -161,7 +166,7 @@ export default function Sidebar() {
           </nav>
 
           <div className="p-4 pb-12 md:pb-4 bg-gray-900 border-t border-gray-800 space-y-1">
-            {!isRestricted && !isSales && (
+            {showHeavyFeatures && (
               <Link href="/settings" className={itemClass('/settings')}>
                 <Settings size={18} /><span>Settings</span>
               </Link>

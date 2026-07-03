@@ -18,7 +18,7 @@ export async function GET() {
     );
 
     const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1 });
+    if (!user) return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1, isTrial: false });
 
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -29,6 +29,7 @@ export async function GET() {
     let companyId = null;
     let companyName = 'Hard Hat Solutions';
     let tier = 1;
+    let isTrial = false;
 
     const { data: memData } = await supabaseAdmin
       .from('company_memberships')
@@ -61,21 +62,22 @@ export async function GET() {
     if (companyId) {
       const { data: comp } = await supabaseAdmin
         .from('companies')
-        .select('name, ai_enabled, module_door_to_door')
+        .select('name, ai_enabled, module_door_to_door, is_trial')
         .eq('id', companyId)
         .single();
       if (comp?.name) {
         companyName = comp.name;
         // Infer tier for test UI
+        if (comp.is_trial) isTrial = true;
         if (comp.name.includes("Tier 3")) tier = 3;
         else if (comp.name.includes("Tier 2")) tier = 2;
         else if (comp.ai_enabled) tier = 2;
       }
     }
 
-    return NextResponse.json({ role, companyName, tier });
+    return NextResponse.json({ role, companyName, tier, isTrial });
   } catch (err) {
     console.error('Error in /api/me:', err);
-    return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1 });
+    return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1, isTrial: false });
   }
 }
