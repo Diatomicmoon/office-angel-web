@@ -135,6 +135,38 @@ export default function Dashboard() {
       )}
 
       {/* Header */}
+      {tier === 1 ? (
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-6 relative overflow-hidden group hover:border-gray-300 transition-all">
+          <div className="absolute top-4 right-4 opacity-10 group-hover:opacity-20 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500"><Briefcase size={100} /></div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to your Workspace</h2>
+          <p className="text-gray-600 max-w-xl">You are currently on the Basic SaaS Tier. Use the CRM, D2D map, and estimating tools below. Upgrade to Tier 2 to unlock your Voice AI receptionist.</p>
+        </div>
+      ) : tier === 2 ? (
+        <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-900 bg-[length:200%_auto] animate-[pulse_4s_ease-in-out_infinite] rounded-xl p-6 shadow-xl mb-6 text-white overflow-hidden border border-blue-500/50">
+          <div className="absolute -right-6 -top-6 opacity-20"><Bot size={130} /></div>
+          <div className="relative z-10 flex items-center gap-3 mb-2">
+            <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse shadow-[0_0_15px_rgba(34,211,238,0.9)]"></div>
+            <h2 className="text-2xl font-bold text-white tracking-wide">Cloud AI is Active</h2>
+          </div>
+          <p className="relative z-10 text-blue-200 max-w-xl opacity-90">Your Voice AI receptionist is monitoring the phone lines. Call routing and SMS follow-ups are online.</p>
+        </div>
+      ) : (
+        <div className="bg-gray-900 rounded-xl p-6 shadow-2xl mb-6 text-white relative overflow-hidden border border-purple-500/50 group">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/10 to-transparent -translate-y-full animate-[ping_3s_linear_infinite] opacity-50"></div>
+          <div className="absolute -right-2 -top-2 opacity-10"><Activity size={140} /></div>
+          
+          <div className="relative z-10 flex items-center gap-3 mb-2">
+            <div className="w-3 h-3 bg-purple-500 rounded-full animate-ping absolute"></div>
+            <div className="w-3 h-3 bg-purple-400 rounded-full relative z-10 shadow-[0_0_15px_rgba(168,85,247,0.9)]"></div>
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Autonomous AI Employee Online</h2>
+          </div>
+          <p className="relative z-10 text-gray-300 max-w-xl">Mothership uplink connected. Hardware node is running. Full-scale dispatching, estimating, and fleet routing are fully autonomous.</p>
+          <div className="relative z-10 mt-4 flex items-center gap-2 text-[10px] font-mono text-purple-300 bg-purple-900/30 w-fit px-3 py-1 rounded-full border border-purple-500/30">
+            <span className="animate-pulse text-purple-400">●</span> HARDWARE LINK: STABLE
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
