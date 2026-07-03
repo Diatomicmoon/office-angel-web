@@ -14,6 +14,12 @@ export default function CustomerPortalLogin() {
   const handleAccessPortal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!portalId.trim()) return;
+    
+    // Catch completely random small numbers/text before routing to prevent client-side exception
+    if (portalId.trim().length < 5) {
+      alert("Please enter a valid Job ID or Portal Link.");
+      return;
+    }
 
     setStatus('loading');
     
