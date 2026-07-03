@@ -218,21 +218,30 @@ function LeadDetail({ lead, onClose }: { lead: Lead; onClose: () => void }) {
         </div>
 
         {/* Footer actions */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50 flex gap-3">
-          <a
-            href={`tel:${lead.phone}`}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg text-center transition-colors flex items-center justify-center gap-2"
-          >
-            <Phone size={16} /> Call Back
-          </a>
-          {lead.customer_id && (
-            <Link
-              href={`/projects/customer-profile?id=${lead.customer_id}`}
-              className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+        <div className="p-4 border-t border-gray-200 bg-gray-50 flex flex-col gap-3">
+          <div className="flex gap-3">
+            <a
+              href={`tel:${lead.phone}`}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2.5 rounded-lg text-center transition-colors flex items-center justify-center gap-2"
             >
-              <ExternalLink size={16} /> Full Profile
-            </Link>
-          )}
+              <Phone size={16} /> Call Back
+            </a>
+            {lead.customer_id && (
+              <Link
+                href={`/projects/customer-profile?id=${lead.customer_id}`}
+                className="flex-1 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-medium py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2"
+              >
+                <User size={16} /> Profile
+              </Link>
+            )}
+          </div>
+          <Link
+            href={`/portal/${lead.job_id || lead.id.slice(0,6).toUpperCase()}`}
+            target="_blank"
+            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium py-2.5 rounded-lg text-center transition-colors flex items-center justify-center gap-2 shadow-sm"
+          >
+            <ExternalLink size={16} /> Open Customer Magic Portal
+          </Link>
         </div>
       </div>
     </div>

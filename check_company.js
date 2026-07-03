@@ -1,14 +1,8 @@
 const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config({ path: '.env.local' });
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-
 async function run() {
-  const { data: users } = await supabase.auth.admin.listUsers();
-  const jakob = users.users.find(u => u.email === 'jakob@hardhat.com' || u.phone === '+16125986260');
-  console.log("Jakob user ID:", jakob?.id);
-  
-  if (jakob) {
-    const { data } = await supabase.from('company_memberships').select('*').eq('user_id', jakob.id);
-    console.log("Memberships:", data);
-  }
+  const { data, error } = await supabase.from('companies').select('phone_number, ai_enabled, forward_to_phone').eq('id', '5341bfb2-8fce-4c7a-9a30-20e6aba60a8a');
+  console.log(data, error);
 }
 run();

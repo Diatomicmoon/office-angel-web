@@ -1,22 +1,28 @@
 import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
-import path from 'path';
-
-dotenv.config({ path: path.join('/home/jakob/.openclaw/workspace/office-angel-web', '.env') });
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
-async function addJakob() {
-  const { error } = await supabase.from('company_memberships').insert({
-    user_id: 'edda60d6-f6c4-447e-8377-af28964c54ea', // Jakob
-    company_id: 'a293eb4c-6a95-40b8-8324-bc493ec6b227', // Hardhat Electric
-    role: 'owner'
-  });
-  if (error) console.error(error);
-  else console.log('Added Jakob to Hardhat Electric');
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+async function run() {
+  let { data: users, error: err } = await supabase.from('users').select('*');
+  if(err) {
+      console.log(err);
+      let res = await supabase.auth.admin.listUsers();
+      users = res.data.users;
+  }
+  const jakob = users.find(u => u.email?.toLowerCase().includes('jakob'));
+  if (jakob) {
+     console.log("Found Jakob's ID:", jakob.id);
+     const { data: companies } = await supabase.from('companies').select('id, name').like('name', 'Test Tier%');
+     for (const c of companies) {
+        await supabase.from('company_memberships').upsert({
+           company_id: c.id,
+           user_id: jakob.id,
+           role: 'owner'
+        }, { onConflict: 'company_id, user_id' });
+        console.log("Linked", c.name);
+     }
+  } else {
+     console.log("Could not find Jakob's user");
+  }
 }
-
-addJakob();
+run();

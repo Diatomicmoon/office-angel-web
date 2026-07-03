@@ -9,6 +9,7 @@ import { createBrowserClient } from '@supabase/ssr';
 export default function Sidebar() {
   const [role, setRole] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>('Hard Hat Solutions');
+  const [tier, setTier] = useState<number>(1);
 
   useEffect(() => {
     async function fetchRole() {
@@ -18,6 +19,7 @@ export default function Sidebar() {
         const data = await res.json();
         setRole(data.role || 'unknown');
         if (data.companyName) setCompanyName(data.companyName);
+        if (data.tier) setTier(data.tier);
       } catch (err) {
         setRole('unknown');
       }
@@ -60,7 +62,18 @@ export default function Sidebar() {
           <img src="/logo_square.jpg" alt="Hard Hat Solutions" className="h-8 w-8 shrink-0 object-contain rounded-md" />
           {companyName}
         </h1>
-        <p className="text-gray-400 text-[10px] uppercase tracking-wider mt-2 font-medium">Powered by Hard Hat Solutions</p>
+        <div className="flex items-center justify-between mt-2">
+          {tier > 1 ? (
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded text-white tracking-wider border border-blue-400/30 shadow-[0_0_10px_rgba(59,130,246,0.5)]">
+              AI TIER {tier} ACTIVE
+            </span>
+          ) : (
+            <span className="bg-gray-800 text-[10px] font-bold px-2 py-0.5 rounded text-gray-300 tracking-wider border border-gray-700">
+              BASIC TIER 1
+            </span>
+          )}
+          <Link href="/select-company" className="text-[10px] text-gray-400 hover:text-white underline">Switch</Link>
+        </div>
       </div>
 
       {role === null ? (
@@ -76,19 +89,19 @@ export default function Sidebar() {
             </Link>
 
             {/* COMMUNICATIONS */}
-            {!isRestricted && sectionLabel('Communications')}
-            {!isRestricted && (
+            {!isRestricted && tier > 1 && sectionLabel('AI Communications')}
+            {!isRestricted && tier > 1 && (
               <Link href="/co-pilot" className={itemClass('/co-pilot')}>
                 <Mic size={18} />
                 <span className="flex items-center justify-between w-full">
-                  Co-Pilot
-                  <span className="bg-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded text-white">BETA</span>
+                  AI Co-Pilot
+                  <span className="bg-blue-600 text-[9px] font-bold px-1.5 py-0.5 rounded text-white shadow-[0_0_8px_rgba(59,130,246,0.6)]">ACTIVE</span>
                 </span>
               </Link>
             )}
-            {!isRestricted && (
+            {!isRestricted && tier > 1 && (
               <Link href="/inbox" className={itemClass('/inbox')}>
-                <Inbox size={18} /><span>Smart Inbox</span>
+                <Inbox size={18} /><span>AI Voice Inbox</span>
               </Link>
             )}
 

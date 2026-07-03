@@ -360,12 +360,14 @@ export async function POST(req: Request) {
             .order('created_at', { ascending: false })
             .limit(1);
 
-          const savedLookup = incomingLog?.[0]?.meta?.lookup_name as string | null;
-          if (savedLookup) {
-            resolvedName = cleanCallerName(savedLookup) || savedLookup;
-            console.log('📋 Name from incoming lookup record:', resolvedName);
-            // Mark the incoming record as processed so it clears from co-pilot
-            await supabase.from('call_logs').update({ call_status: 'processed' }).eq('id', incomingLog![0].id);
+          if (incomingLog && incomingLog.length > 0) {
+            const savedLookup = incomingLog[0].meta?.lookup_name as string | null;
+            if (savedLookup) {
+              resolvedName = cleanCallerName(savedLookup) || savedLookup;
+              console.log('📋 Name from incoming lookup record:', resolvedName);
+            }
+            // ALWAYS clean up the incoming record so it doesn't clutter the inbox
+            await supabase.from('call_logs').delete().eq('id', incomingLog[0].id);
           }
         }
 

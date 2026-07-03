@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText, Users, Tag, BarChart2 } from "lucide-react";
+import { Bot, Briefcase, PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText, Users, Tag, BarChart2 } from "lucide-react";
 import { VapiCallButton } from "@/components/VapiCallButton";
 import Link from "next/link";
 
@@ -35,6 +35,7 @@ function statusPill(status?: string) {
 export default function Dashboard() {
   const [data, setData] = useState<any>({ calls: [], technicians: [], techTableAvailable: true, actionItems: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 } });
   const [loading, setLoading] = useState(true);
+  const [tier, setTier] = useState<number>(1);
   const [aiMode, setAiMode] = useState<"auto" | "copilot">("auto");
   const [ghlContacts, setGhlContacts] = useState<any[]>([]);
   const [ghlTotal, setGhlTotal] = useState<number>(0);
@@ -43,6 +44,7 @@ export default function Dashboard() {
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
 
   useEffect(() => {
+    fetch('/api/me').then(r => r.json()).then(d => setTier(d.tier || 1)).catch(()=>{});
     try {
       const stored = localStorage.getItem('oa_recent_jobs');
       if (stored) setRecentlyViewed(JSON.parse(stored));

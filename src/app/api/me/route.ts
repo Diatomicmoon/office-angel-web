@@ -5,7 +5,6 @@ import { createServerClient } from '@supabase/ssr';
 
 export async function GET() {
   try {
-    // Get the current user from the session cookie
     const cookieStore = await cookies();
     const supabaseAuth = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -19,9 +18,8 @@ export async function GET() {
     );
 
     const { data: { user } } = await supabaseAuth.auth.getUser();
-    if (!user) return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions' });
+    if (!user) return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1 });
 
-    // Use service role key to bypass RLS and get the true role
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       process.env.SUPABASE_SERVICE_ROLE_KEY || ''
@@ -30,14 +28,20 @@ export async function GET() {
     let role = 'unknown';
     let companyId = null;
     let companyName = 'Hard Hat Solutions';
+    let tier = 1;
 
     const { data: memData } = await supabaseAdmin
       .from('company_memberships')
       .select('role, company_id')
-      .eq('user_id', user.id)
-      .limit(1);
+      .eq('user_id', user.id);
 
-    if (memData && memData.length > 0) {
+    // Prefer the cookie selected company if present, else fallback to first membership
+    let selectedCompanyId = cookieStore.get('oa_company_id')?.value;
+    const memMatch = memData?.find(m => m.company_id === selectedCompanyId);
+    if (memMatch) {
+      role = memMatch.role;
+      companyId = memMatch.company_id;
+    } else if (memData && memData.length > 0) {
       role = memData[0].role;
       companyId = memData[0].company_id;
     }
@@ -57,15 +61,21 @@ export async function GET() {
     if (companyId) {
       const { data: comp } = await supabaseAdmin
         .from('companies')
-        .select('name')
+        .select('name, ai_enabled, module_door_to_door')
         .eq('id', companyId)
         .single();
-      if (comp?.name) companyName = comp.name;
+      if (comp?.name) {
+        companyName = comp.name;
+        // Infer tier for test UI
+        if (comp.name.includes("Tier 3")) tier = 3;
+        else if (comp.name.includes("Tier 2")) tier = 2;
+        else if (comp.ai_enabled) tier = 2;
+      }
     }
 
-    return NextResponse.json({ role, companyName });
+    return NextResponse.json({ role, companyName, tier });
   } catch (err) {
     console.error('Error in /api/me:', err);
-    return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions' });
+    return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1 });
   }
 }
