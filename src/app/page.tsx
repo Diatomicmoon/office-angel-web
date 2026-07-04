@@ -221,7 +221,7 @@ export default function LandingPage() {
 
       <footer className="bg-white py-8 border-t border-gray-200 text-center text-sm text-gray-500 flex flex-col items-center justify-center gap-2">
         <p>© 2026 Hard Hat Holdings LLC. All rights reserved.</p>
-        <p className="mt-1">Contact: sales@hardhat-solutions.com | (763) 300-3435</p>
+        <p className="mt-1">Contact: sales@hardhat-solutions.com | (612) 598-6260</p>
         <div>
           <a href="/privacy-policy" className="hover:underline text-gray-400 mx-2">Privacy Policy</a> | 
           <a href="/terms" className="hover:underline text-gray-400 mx-2">Terms & Conditions</a>
