@@ -112,7 +112,7 @@ export default function Sidebar() {
 
             {/* SALES & CRM */}
             {sectionLabel('Sales & CRM')}
-            {(!isRestricted && !isTrial) && (
+            {(!isRestricted) && (
               <Link href="/crm" className={itemClass('/crm')}>
                 <Users size={18} /><span>Lead Pipeline</span>
               </Link>
