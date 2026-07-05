@@ -98,12 +98,12 @@ export default function FinancialsPage() {
           <Link href="/settings" className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 shadow-sm transition-all hidden lg:flex whitespace-nowrap">
             Manage Accounting
           </Link>
-          {isDevAccount && !hasStripe && (
+          {!hasStripe && (
             <a href="/api/stripe/onboard" target="_blank" rel="noopener noreferrer" className="col-span-2 bg-[#635BFF] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#5851E5] shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
               Connect Stripe
             </a>
           )}
-          {isDevAccount && hasStripe && (
+          {hasStripe && (
             <div className="col-span-2 bg-indigo-50 border border-indigo-200 text-indigo-700 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-all flex justify-center items-center gap-2 whitespace-nowrap">
               <span className="h-2 w-2 bg-indigo-500 rounded-full"></span> Stripe Connected
             </div>
