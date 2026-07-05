@@ -57,7 +57,7 @@ export default function JobsArchivePage() {
   const [status, setStatus] = useState<string>("all");
   const [ghlBanner, setGhlBanner] = useState<{ name: string; phone: string; address: string } | null>(null);
   const [showNewJob, setShowNewJob] = useState(false);
-  const [newJob, setNewJob] = useState({ title: "", address: "", status: "Lead", priority: "normal" });
+  const [newJob, setNewJob] = useState({ title: "", address: "", status: "Lead", priority: "normal", scheduled_start: "" });
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -123,6 +123,17 @@ export default function JobsArchivePage() {
                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</label>
                 <input value={newJob.address} onChange={e => setNewJob(p => ({...p, address: e.target.value}))} placeholder="123 Main St, Minneapolis" className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider flex items-center gap-2">
+                  <CalendarClock size={14} className="text-blue-500" /> Scheduled Start
+                </label>
+                <input 
+                  type="datetime-local" 
+                  value={newJob.scheduled_start} 
+                  onChange={e => setNewJob(p => ({...p, scheduled_start: e.target.value}))} 
+                  className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white" 
+                />
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</label>
@@ -155,7 +166,7 @@ export default function JobsArchivePage() {
                     if (json.job) {
                       setJobs(prev => [json.job, ...prev]);
                       setShowNewJob(false);
-                      setNewJob({ title: "", address: "", status: "Lead", priority: "normal" });
+                      setNewJob({ title: "", address: "", status: "Lead", priority: "normal", scheduled_start: "" });
                     }
                   } catch(e) { console.error(e); } finally { setCreating(false); }
                 }}
