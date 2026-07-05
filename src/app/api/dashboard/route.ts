@@ -94,27 +94,27 @@ export async function GET() {
         };
 
         if (reportData.Rows && reportData.Rows.Row) {
-           qbGrossProfit = findTotal(reportData.Rows.Row, "Gross Profit") || 15420.50;
-           qbTotalExpenses = findTotal(reportData.Rows.Row, "Total Expenses") || 4210.00;
-           qbNetIncome = findTotal(reportData.Rows.Row, "Net Income") || findTotal(reportData.Rows.Row, "Net Operating Income") || 11210.50;
+           qbGrossProfit = findTotal(reportData.Rows.Row, "Gross Profit") || 0;
+           qbTotalExpenses = findTotal(reportData.Rows.Row, "Total Expenses") || 0;
+           qbNetIncome = findTotal(reportData.Rows.Row, "Net Income") || findTotal(reportData.Rows.Row, "Net Operating Income") || 0;
         }
       } else {
         qbError = "Auth Expired";
-        qbGrossProfit = 18450.00;
-        qbTotalExpenses = 5120.00;
-        qbNetIncome = 13330.00;
+        qbGrossProfit = 0;
+        qbTotalExpenses = 0;
+        qbNetIncome = 0;
       }
     } catch (err: any) {
       qbError = err.message;
-      qbGrossProfit = 18450.00;
-      qbTotalExpenses = 5120.00;
-      qbNetIncome = 13330.00;
+      qbGrossProfit = 0;
+      qbTotalExpenses = 0;
+      qbNetIncome = 0;
     }
   } else if (qbConnected) {
      qbError = "Missing Token";
-     qbGrossProfit = 18450.00;
-     qbTotalExpenses = 5120.00;
-     qbNetIncome = 13330.00;
+     qbGrossProfit = 0;
+     qbTotalExpenses = 0;
+     qbNetIncome = 0;
   }
 
   const { data: calls, error: callsErr } = await supabase

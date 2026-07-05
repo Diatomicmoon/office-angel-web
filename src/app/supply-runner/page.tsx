@@ -17,31 +17,7 @@ type PresetKit = {
   items: Omit<MaterialItem, 'id'>[];
 };
 
-const DEFAULT_KITS: PresetKit[] = [
-  {
-    id: "kit-1",
-    name: "Basic Van Restock",
-    items: [
-      { name: "Premium Silicone Sealant (Clear)", quantity: 12, unit: "tube", notes: "" },
-      { name: "Utility Blades (100pk)", quantity: 1, unit: "box", notes: "" },
-      { name: "Masking Tape (2-inch)", quantity: 6, unit: "roll", notes: "" },
-      { name: "Assorted Shims", quantity: 2, unit: "bundle", notes: "" },
-      { name: "Heavy Duty Trash Bags", quantity: 1, unit: "box", notes: "" },
-      { name: "Safety Glasses", quantity: 3, unit: "ea", notes: "" },
-      { name: "Microfiber Towels", quantity: 10, unit: "ea", notes: "" }
-    ]
-  },
-  {
-    id: "kit-2",
-    name: "Standard Installation Kit",
-    items: [
-      { name: "Mounting Hardware Assortment", quantity: 1, unit: "box", notes: "" },
-      { name: "Drop Cloths (Canvas)", quantity: 2, unit: "ea", notes: "" },
-      { name: "Industrial Cleaning Solvent", quantity: 1, unit: "gal", notes: "" },
-      { name: "Protective Foam Roll", quantity: 1, unit: "roll", notes: "" }
-    ]
-  }
-];
+const DEFAULT_KITS: PresetKit[] = [];
 
 export default function SupplyRunnerPage() {
   const [items, setItems] = useState<MaterialItem[]>([]);
@@ -60,14 +36,14 @@ export default function SupplyRunnerPage() {
           setItems(json.items);
           localStorage.removeItem("supplyRunnerItems"); // clear old local data
         } else {
-          // Supabase empty or table not yet created — check localStorage
-          const saved = localStorage.getItem("supplyRunnerItems");
-          if (saved) setItems(JSON.parse(saved));
+          // Supabase empty — clear local storage as well to remove fake data
+          localStorage.removeItem("supplyRunnerItems");
+          setItems([]);
         }
       })
       .catch(() => {
-        const saved = localStorage.getItem("supplyRunnerItems");
-        if (saved) setItems(JSON.parse(saved));
+        localStorage.removeItem("supplyRunnerItems");
+        setItems([]);
       });
   }, []);
 

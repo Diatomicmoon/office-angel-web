@@ -64,35 +64,35 @@ export default function Marketing() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Google Search Views</h3>
-          <p className="text-3xl font-bold text-gray-900">4,281</p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-green-600">
-            <TrendingUp size={14} /> +12% vs last month
+          <p className="text-3xl font-bold text-gray-400">0</p>
+          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
+            <TrendingUp size={14} /> Connect account
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Map Route Requests</h3>
-          <p className="text-3xl font-bold text-gray-900">142</p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-green-600">
-            <TrendingUp size={14} /> +5% vs last month
+          <p className="text-3xl font-bold text-gray-400">0</p>
+          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
+            <TrendingUp size={14} /> Connect account
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Website Clicks</h3>
-          <p className="text-3xl font-bold text-gray-900">856</p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-red-600">
-            <TrendingDown size={14} /> -2% vs last month
+          <p className="text-3xl font-bold text-gray-400">0</p>
+          <div className="flex items-center gap-1.5 mt-3 text-xs font-bold text-gray-400">
+            <TrendingDown size={14} /> Connect account
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Average Rating</h3>
-          <p className="text-3xl font-bold text-gray-900 flex items-center gap-2">
-            4.9 <Star size={24} className="fill-yellow-400 text-yellow-400" />
+          <p className="text-3xl font-bold text-gray-400 flex items-center gap-2">
+            0.0 <Star size={24} className="text-gray-300" />
           </p>
-          <div className="flex items-center gap-1.5 mt-3 text-xs font-medium text-gray-500">
-            Based on 144 total reviews
+          <div className="flex items-center gap-1.5 mt-3 text-xs font-medium text-gray-400">
+            No reviews yet
           </div>
         </div>
       </div>
@@ -123,12 +123,9 @@ export default function Marketing() {
             
             {/* 3x3 SEO Grid Overlay */}
             <div className="relative z-10 grid grid-cols-3 gap-2 w-full max-w-sm pointer-events-none">
-              {[2, 1, 1, 3, 1, 2, 7, 4, 3].map((rank, i) => (
-                <div key={i} className={`aspect-square rounded-full flex flex-col items-center justify-center border-4 shadow-lg transform transition-transform pointer-events-auto hover:scale-110 cursor-pointer ${
-                  rank <= 3 ? 'bg-green-500 border-white text-white' : 
-                  rank <= 5 ? 'bg-yellow-400 border-white text-white' : 'bg-red-500 border-white text-white'
-                }`}>
-                  <span className="text-2xl font-black">{rank}</span>
+              {[0, 0, 0, 0, 0, 0, 0, 0, 0].map((rank, i) => (
+                <div key={i} className={`aspect-square rounded-full flex flex-col items-center justify-center border-4 shadow-lg transform transition-transform pointer-events-auto bg-gray-300 border-white text-white opacity-50`}>
+                  <span className="text-xl font-bold">-</span>
                 </div>
               ))}
             </div>
@@ -136,11 +133,10 @@ export default function Marketing() {
             {/* AI SEO Suggestion Overlay */}
             <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur border border-gray-200 p-4 rounded-xl shadow-lg">
               <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-1">
-                <Search size={16} className="text-blue-600" /> AI Ranking Analysis
+                <Search size={16} className="text-gray-400" /> AI Ranking Analysis
               </h4>
-              <p className="text-xs text-gray-700">
-                You are ranking <strong>#1</strong> in the center of town, but dropping to <strong>#7</strong> in the Southwest quadrant. 
-                <strong className="text-blue-600 ml-1 cursor-pointer hover:underline">Generate a geo-tagged post about "Southwest Service Calls" to boost ranking here.</strong>
+              <p className="text-xs text-gray-500">
+                Connect your Google Business Profile to see localized SEO ranking heatmaps and receive AI suggestions.
               </p>
             </div>
           </div>
@@ -164,8 +160,11 @@ export default function Marketing() {
               <label className="block text-sm font-bold text-gray-700 mb-2">Upload Job Photo</label>
               <div className="h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer relative overflow-hidden group">
                 <div className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white font-bold text-sm z-10">Change Photo</div>
-                {/* Fake uploaded photo */}
-                <img src="https://images.unsplash.com/photo-1581141849291-1125c7b692b5?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" alt="Completed Job" />
+                {/* Empty upload state */}
+                <div className="flex flex-col items-center justify-center text-gray-400">
+                  <Camera size={24} className="mb-2" />
+                  <span className="text-sm font-medium">Click to upload</span>
+                </div>
               </div>
             </div>
 
@@ -173,14 +172,15 @@ export default function Marketing() {
             <div>
               <div className="flex justify-between items-end mb-2">
                 <label className="block text-sm font-bold text-gray-700">AI Generated Caption</label>
-                <button className="text-xs font-medium text-blue-600 hover:underline flex items-center gap-1">
+                <button className="text-xs font-medium text-gray-400 cursor-not-allowed flex items-center gap-1">
                   <RefreshCw size={12} /> Regenerate
                 </button>
               </div>
               <textarea 
-                className="w-full p-4 border border-gray-300 rounded-xl text-sm text-gray-800 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none resize-none" 
+                className="w-full p-4 border border-gray-300 rounded-xl text-sm text-gray-400 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none resize-none" 
                 rows={5}
-                defaultValue="Just finished up a massive 200 Amp service upgrade for a great customer in Maple Grove! ⚡ If you're dealing with an old Federal Pacific panel or need more power for an EV charger, give us a call. We are fully licensed, insured, and ready to roll. \n\n#Electrician #MapleGroveMN #PanelUpgrade #HomeImprovement #TradeVolt"
+                placeholder="Upload a photo and AI will generate a caption for your post..."
+                defaultValue=""
               ></textarea>
             </div>
 

@@ -176,6 +176,7 @@ export default function Dashboard() {
             {data.company?.name ? `Live overview for ${data.company.name}.` : "Live overview of dispatch, AI operations, and daily revenue."}
           </p>
         </div>
+        {tier > 1 && (
         <div className="flex gap-3 items-center w-full md:w-auto">
           
           {/* AI Mode Toggle */}
@@ -198,45 +199,52 @@ export default function Dashboard() {
             <VapiCallButton />
           </div>
         </div>
+        )}
       </div>
 
       {/* Mode Status Banner */}
-      {aiMode === "auto" ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between text-sm text-blue-800">
-          <div className="flex items-center gap-2 font-medium">
-            <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse"></div>
-            Auto-Pilot Active: AI is currently answering all inbound calls automatically.
+      {tier > 1 && (
+        aiMode === "auto" ? (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between text-sm text-blue-800">
+            <div className="flex items-center gap-2 font-medium">
+              <div className="h-2 w-2 bg-blue-500 rounded-full animate-pulse"></div>
+              Auto-Pilot Active: AI is currently answering all inbound calls automatically.
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-center justify-between text-sm text-purple-800">
-          <div className="flex items-center gap-2 font-medium">
-            <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse"></div>
-            Co-Pilot Active: Phones ring to office staff. AI is listening silently in the background.
+        ) : (
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-center justify-between text-sm text-purple-800">
+            <div className="flex items-center gap-2 font-medium">
+              <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse"></div>
+              Co-Pilot Active: Phones ring to office staff. AI is listening silently in the background.
+            </div>
+            <Link href="/co-pilot" className="text-purple-700 font-bold hover:text-purple-900 underline">Open Dispatcher Screen →</Link>
           </div>
-          <Link href="/co-pilot" className="text-purple-700 font-bold hover:text-purple-900 underline">Open Dispatcher Screen →</Link>
-        </div>
+        )
       )}
 
       {/* Core KPIs */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-gray-500 mb-4">
-            <h3 className="font-medium text-sm">AI Calls Handled</h3>
-            <div className="bg-blue-50 p-2 rounded-lg"><PhoneIncoming size={18} className="text-blue-600" /></div>
-          </div>
-          {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-3xl font-bold text-gray-900">{data.stats.totalCalls}</p>}
-          <p className="text-sm text-gray-400 font-medium mt-2 flex items-center gap-1">Real database count</p>
-        </div>
+      <div className={`grid grid-cols-1 ${tier > 1 ? 'md:grid-cols-4' : 'md:grid-cols-2'} gap-6`}>
+        {tier > 1 && (
+          <>
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm">AI Calls Handled</h3>
+                <div className="bg-blue-50 p-2 rounded-lg"><PhoneIncoming size={18} className="text-blue-600" /></div>
+              </div>
+              {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-3xl font-bold text-gray-900">{data.stats.totalCalls}</p>}
+              <p className="text-sm text-gray-400 font-medium mt-2 flex items-center gap-1">Real database count</p>
+            </div>
 
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
-          <div className="flex items-center justify-between text-gray-500 mb-4">
-            <h3 className="font-medium text-sm">Missed Calls Rescued</h3>
-            <div className="bg-green-50 p-2 rounded-lg"><PhoneMissed size={18} className="text-green-600" /></div>
-          </div>
-          {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-3xl font-bold text-gray-900">${(data.stats.rescuedValue || 0).toLocaleString()}</p>}
-          <p className="text-sm text-gray-400 font-medium mt-2 flex items-center gap-1">Est. pipeline value ($150/lead)</p>
-        </div>
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm">Missed Calls Rescued</h3>
+                <div className="bg-green-50 p-2 rounded-lg"><PhoneMissed size={18} className="text-green-600" /></div>
+              </div>
+              {loading ? <p className="text-3xl font-bold text-gray-400">...</p> : <p className="text-3xl font-bold text-gray-900">${(data.stats.rescuedValue || 0).toLocaleString()}</p>}
+              <p className="text-sm text-gray-400 font-medium mt-2 flex items-center gap-1">Est. pipeline value ($150/lead)</p>
+            </div>
+          </>
+        )}
 
         <div className="bg-white p-6 rounded-xl border border-red-100 bg-red-50/40 shadow-sm relative overflow-hidden">
           <div className="flex items-center justify-between text-red-700 mb-4">
@@ -339,6 +347,7 @@ export default function Dashboard() {
           </div>
 
           {/* Recent AI Calls */}
+          {tier > 1 && (
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
@@ -382,6 +391,7 @@ export default function Dashboard() {
               )}
             </div>
           </div>
+          )}
         </div>
 
         {/* Recent Jobs */}
