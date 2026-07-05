@@ -18,7 +18,7 @@ export default function Marketing() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companyId: "5341bfb2-8fce-4c7a-9a30-20e6aba60a8a", // Defaulting to your testing tenant
-          text: "Just finished up a massive 200 Amp service upgrade for a great customer in Maple Grove! ⚡ If you're dealing with an old Federal Pacific panel or need more power for an EV charger, give us a call. We are fully licensed, insured, and ready to roll. \n\n#Electrician #MapleGroveMN #PanelUpgrade #HomeImprovement #TradeVolt",
+          text: "Just wrapped up another successful project for a great customer! 🛠️ If you need reliable, professional service for your home or business, give us a call. We are fully licensed, insured, and ready to roll. \n\n#HomeService #Contractor #QualityWork #HomeImprovement",
           platforms: ["gmb", "facebook"]
         })
       });
@@ -106,13 +106,13 @@ export default function Marketing() {
             <div>
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <MapPin size={18} className="text-red-500" />
-                Local Search Grid (Keyword: "Electrician Near Me")
+                Local Search Grid (Keyword: "Our Service Near Me")
               </h2>
             </div>
             <select className="bg-white border border-gray-300 text-sm rounded-md px-3 py-1">
-              <option>Electrician Near Me</option>
-              <option>Panel Upgrade</option>
-              <option>EV Charger Installer</option>
+              <option>Our Service Near Me</option>
+              <option>Service Call</option>
+              <option>Installation</option>
             </select>
           </div>
           
@@ -165,7 +165,7 @@ export default function Marketing() {
               <div className="h-32 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-colors cursor-pointer relative overflow-hidden group">
                 <div className="absolute inset-0 bg-black/50 hidden group-hover:flex items-center justify-center text-white font-bold text-sm z-10">Change Photo</div>
                 {/* Fake uploaded photo */}
-                <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" alt="Electrical Panel" />
+                <img src="https://images.unsplash.com/photo-1581141849291-1125c7b692b5?q=80&w=800&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" alt="Completed Job" />
               </div>
             </div>
 
