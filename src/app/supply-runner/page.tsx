@@ -20,26 +20,25 @@ type PresetKit = {
 const DEFAULT_KITS: PresetKit[] = [
   {
     id: "kit-1",
-    name: "200A Overhead Service",
+    name: "Basic Van Restock",
     items: [
-      { name: "200A Meter Socket (Milbank)", quantity: 1, unit: "ea", notes: "" },
-      { name: "200A 40-Space Panel (Square D QO)", quantity: 1, unit: "ea", notes: "With main breaker" },
-      { name: "2\" Rigid Conduit", quantity: 10, unit: "ft", notes: "For mast" },
-      { name: "2\" Weatherhead", quantity: 1, unit: "ea", notes: "" },
-      { name: "4/0 SE Cable", quantity: 25, unit: "ft", notes: "Aluminum" },
-      { name: "Ground Rods (5/8\" x 8')", quantity: 2, unit: "ea", notes: "Copper clad" },
-      { name: "#6 Bare Solid Copper", quantity: 20, unit: "ft", notes: "Grounding wire" }
+      { name: "Premium Silicone Sealant (Clear)", quantity: 12, unit: "tube", notes: "" },
+      { name: "Utility Blades (100pk)", quantity: 1, unit: "box", notes: "" },
+      { name: "Masking Tape (2-inch)", quantity: 6, unit: "roll", notes: "" },
+      { name: "Assorted Shims", quantity: 2, unit: "bundle", notes: "" },
+      { name: "Heavy Duty Trash Bags", quantity: 1, unit: "box", notes: "" },
+      { name: "Safety Glasses", quantity: 3, unit: "ea", notes: "" },
+      { name: "Microfiber Towels", quantity: 10, unit: "ea", notes: "" }
     ]
   },
   {
     id: "kit-2",
-    name: "EV Charger Install (Tesla)",
+    name: "Standard Installation Kit",
     items: [
-      { name: "Tesla Wall Connector (Gen 3)", quantity: 1, unit: "ea", notes: "" },
-      { name: "60A 2-Pole Breaker", quantity: 1, unit: "ea", notes: "Match existing panel brand" },
-      { name: "6/2 NM-B (Romex)", quantity: 50, unit: "ft", notes: "" },
-      { name: "3/4\" PVC Conduit", quantity: 20, unit: "ft", notes: "If exterior run needed" },
-      { name: "3/4\" PVC Fittings (LB, MA)", quantity: 4, unit: "ea", notes: "" }
+      { name: "Mounting Hardware Assortment", quantity: 1, unit: "box", notes: "" },
+      { name: "Drop Cloths (Canvas)", quantity: 2, unit: "ea", notes: "" },
+      { name: "Industrial Cleaning Solvent", quantity: 1, unit: "gal", notes: "" },
+      { name: "Protective Foam Roll", quantity: 1, unit: "roll", notes: "" }
     ]
   }
 ];
@@ -48,7 +47,7 @@ export default function SupplyRunnerPage() {
   const [items, setItems] = useState<MaterialItem[]>([]);
   const [newItemName, setNewItemName] = useState("");
   const [newItemQty, setNewItemQty] = useState(1);
-  const [supplierEmail, setSupplierEmail] = useState("orders@ced-twincities.com");
+  const [supplierEmail, setSupplierEmail] = useState("orders@local-supply.com");
   const [sent, setSent] = useState(false);
   const [kits, setKits] = useState<PresetKit[]>(DEFAULT_KITS);
 
@@ -217,7 +216,7 @@ export default function SupplyRunnerPage() {
                 />
                 <input 
                   type="text" 
-                  placeholder="e.g. 500ft spool 12/2 Romex" 
+                  placeholder="e.g. 10 cases of Premium Silicone Sealant" 
                   value={newItemName} 
                   onChange={e => setNewItemName(e.target.value)}
                   className="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
