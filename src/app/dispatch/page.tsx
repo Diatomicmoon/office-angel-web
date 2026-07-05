@@ -216,6 +216,8 @@ const getJobLatLng = (job: Job) => {
 export default function Dispatch() {
   const isDemoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
+  const [mobileTab, setMobileTab] = useState<'unassigned' | 'calendar' | 'map'>('calendar');
+  const [mobileTechId, setMobileTechId] = useState<string>('all');
 
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   
@@ -862,12 +864,12 @@ export default function Dispatch() {
       )}
 
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-end gap-4">
+      <div className="flex flex-col lg:flex-row lg:justify-between items-start lg:items-end gap-4 mb-2 lg:mb-0">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Dispatch & Routing</h1>
           <p className="text-sm md:text-base text-gray-500 mt-2">Live truck tracking, AI routing, and schedule management.</p>
         </div>
-        <div className="flex flex-wrap gap-2 lg:gap-4 items-center w-full lg:w-auto">
+        <div className="hidden lg:flex flex-wrap gap-2 lg:gap-4 items-center w-full lg:w-auto">
           <div className="bg-blue-50 border border-blue-100 px-3 py-2 md:px-4 md:py-2 rounded-lg flex items-center gap-2 md:gap-3 flex-1 lg:flex-none">
             <Sun size={20} className="text-yellow-500 flex-shrink-0" />
             <div>
@@ -886,8 +888,30 @@ export default function Dispatch() {
         </div>
       </div>
 
+      {/* Mobile Tab Bar */}
+      <div className="flex bg-gray-200/60 p-1 rounded-xl w-full mb-4 lg:hidden relative z-20">
+        <button 
+          onClick={() => { setMobileTab('unassigned'); setViewMode('day'); }} 
+          className={`flex-1 px-2 py-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'unassigned' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
+        >
+          Unassigned <span className="bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full ml-1">{unassignedJobs.length}</span>
+        </button>
+        <button 
+          onClick={() => { setMobileTab('calendar'); setViewMode('day'); }} 
+          className={`flex-1 px-2 py-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'calendar' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
+        >
+          Schedule
+        </button>
+        <button 
+          onClick={() => { setMobileTab('map'); setViewMode('map'); }} 
+          className={`flex-1 px-2 py-2 rounded-lg text-xs font-bold transition-all ${mobileTab === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500'}`}
+        >
+          Live Map
+        </button>
+      </div>
+
       {/* Calendar Controls */}
-      <div className="bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+      <div className={`bg-white p-3 md:p-4 rounded-xl border border-gray-200 shadow-sm flex-col md:flex-row items-center justify-between gap-4 md:gap-0 ${mobileTab === 'unassigned' ? 'hidden lg:flex' : 'flex'}`}>
         <div className="flex items-center justify-between md:justify-start gap-2 w-full md:w-auto">
           <button
             onClick={() => setSelectedDate((d) => new Date(d.getTime() - 24 * 60 * 60 * 1000))}
@@ -923,7 +947,7 @@ export default function Dispatch() {
             </div>
           ) : null}
         </div>
-        <div className="flex bg-gray-100 p-1 rounded-lg w-full md:w-auto">
+        <div className="hidden lg:flex bg-gray-100 p-1 rounded-lg w-full md:w-auto">
           <button onClick={() => setViewMode('day')} className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'day' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Day View</button>
           <button onClick={() => setViewMode('map')} className={`flex-1 md:flex-none px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${viewMode === 'map' ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-900'}`}>Map View</button>
         </div>
@@ -931,7 +955,7 @@ export default function Dispatch() {
 
       <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0 lg:overflow-hidden">
         {/* Left Sidebar: AI Parking Lot */}
-        <div className="w-full lg:w-80 h-[350px] lg:h-auto lg:min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col flex-shrink-0">
+        <div className={`w-full lg:w-80 h-[calc(100dvh-12rem)] lg:h-auto lg:min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm flex-col flex-shrink-0 ${mobileTab === 'unassigned' ? 'flex' : 'hidden lg:flex'}`}>
           <div className="p-3 lg:p-4 border-b border-gray-200 bg-white rounded-t-xl flex justify-between items-center">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2 text-sm lg:text-base">AI Parking Lot</h3>
             <div className="flex items-center gap-2">
@@ -1088,8 +1112,8 @@ export default function Dispatch() {
         </div>
 
         {/* Right Side: Board or Map */}
-        <div className="flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col relative min-h-0 min-w-0">
-          {viewMode === 'map' ? (
+        <div className={`flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex-col relative min-h-0 min-w-0 ${mobileTab === 'unassigned' ? 'hidden lg:flex' : 'flex'}`}>
+          {(viewMode === 'map' || mobileTab === 'map') ? (
             <div className="flex-1 relative overflow-hidden bg-gray-100 rounded-xl min-h-[500px] lg:min-h-0 border border-gray-200">
               <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-[999] w-[90%] max-w-sm md:w-72">
                 <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
@@ -1184,11 +1208,26 @@ export default function Dispatch() {
               onPointerCancel={() => { dragRef.current.active = false; }}
             >
               {/* Sticky header row (single, reliable) */}
-              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex">
-                <div className="bg-gray-50 border-r border-gray-200" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
+              <div className="sticky top-0 z-40 bg-white border-b border-gray-200 flex flex-col">
+                
+                {/* Mobile Tech Selector */}
+                <div className="lg:hidden p-2 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                   <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Dispatcher View</span>
+                   <select 
+                     className="bg-white border border-gray-200 rounded-lg text-xs font-bold py-1.5 px-3 text-gray-800 shadow-sm outline-none"
+                     value={mobileTechId}
+                     onChange={e => setMobileTechId(e.target.value)}
+                   >
+                     <option value="all">All Technicians</option>
+                     {techs.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                   </select>
+                </div>
+
+                <div className="flex">
+                <div className="bg-gray-50 border-r border-gray-200 flex-shrink-0" style={{ width: GUTTER_W, height: GRID_HEADER_PX }} />
                 <div className="flex min-w-max">
-                  {techs.map((tech) => (
-                    <div key={tech.id} className="w-[300px] border-r border-gray-200 bg-white p-3 flex items-center" style={{ height: GRID_HEADER_PX }}>
+                  {techs.filter(t => mobileTechId === 'all' || t.id === mobileTechId).map((tech) => (
+                    <div key={tech.id} className="w-[calc(100vw-115px)] lg:w-[300px] border-r border-gray-200 bg-white p-3 flex items-center flex-shrink-0" style={{ height: GRID_HEADER_PX }}>
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
                           <User size={18} className="text-blue-600" />
@@ -1202,6 +1241,7 @@ export default function Dispatch() {
                     </div>
                   ))}
                 </div>
+              </div>
               </div>
 
               {/* Body */}
@@ -1248,7 +1288,7 @@ export default function Dispatch() {
 
                   {techs.length === 0 ? (
                     <div className="p-8 text-gray-500 text-sm">No technicians found. Add some in the database.</div>
-                  ) : techs.map((tech) => {
+                  ) : techs.filter(t => mobileTechId === 'all' || t.id === mobileTechId).map((tech) => {
                     // Only render jobs scheduled for the selected day in DISPLAY_TZ.
                     const day = selectedDate;
 
@@ -1261,7 +1301,7 @@ export default function Dispatch() {
                     });
 
                     return (
-                      <div key={tech.id} className="w-[300px] border-r border-gray-200 relative">
+                      <div key={tech.id} className="w-[calc(100vw-115px)] lg:w-[300px] border-r border-gray-200 relative flex-shrink-0">
                         <div className="relative" style={{ height: gridTotalPx }}>
                           {[...Array(slotCount)].map((_, i) => (
                             <div
