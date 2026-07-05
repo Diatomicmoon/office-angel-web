@@ -122,7 +122,12 @@ export default function Sidebar() {
             </Link>
             {!isRestricted && (
               <Link href="/projects" className={itemClass('/projects')}>
-                <Briefcase size={18} /><span>{isTrial ? 'Jobs & Invoices' : 'Customers & Jobs'}</span>
+                <Users size={18} /><span>Customer Archive</span>
+              </Link>
+            )}
+            {!isRestricted && (
+              <Link href="/jobs" className={itemClass('/jobs')}>
+                <Briefcase size={18} /><span>{isTrial ? 'Jobs & Invoices' : 'Job Archive'}</span>
               </Link>
             )}
 

@@ -65,3 +65,31 @@ export async function PATCH(req: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ ok: true });
 }
+
+export async function POST(req: Request) {
+  let companyId;
+  try {
+    const res = await resolveCompanyIdOrThrow();
+    companyId = res.companyId;
+  } catch (err) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await req.json();
+  
+  const { data, error } = await sb()
+    .from("customers")
+    .insert([{
+      company_id: companyId,
+      first_name: body.first_name,
+      last_name: body.last_name || '',
+      phone_number: body.phone_number || '',
+      email: body.email || '',
+      address: body.address || '',
+    }])
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json({ customer: data });
+}
