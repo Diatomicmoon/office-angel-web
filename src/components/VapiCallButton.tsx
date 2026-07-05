@@ -22,7 +22,7 @@ export function VapiCallButton() {
     }
 
     if (!publicKey || !assistantId) {
-      setErrorMsg("Missing Vapi env vars (NEXT_PUBLIC_VAPI_PUBLIC_KEY / NEXT_PUBLIC_VAPI_ASSISTANT_ID). Check .env.local / Vercel env.");
+      setErrorMsg("Voice AI credentials loading...");
       return;
     }
 

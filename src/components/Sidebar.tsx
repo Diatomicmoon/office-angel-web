@@ -77,7 +77,7 @@ export default function Sidebar() {
               BASIC TIER 1
             </span>
           )}
-          <Link href="/select-company" className="text-[10px] text-gray-400 hover:text-white underline">Switch</Link>
+          {/* Switch hidden for trial users */}
         </div>
       </div>
 
