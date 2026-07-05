@@ -651,7 +651,7 @@ export default function Dispatch() {
       .then((json) => {
         const s = json?.settings || {};
         const startMin = typeof s.schedule_start_minute === 'number' ? s.schedule_start_minute : 480;
-        const endMin = typeof s.schedule_end_minute === 'number' ? s.schedule_end_minute : 1020;
+        const endMin = typeof s.schedule_end_minute === 'number' ? s.schedule_end_minute : 1260; // 9:00 PM
         setScheduleHours({ startMin, endMin });
       })
       .catch(() => {});
