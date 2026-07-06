@@ -50,9 +50,9 @@ export async function POST(req: Request) {
       const recordingCallbackUrl = `${baseUrl}/api/twilio-recording`;
       
       // Support simulring if forwardPhone has multiple comma-separated numbers
-      const phones = forwardPhone.split(',').map(p => p.trim()).filter(Boolean);
+      const phones = forwardPhone.split(',').map((p: string) => p.trim()).filter(Boolean);
       
-      const dialContent = phones.map(p => `<Number>${p}</Number>`).join('\n    ');
+      const dialContent = phones.map((p: string) => `<Number>${p}</Number>`).join('\n    ');
       
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
