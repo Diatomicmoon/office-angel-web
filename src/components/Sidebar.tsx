@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Users, Calendar, Settings, Mic, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, LogOut } from 'lucide-react';
+import { Home, Users, Calendar, Settings, Mic, Smartphone, Share2, Inbox, DollarSign, Briefcase, FileText, Map, Truck, LogOut, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { createBrowserClient } from '@supabase/ssr';
 
@@ -107,6 +107,11 @@ export default function Sidebar() {
             {!isRestricted && tier > 1 && (
               <Link href="/inbox" className={itemClass('/inbox')}>
                 <Inbox size={18} /><span>AI Voice Inbox</span>
+              </Link>
+            )}
+            {!isRestricted && tier > 1 && (
+              <Link href="/chat" className={itemClass('/chat')}>
+                <MessageSquare size={18} /><span>AI Employee Chat</span>
               </Link>
             )}
 
