@@ -112,7 +112,7 @@ export default function ContactPage() {
               <div className="ml-3 text-sm">
                 <label htmlFor="sms-consent" className="font-medium text-gray-700">SMS Opt-In Consent (Optional)</label>
                 <p className="text-gray-500 text-xs mt-1">
-                  By checking this box, you agree to receive promotional and informational SMS text messages from Hard Hat Solutions regarding your account, job updates, and service inquiries. Message frequency varies. I understand that consent is not a condition of purchase. Message and data rates may apply. Reply STOP to opt out or HELP for help. View our <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
+                  By checking this box, you agree to receive promotional and informational SMS text messages from Hard Hat Solutions regarding your account, job updates, and service inquiries. Message frequency varies. I understand that consent is not a condition of purchase. Message and data rates may apply. Reply STOP to opt out or HELP for help. View our <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> and <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                 </p>
               </div>
             </div>
