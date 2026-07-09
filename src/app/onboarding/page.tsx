@@ -22,12 +22,25 @@ export default function OnboardingPage() {
         },
         body: JSON.stringify({
           name: companyName,
-          // You could also pass aiMode here if the backend expects it.
         })
       });
       
       if (!res.ok) {
         console.error('Failed to save company setup');
+      }
+
+      const settingsRes = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ai_enabled: aiMode === 'answerer'
+        })
+      });
+
+      if (!settingsRes.ok) {
+        console.error('Failed to save AI settings');
       }
     } catch (err) {
       console.error(err);
