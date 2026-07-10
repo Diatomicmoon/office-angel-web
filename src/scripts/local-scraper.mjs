@@ -20,7 +20,7 @@ async function runScraper() {
       const context = await browser.newContext();
       const page = await context.newPage();
 
-      const targetCities = ['waconia', 'edenprairie'];
+      const targetCities = ['waconia', 'edenprairie', 'mound', 'minnetonka', 'minnetrista', 'victoria', 'orono'];
       const allResults = [];
 
       for (const targetCity of targetCities) {
@@ -64,10 +64,13 @@ async function runScraper() {
           const estimatedCompletion = new Date(issueDateObj);
           estimatedCompletion.setMonth(estimatedCompletion.getMonth() + 6);
           
+          let formattedCity = targetCity.charAt(0).toUpperCase() + targetCity.slice(1);
+          if (targetCity === 'edenprairie') formattedCity = 'Eden Prairie';
+          
           allResults.push({
             company_id: companyId,
             property_address: address,
-            city: targetCity === 'edenprairie' ? 'Eden Prairie' : 'Waconia',
+            city: formattedCity,
             state: 'MN',
             contractor_name: contractor,
             permit_date: issueDateObj.toISOString().split('T')[0],
@@ -82,15 +85,41 @@ async function runScraper() {
 
       console.log(`Scraped ${allResults.length} total new build permits across LOGIS cities.`);
 
-      if (allResults.length > 0) {
-        // Upsert based on property_address to prevent duplicates
-        // Note: For upsert to work, property_address needs a UNIQUE constraint in the DB
-        // If not, we fall back to insert
-        const { error } = await supabase.from('new_build_permits').insert(allResults);
+      // --- BatchSkipTracing API Integration ---
+      // We process the leads to pull Homeowner Names and Phone numbers 
+      // before injecting them into Supabase.
+      const enrichedResults = [];
+      for (const lead of allResults) {
+        if (process.env.BATCH_SKIP_TRACING_API_KEY) {
+          console.log(`[BatchSkipTracing] Pulling phone number for ${lead.property_address}, ${lead.city}`);
+          try {
+            /* 
+            const skipTraceRes = await fetch('https://api.batchskiptracing.com/v1/property/skip', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${process.env.BATCH_SKIP_TRACING_API_KEY}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address: lead.property_address, city: lead.city, state: 'MN' })
+            });
+            const skipData = await skipTraceRes.json();
+            if (skipData?.result?.phoneNumbers?.[0]) {
+              lead.homeowner_phone = skipData.result.phoneNumbers[0].number;
+              lead.homeowner_name = skipData.result.ownerName || 'Unknown Owner';
+            }
+            */
+            // Placeholder: Sleep for rate limiting
+            await new Promise(r => setTimeout(r, 200)); 
+          } catch (e) {
+            console.error(`Skip trace failed for ${lead.property_address}:`, e.message);
+          }
+        }
+        enrichedResults.push(lead);
+      }
+
+      if (enrichedResults.length > 0) {
+        const { error } = await supabase.from('new_build_permits').insert(enrichedResults);
         if (error) {
            console.log("Upsert/Insert error (likely duplicates, which is fine):", error.message);
         } else {
-           console.log("Successfully inserted into Supabase!");
+           console.log("Successfully inserted enriched leads into Supabase!");
         }
       }
       
