@@ -134,7 +134,7 @@ export default function Sidebar() {
               </Link>
             )}
             {!isRestricted && tier > 1 && (
-              <Link href="/inbox" className={itemClass('/inbox')}>
+              <Link href="/scheduling-inbox" className={itemClass('/scheduling-inbox')}>
                 <Inbox size={18} /><span>AI Voice Inbox</span>
               </Link>
             )}
@@ -194,6 +194,11 @@ export default function Sidebar() {
             {showHeavyFeatures && (
               <Link href="/financials" className={itemClass('/financials')}>
                 <DollarSign size={18} /><span>Financial Command</span>
+              </Link>
+            )}
+            {showHeavyFeatures && (
+              <Link href="/inbox" className={itemClass('/inbox')}>
+                <FileText size={18} /><span>Material Costs</span>
               </Link>
             )}
             {showHeavyFeatures && (
