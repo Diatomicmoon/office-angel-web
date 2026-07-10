@@ -20,6 +20,8 @@ export async function GET() {
     const { data: { user } } = await supabaseAuth.auth.getUser();
     if (!user) return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1, isTrial: false });
 
+    const userEmail = user.email || '';
+
     const supabaseAdmin = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       process.env.SUPABASE_SERVICE_ROLE_KEY || ''
@@ -75,7 +77,15 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ role, companyName, tier, isTrial });
+    // Dev Tier Override for Jakob
+    if (userEmail.toLowerCase().includes('jakob')) {
+      const devTierCookie = cookieStore.get('oa_dev_tier');
+      if (devTierCookie && devTierCookie.value) {
+        tier = parseInt(devTierCookie.value, 10) || tier;
+      }
+    }
+
+    return NextResponse.json({ role, companyName, tier, isTrial, userEmail });
   } catch (err) {
     console.error('Error in /api/me:', err);
     return NextResponse.json({ role: 'unknown', companyName: 'Hard Hat Solutions', tier: 1, isTrial: false });

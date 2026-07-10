@@ -11,6 +11,7 @@ export default function Sidebar() {
   const [companyName, setCompanyName] = useState<string>('Hard Hat Solutions');
   const [tier, setTier] = useState<number>(1);
   const [isTrial, setIsTrial] = useState<boolean>(false);
+  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
     async function fetchRole() {
@@ -22,6 +23,7 @@ export default function Sidebar() {
         if (data.companyName) setCompanyName(data.companyName);
         if (data.tier) setTier(data.tier);
         if (data.isTrial) setIsTrial(data.isTrial);
+        if (data.userEmail) setUserEmail(data.userEmail);
       } catch (err) {
         setRole('unknown');
       }
@@ -58,6 +60,19 @@ export default function Sidebar() {
   const isRestricted = !isOwnerOrAdmin;
 
   // For 14-day Free Trial users, we hide heavy ops/financials to keep the "Aha!" moment clean
+  const setDevTier = async (newTier: number | null) => {
+    try {
+      await fetch('/api/dev/set-tier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier: newTier })
+      });
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const showHeavyFeatures = !isTrial && !isRestricted && !isSales;
 
   return (
@@ -78,6 +93,20 @@ export default function Sidebar() {
             </span>
           )}
           {/* Switch hidden for trial users */}
+          {userEmail.toLowerCase().includes('jakob') && (
+            <div className="relative group">
+              <button className="text-xs text-gray-500 hover:text-white px-2 cursor-pointer ml-1">
+                ⚙️ Dev Switch
+              </button>
+              <div className="absolute right-0 top-full mt-1 hidden group-hover:block bg-gray-800 border border-gray-700 rounded shadow-xl py-1 z-50">
+                <button onClick={() => setDevTier(1)} className="block w-full text-left px-4 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700">Tier 1</button>
+                <button onClick={() => setDevTier(2)} className="block w-full text-left px-4 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700">Tier 2</button>
+                <button onClick={() => setDevTier(3)} className="block w-full text-left px-4 py-1.5 text-xs text-gray-300 hover:text-white hover:bg-gray-700">Tier 3</button>
+                <div className="border-t border-gray-700 my-1"></div>
+                <button onClick={() => setDevTier(null)} className="block w-full text-left px-4 py-1.5 text-xs text-red-400 hover:bg-gray-700">Reset</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
