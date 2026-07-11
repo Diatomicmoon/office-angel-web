@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     };
 
     if (job_id) {
-      estimatePayload.id = job_id;
+      estimatePayload.job_id = job_id;
     }
 
     // Insert estimate
