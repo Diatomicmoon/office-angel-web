@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Search, MapPin, Phone, FolderOpen, AlertCircle, PlusCircle, ChevronRight, User, Plus, X } from "lucide-react";
 import Link from "next/link";
+import { AddressAutocomplete } from "@/components/AddressAutocomplete";
 
 type Customer = {
   id: string;
@@ -105,7 +106,10 @@ export default function JobArchive() {
               </div>
               <div>
                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</label>
-                <input value={newCustomer.address} onChange={e => setNewCustomer(p => ({...p, address: e.target.value}))} placeholder="123 Main St..." className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+                <AddressAutocomplete 
+                  value={newCustomer.address} 
+                  onChange={(val, lat, lng) => setNewCustomer(p => ({...p, address: val}))} 
+                />
               </div>
             </div>
             <div className="p-5 border-t flex gap-3">
