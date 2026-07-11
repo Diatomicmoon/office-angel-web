@@ -150,7 +150,14 @@ export async function POST(req: Request) {
 
     // --- SPAM FILTER: Only allow images from known supply houses to prevent Vision API cost bleeding ---
     const allowedImageSenders = ['homedepot.com', 'menards.com', 'jhlarson.com', 'vikingelectric.com', 'ced.com', 'graybar.com', 'lowes.com', 'ferguson.com'];
-    const isAllowedForImages = allowedImageSenders.some(domain => sender.toLowerCase().includes(domain));
+    
+    // Check BOTH the sender AND the email text for allowed domains (since forwarded emails come from the contractor's address)
+    const isAllowedForImages = allowedImageSenders.some(domain => 
+      sender.toLowerCase().includes(domain) ||
+      body.toLowerCase().includes(domain) ||
+      subject.toLowerCase().includes(domain)
+    );
+    
     if (!isAllowedForImages && images.length > 0) {
       console.log(`[SPAM FILTER] Dropping ${images.length} images from ${sender} to save OpenAI Vision tokens.`);
       images.length = 0; // Clear the array so we only process text
