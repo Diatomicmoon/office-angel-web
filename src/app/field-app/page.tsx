@@ -7,6 +7,7 @@ export default function FieldAppMockup() {
   const [activeTab, setActiveTab] = useState<'jobs' | 'timecard'>('timecard');
   const [timeView, setTimeView] = useState<'today' | 'week'>('today');
   const [isClockedIn, setIsClockedIn] = useState(false);
+  const [isLoadingState, setIsLoadingState] = useState(true);
   const [autoPunchStatus, setAutoPunchStatus] = useState("Waiting for geofence...");
   const [timeEntries, setTimeEntries] = useState<any[]>([]);
   const [activeTimesheetId, setActiveTimesheetId] = useState<string | null>(null);
@@ -109,6 +110,8 @@ export default function FieldAppMockup() {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsLoadingState(false);
     }
   };
 
@@ -336,28 +339,37 @@ export default function FieldAppMockup() {
                   <div className="p-8 flex flex-col items-center justify-center text-center space-y-4">
                      
                      <div className="relative">
-                       {isClockedIn && (
-                         <div className="absolute inset-0 rounded-full bg-red-500 blur-2xl opacity-40 animate-pulse"></div>
+                       {isLoadingState ? (
+                         <div className="relative w-64 h-64 rounded-full flex flex-col items-center justify-center bg-gray-200 border-[8px] border-gray-300 animate-pulse text-gray-400">
+                           <Clock size={48} className="mb-3 opacity-50" />
+                           <span className="text-xl font-bold uppercase tracking-widest">Syncing...</span>
+                         </div>
+                       ) : (
+                         <>
+                           {isClockedIn && (
+                             <div className="absolute inset-0 rounded-full bg-red-500 blur-2xl opacity-40 animate-pulse"></div>
+                           )}
+                           {!isClockedIn && (
+                             <div className="absolute inset-0 rounded-full bg-green-500 blur-2xl opacity-30"></div>
+                           )}
+                           <button 
+                             onClick={handleClockInOut}
+                             className={`relative w-64 h-64 rounded-full flex flex-col items-center justify-center text-white shadow-2xl transition-all duration-300 active:scale-95 border-[8px] ${
+                               isClockedIn 
+                                 ? 'bg-gradient-to-br from-red-400 to-red-600 border-red-300/30' 
+                                 : 'bg-gradient-to-br from-green-400 to-green-600 border-green-300/30'
+                             }`}
+                           >
+                             <Clock size={48} className={`mb-3 ${isClockedIn ? 'animate-pulse' : ''}`} />
+                             <span className="text-4xl font-extrabold uppercase tracking-widest drop-shadow-md">
+                               {isClockedIn ? "Stop" : "Start"}
+                             </span>
+                             <span className="text-sm font-medium mt-2 opacity-90 uppercase tracking-widest">
+                               {isClockedIn ? "Clock Out" : "Clock In"}
+                             </span>
+                           </button>
+                         </>
                        )}
-                       {!isClockedIn && (
-                         <div className="absolute inset-0 rounded-full bg-green-500 blur-2xl opacity-30"></div>
-                       )}
-                       <button 
-                         onClick={handleClockInOut}
-                         className={`relative w-64 h-64 rounded-full flex flex-col items-center justify-center text-white shadow-2xl transition-all duration-300 active:scale-95 border-[8px] ${
-                           isClockedIn 
-                             ? 'bg-gradient-to-br from-red-400 to-red-600 border-red-300/30' 
-                             : 'bg-gradient-to-br from-green-400 to-green-600 border-green-300/30'
-                         }`}
-                       >
-                         <Clock size={48} className={`mb-3 ${isClockedIn ? 'animate-pulse' : ''}`} />
-                         <span className="text-4xl font-extrabold uppercase tracking-widest drop-shadow-md">
-                           {isClockedIn ? "Stop" : "Start"}
-                         </span>
-                         <span className="text-sm font-medium mt-2 opacity-90 uppercase tracking-widest">
-                           {isClockedIn ? "Clock Out" : "Clock In"}
-                         </span>
-                       </button>
                      </div>
 
                      {isClockedIn ? (
