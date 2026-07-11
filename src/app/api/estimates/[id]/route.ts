@@ -75,6 +75,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     const invoiceData = await invoiceRes.json();
 
+    // 4. Update the estimate with the newly created invoice_id
+    await supabase.from('estimates').update({ invoice_id: invoiceData.invoice.id }).eq('id', id);
+
     return NextResponse.json({ 
       success: true, 
       stripe_session_url: invoiceData.stripe_session_url 
