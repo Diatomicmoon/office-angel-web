@@ -69,6 +69,37 @@ body {
   animation: slide-in 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Live Grid Enhancements */
+@keyframes pulse-border {
+  0% { border-color: transparent; }
+  50% { border-color: rgba(74, 222, 128, 0.7); /* green-400 with opacity */ }
+  100% { border-color: transparent; }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+.status-dot {
+  animation: none; /* Default, overridden by specific statuses */
+}
+
+.status-available-dot {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.status-en-route-dot {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.status-on-site-dot {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+}
 
 /* Mobile App WebView Fixes */
 html, body {

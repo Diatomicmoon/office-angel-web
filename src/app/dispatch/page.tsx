@@ -638,6 +638,21 @@ export default function Dispatch() {
           });
         });
       })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'technicians' }, (payload) => {
+        const updatedTech = payload.new;
+        setTechs((currentTechs) => {
+          return currentTechs.map(tech => {
+            if (tech.id === updatedTech.id) {
+              return {
+                ...tech,
+                status: updatedTech.status,
+                name: updatedTech.name, // Also update name in case it changes
+              };
+            }
+            return tech;
+          });
+        });
+      })
       .subscribe();
 
     return () => {
@@ -1226,9 +1241,9 @@ export default function Dispatch() {
                   {techs.filter(t => mobileTechId === 'all' || t.id === mobileTechId).map((tech) => (
                     <div key={tech.id} className="w-[calc(100vw-115px)] lg:w-[300px] border-r border-gray-200 bg-white p-3 flex items-center flex-shrink-0" style={{ height: GRID_HEADER_PX }}>
                       <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0">
+                        <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center relative flex-shrink-0 border-2 border-transparent has-[.status-available-dot]:border-green-400 has-[.status-en-route-dot]:border-blue-400 has-[.status-on-site-dot]:border-purple-400 animate-pulse-border">
                           <User size={18} className="text-blue-600" />
-                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
+                          <div className={`absolute -bottom-1 -right-1 h-3 w-3 border-2 border-white rounded-full status-dot status-${String(tech.status || '').toLowerCase().replace(/\s/g, '-')} ${String(tech.status || '').toLowerCase() === 'available' ? 'bg-green-500' : String(tech.status || '').toLowerCase().includes('route') ? 'bg-blue-500' : String(tech.status || '').toLowerCase().includes('site') ? 'bg-purple-500' : 'bg-gray-400'}`}></div>
                         </div>
                         <div className="min-w-0">
                           <h4 className="font-bold text-gray-900 leading-tight truncate">{tech.name}</h4>
@@ -1312,10 +1327,10 @@ export default function Dispatch() {
                             <div
                               key={job.id}
                               onClick={() => openTicket(job.id)}
-                              className="absolute left-2 right-2 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm flex flex-col z-10 cursor-pointer hover:shadow-md"
+                              className="absolute left-2 right-2 bg-white border border-gray-200 rounded-xl p-4 shadow-md flex flex-col z-10 cursor-pointer hover:shadow-lg transition-all"
                               style={jobStyleForGrid(job, idx)}
                             >
-                              <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-start justify-between mb-2">
                                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase border ${statusPill(job.status)}`}>{job.status || 'Scheduled'}</span>
                                 {job.scheduled_start && (
                                   <span className="text-[10px] font-bold text-gray-600 bg-white/70 px-2 py-0.5 rounded border border-gray-200">
@@ -1323,9 +1338,9 @@ export default function Dispatch() {
                                   </span>
                                 )}
                               </div>
-                          <p className="text-sm font-bold text-gray-900 line-clamp-1">{job.title || 'Untitled Job'}</p>
-                          <p className="text-xs text-gray-700 mt-1 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
-                          <p className="text-xs text-gray-600 mt-1 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
+                          <p className="text-base font-extrabold text-gray-900 line-clamp-1 mb-1">{job.title || 'Untitled Job'}</p>
+                          <p className="text-xs text-gray-700 flex items-center gap-1 line-clamp-1"><User size={12}/> {customerLabel(job)}</p>
+                          <p className="text-xs text-gray-600 mt-0.5 flex items-center gap-1 line-clamp-1"><MapPin size={12}/> {job.address || 'No address'}</p>
                         </div>
                       ))}
                         </div>
