@@ -5,6 +5,7 @@ import SidebarClientWrapper from "@/components/SidebarClientWrapper";
 import IncomingCallBanner from "@/components/IncomingCallBanner";
 import { HaloWidget } from "@/components/HaloWidget";
 import RoleGuard from "@/components/RoleGuard";
+import { GeofenceToast } from "@/components/GeofenceToast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -58,6 +59,7 @@ export default function RootLayout({
 
           <IncomingCallBanner />
           <HaloWidget />
+          <GeofenceToast />
         </div>
       </body>
     </html>
