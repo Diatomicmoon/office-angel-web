@@ -12,6 +12,16 @@ export async function POST(req: Request) {
     
     const emailText = `${text || ''}\n${html || ''}`.slice(0, 2000);
 
+    // --- SPAM FILTER: Only allow images from known supply houses to prevent Vision API cost bleeding ---
+    let processImageUrl = imageUrl;
+    const allowedImageSenders = ['homedepot.com', 'menards.com', 'jhlarson.com', 'vikingelectric.com', 'ced.com', 'graybar.com', 'lowes.com', 'ferguson.com'];
+    const isAllowedForImages = allowedImageSenders.some(domain => (sender || '').toLowerCase().includes(domain));
+    if (!isAllowedForImages && processImageUrl) {
+      console.log(`[SPAM FILTER] Dropping image from ${sender} to save OpenAI Vision tokens.`);
+      processImageUrl = null; // Clear the image URL so we only process text
+    }
+    // ----------------------------------------------------------------------------------------------------
+
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     
     const prompt = `You are parsing an inbound email for an electrical contractor. 
@@ -74,10 +84,10 @@ ${emailText}`;
     const contentArray: any[] = [{ type: 'text', text: prompt }];
     
     // Add the Supabase URL instead of a base64 string
-    if (imageUrl) {
+    if (processImageUrl) {
       contentArray.push({
         type: 'image_url',
-        image_url: { url: imageUrl, detail: "high" }
+        image_url: { url: processImageUrl, detail: "high" }
       });
     }
 
