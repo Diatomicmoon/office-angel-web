@@ -51,7 +51,7 @@ export default function FieldAppMockup() {
 
   useEffect(() => {
     fetchTimesheets();
-  }, []);
+  }, [techId]);
 
   // Background GPS Pinger
   useEffect(() => {
@@ -87,10 +87,12 @@ export default function FieldAppMockup() {
 
   const fetchTimesheets = async () => {
     try {
-      const res = await fetch('/api/timesheets');
+      const res = await fetch(`/api/timesheets?_t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.timesheets) {
-        const sorted = data.timesheets.sort((a: any, b: any) => new Date(a.clock_in).getTime() - new Date(b.clock_in).getTime());
+        let sorted = data.timesheets.sort((a: any, b: any) => new Date(b.clock_in).getTime() - new Date(a.clock_in).getTime());
+        // Filter strictly to the current logged in tech
+        sorted = sorted.filter((t: any) => t.technician_id === techId);
         setTimeEntries(sorted);
         
         // Check if currently clocked in
@@ -99,6 +101,10 @@ export default function FieldAppMockup() {
            setIsClockedIn(true);
            setActiveTimesheetId(active.id);
            setAutoPunchStatus("Geofence active. 30ft radius monitored.");
+        } else {
+           setIsClockedIn(false);
+           setActiveTimesheetId(null);
+           setAutoPunchStatus("Waiting for next job...");
         }
       }
     } catch (err) {
@@ -329,15 +335,30 @@ export default function FieldAppMockup() {
                <div className={`rounded-xl shadow-sm border overflow-hidden transition-colors ${isClockedIn ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200'}`}>
                   <div className="p-8 flex flex-col items-center justify-center text-center space-y-4">
                      
-                     <button 
-                       onClick={handleClockInOut}
-                       className={`w-56 h-56 rounded-full flex flex-col items-center justify-center text-white shadow-xl transition-transform active:scale-95 ${isClockedIn ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'}`}
-                     >
-                       <Clock size={56} className="mb-2 opacity-80" />
-                       <span className="text-3xl font-bold uppercase tracking-wide">
-                         {isClockedIn ? "Clock Out" : "Clock In"}
-                       </span>
-                     </button>
+                     <div className="relative">
+                       {isClockedIn && (
+                         <div className="absolute inset-0 rounded-full bg-red-500 blur-2xl opacity-40 animate-pulse"></div>
+                       )}
+                       {!isClockedIn && (
+                         <div className="absolute inset-0 rounded-full bg-green-500 blur-2xl opacity-30"></div>
+                       )}
+                       <button 
+                         onClick={handleClockInOut}
+                         className={`relative w-64 h-64 rounded-full flex flex-col items-center justify-center text-white shadow-2xl transition-all duration-300 active:scale-95 border-[8px] ${
+                           isClockedIn 
+                             ? 'bg-gradient-to-br from-red-400 to-red-600 border-red-300/30' 
+                             : 'bg-gradient-to-br from-green-400 to-green-600 border-green-300/30'
+                         }`}
+                       >
+                         <Clock size={48} className={`mb-3 ${isClockedIn ? 'animate-pulse' : ''}`} />
+                         <span className="text-4xl font-extrabold uppercase tracking-widest drop-shadow-md">
+                           {isClockedIn ? "Stop" : "Start"}
+                         </span>
+                         <span className="text-sm font-medium mt-2 opacity-90 uppercase tracking-widest">
+                           {isClockedIn ? "Clock Out" : "Clock In"}
+                         </span>
+                       </button>
+                     </div>
 
                      {isClockedIn ? (
                        <div className="flex items-center gap-2 text-green-800 text-sm font-medium bg-green-100 px-4 py-2 rounded-full mt-6 shadow-sm border border-green-200">
