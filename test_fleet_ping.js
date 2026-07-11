@@ -3,7 +3,8 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 async function run() {
-  const { data } = await supabase.from('technicians').select('id, name, company_id').limit(1);
-  console.log(JSON.stringify(data, null, 2));
+  const { data, error } = await supabase.from('fleet_locations').select('*').limit(1);
+  if(error) console.log("Error:", error);
+  else console.log("Success! Table exists. Rows:", data.length);
 }
 run();

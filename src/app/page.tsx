@@ -12,9 +12,9 @@ import {
   Inbox,
   Users,
   Mic,
-  DollarSign,
   ClipboardList,
 } from "lucide-react";
+import FinancialPulse from "@/components/FinancialPulse";
 import Navbar from "@/components/Navbar";
 
 export default function LandingPage() {
@@ -139,15 +139,7 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
-                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-5">
-                  <DollarSign size={24} />
-                </div>
-                <h3 className="text-lg md:text-xl font-bold mb-3">Financial Dashboard</h3>
-                <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-                  Revenue, open invoices, and job profitability — at a glance. Know where your business stands without chasing spreadsheets or waiting on your accountant.
-                </p>
-              </div>
+              <FinancialPulse />
 
               <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all duration-300 transform hover:-translate-y-2 group">
                 <div className="w-12 h-12 bg-yellow-100 text-yellow-600 rounded-xl flex items-center justify-center mb-5">

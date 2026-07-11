@@ -672,7 +672,6 @@ export default function Dispatch() {
         window.history.replaceState({}, '', u.toString());
       } catch {}
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -693,7 +692,6 @@ export default function Dispatch() {
     setTimeout(jumpToNow, 50);
     setTimeout(jumpToNow, 250);
     try { window.localStorage.setItem(storageKey, '1'); } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewMode]);
 
   // If the tech/job columns pop in after fetch, re-center once.
@@ -702,7 +700,6 @@ export default function Dispatch() {
     if (!didAutoScrollRef.current) return;
     if (techs.length === 0) return;
     setTimeout(jumpToNow, 50);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [techs.length]);
 
   return (
