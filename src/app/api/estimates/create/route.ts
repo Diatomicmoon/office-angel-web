@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
 
     if (estimateError) {
       console.error('Error inserting estimate:', estimateError);
-      return NextResponse.json({ error: 'Failed to create estimate' }, { status: 500 });
+      return NextResponse.json({ error: `Failed to create estimate: ${estimateError.message || JSON.stringify(estimateError)}` }, { status: 500 });
     }
 
     const estimateId = estimateData.id;
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     if (itemsError) {
       console.error('Error inserting estimate items:', itemsError);
-      return NextResponse.json({ error: 'Failed to create estimate items' }, { status: 500 });
+      return NextResponse.json({ error: `Failed to create estimate items: ${itemsError.message || JSON.stringify(itemsError)}` }, { status: 500 });
     }
 
     // Build the Magic Link
@@ -86,8 +86,8 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ estimate: estimateData, magic_link: magicLink });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Estimate creation failed:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: `Internal server error: ${error.message}` }, { status: 500 });
   }
 }
