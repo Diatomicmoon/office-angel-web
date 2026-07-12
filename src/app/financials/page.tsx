@@ -134,7 +134,7 @@ export default function FinancialsPage() {
           )}
 
           {/* Core KPIs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between text-gray-500 mb-4">
                 <h3 className="font-medium text-sm">Estimates Out</h3>
@@ -174,7 +174,21 @@ export default function FinancialsPage() {
               <p className="text-3xl font-bold text-green-900">${(data.report?.netIncome || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
               <p className="text-sm text-green-700 font-medium mt-2 flex items-center gap-1">After total expenses</p>
             </div>
+          
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm">Free Estimates Cost</h3>
+                <div className="bg-orange-50 p-2 rounded-lg"><Clock size={18} className="text-orange-600" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">
+                ${(data.report?.freeEstimateMoneyLost || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
+              </p>
+              <p className="text-sm text-orange-600 font-medium mt-2 flex items-center gap-1">
+                <TrendingUp size={14} className="rotate-180" /> {(data.report?.freeEstimateHoursLost || 0).toFixed(1)} labor hours lost
+              </p>
+            </div>
           </div>
+
 
           {/* Operational ROI & Leaks (The "Owner's View") */}
           <div className="mt-8 mb-4">

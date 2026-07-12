@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-function getDistanceFromLatLonInFeet(lat1, lon1, lat2, lon2) {
+function getDistanceFromLatLonInFeet(lat1: number, lon1: number, lat2: number, lon2: number) {
   const R = 20902231; // Radius of the earth in feet
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLon = (lon2 - lon1) * Math.PI / 180; 
@@ -13,7 +13,7 @@ function getDistanceFromLatLonInFeet(lat1, lon1, lat2, lon2) {
   return R * c; // Distance in feet
 }
 
-async function geocode(address) {
+async function geocode(address: string) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
   const res = await fetch(url, { headers: { 'User-Agent': 'HardHatSolutions/1.0' } });
   const json = await res.json().catch(() => null);

@@ -64,6 +64,30 @@ export async function GET(req: Request) {
       openEstimatesValue = estimates.filter((e: any) => e.status === 'pending').reduce((sum: number, e: any) => sum + Number(e.amount || 0), 0);
     }
 
+    
+    let freeEstimateHoursLost = 0;
+    let freeEstimateMoneyLost = 0;
+    const { data: freeJobs } = await supabase.from('jobs').select('id').eq('is_free_estimate', true).eq('company_id', companyId);
+    if (freeJobs && freeJobs.length > 0) {
+       const freeJobIds = freeJobs.map((j: any) => j.id);
+       const { data: tsData } = await supabase.from('timesheets').select('*').in('job_id', freeJobIds);
+       const { data: techData } = await supabase.from('technicians').select('id, hourly_rate').eq('company_id', companyId);
+       
+       if (tsData) {
+          for (const ts of tsData) {
+             if (ts.clock_in && ts.clock_out) {
+                const ms = new Date(ts.clock_out).getTime() - new Date(ts.clock_in).getTime();
+                const hours = ms / (1000 * 60 * 60);
+                freeEstimateHoursLost += hours;
+                
+                const t = techData?.find((t: any) => t.id === ts.technician_id);
+                const rate = t ? Number(t.hourly_rate || 35) : 35;
+                freeEstimateMoneyLost += (hours * rate);
+             }
+          }
+       }
+    }
+
     const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
     const rescuedCalls = calls ? calls.length : 0;
     const rescuedValue = rescuedCalls * 150;
@@ -84,6 +108,8 @@ export async function GET(req: Request) {
          openInvoicesCount: invoices?.filter((i: any) => i.status === 'pending' || i.status === 'overdue').length || 0,
          openEstimatesCount: estimates?.filter((e: any) => e.status === 'pending').length || 0,
          openEstimatesValue,
+         freeEstimateHoursLost,
+         freeEstimateMoneyLost,
          profitByCrew: [], 
          topExpenseCategories: [],
          aiRescued: { calls: rescuedCalls, value: rescuedValue },
@@ -179,6 +205,30 @@ export async function GET(req: Request) {
       openEstimatesValue = estimates.filter((e: any) => e.status === 'pending').reduce((sum: number, e: any) => sum + Number(e.amount || 0), 0);
     }
 
+    
+    let freeEstimateHoursLost = 0;
+    let freeEstimateMoneyLost = 0;
+    const { data: freeJobs } = await supabase.from('jobs').select('id').eq('is_free_estimate', true).eq('company_id', companyId);
+    if (freeJobs && freeJobs.length > 0) {
+       const freeJobIds = freeJobs.map((j: any) => j.id);
+       const { data: tsData } = await supabase.from('timesheets').select('*').in('job_id', freeJobIds);
+       const { data: techData } = await supabase.from('technicians').select('id, hourly_rate').eq('company_id', companyId);
+       
+       if (tsData) {
+          for (const ts of tsData) {
+             if (ts.clock_in && ts.clock_out) {
+                const ms = new Date(ts.clock_out).getTime() - new Date(ts.clock_in).getTime();
+                const hours = ms / (1000 * 60 * 60);
+                freeEstimateHoursLost += hours;
+                
+                const t = techData?.find((t: any) => t.id === ts.technician_id);
+                const rate = t ? Number(t.hourly_rate || 35) : 35;
+                freeEstimateMoneyLost += (hours * rate);
+             }
+          }
+       }
+    }
+
     const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
     const rescuedCalls = calls ? calls.length : 0;
     const rescuedValue = rescuedCalls * 150;
@@ -199,6 +249,8 @@ export async function GET(req: Request) {
          openInvoicesCount: 0,
          openEstimatesCount: estimates?.filter((e: any) => e.status === 'pending').length || 0,
          openEstimatesValue,
+         freeEstimateHoursLost,
+         freeEstimateMoneyLost,
          profitByCrew: [], 
          topExpenseCategories: topExpenseCategories.slice(0, 4),
          aiRescued: { calls: rescuedCalls, value: rescuedValue },
