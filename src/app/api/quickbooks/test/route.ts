@@ -49,12 +49,19 @@ export async function GET(req: Request) {
   if (error || !company || !company.quickbooks_access_token) {
     // Fallback to internal invoices if QuickBooks is not connected
     const { data: invoices } = await supabase.from('invoices').select('*').eq('company_id', companyId);
+    const { data: estimates } = await supabase.from('estimates').select('*').eq('company_id', companyId);
+    
     let grossProfit = 0;
     let accountsReceivable = 0;
+    let openEstimatesValue = 0;
     
     if (invoices) {
       grossProfit = invoices.filter((i: any) => i.status === 'paid').reduce((sum: number, i: any) => sum + Number(i.amount || 0), 0);
       accountsReceivable = invoices.filter((i: any) => i.status === 'pending' || i.status === 'overdue').reduce((sum: number, i: any) => sum + Number(i.amount || 0), 0);
+    }
+
+    if (estimates) {
+      openEstimatesValue = estimates.filter((e: any) => e.status === 'pending').reduce((sum: number, e: any) => sum + Number(e.amount || 0), 0);
     }
 
     const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
@@ -74,7 +81,9 @@ export async function GET(req: Request) {
          totalExpenses: 0,
          netIncome: grossProfit,
          accountsReceivable,
-         openInvoicesCount: invoices?.filter((i: any) => i.status === 'pending').length || 0,
+         openInvoicesCount: invoices?.filter((i: any) => i.status === 'pending' || i.status === 'overdue').length || 0,
+         openEstimatesCount: estimates?.filter((e: any) => e.status === 'pending').length || 0,
+         openEstimatesValue,
          profitByCrew: [], 
          topExpenseCategories: [],
          aiRescued: { calls: rescuedCalls, value: rescuedValue },
@@ -164,6 +173,12 @@ export async function GET(req: Request) {
     }
     topExpenseCategories.sort((a, b) => b.amount - a.amount);
 
+    const { data: estimates } = await supabase.from('estimates').select('*').eq('company_id', companyId);
+    let openEstimatesValue = 0;
+    if (estimates) {
+      openEstimatesValue = estimates.filter((e: any) => e.status === 'pending').reduce((sum: number, e: any) => sum + Number(e.amount || 0), 0);
+    }
+
     const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
     const rescuedCalls = calls ? calls.length : 0;
     const rescuedValue = rescuedCalls * 150;
@@ -182,6 +197,8 @@ export async function GET(req: Request) {
          netIncome,
          accountsReceivable,
          openInvoicesCount: 0,
+         openEstimatesCount: estimates?.filter((e: any) => e.status === 'pending').length || 0,
+         openEstimatesValue,
          profitByCrew: [], 
          topExpenseCategories: topExpenseCategories.slice(0, 4),
          aiRescued: { calls: rescuedCalls, value: rescuedValue },

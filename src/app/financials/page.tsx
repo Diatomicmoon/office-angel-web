@@ -134,10 +134,21 @@ export default function FinancialsPage() {
           )}
 
           {/* Core KPIs */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between text-gray-500 mb-4">
-                <h3 className="font-medium text-sm">Money Outstanding (A/R)</h3>
+                <h3 className="font-medium text-sm">Estimates Out</h3>
+                <div className="bg-yellow-50 p-2 rounded-lg"><FileText size={18} className="text-yellow-600" /></div>
+              </div>
+              <p className="text-3xl font-bold text-gray-900">${(data.report?.openEstimatesValue || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
+              <p className="text-sm text-yellow-600 font-medium mt-2 flex items-center gap-1">
+                <Clock size={14} /> {data.report?.openEstimatesCount || 0} Pending Approvals
+              </p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between text-gray-500 mb-4">
+                <h3 className="font-medium text-sm">Invoices Out (A/R)</h3>
                 <div className="bg-red-50 p-2 rounded-lg"><CreditCard size={18} className="text-red-600" /></div>
               </div>
               <p className="text-3xl font-bold text-gray-900">${(data.report?.accountsReceivable || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
