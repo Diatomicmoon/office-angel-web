@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Phone, Bot, PhoneForwarded, Save, CheckCircle2, AlertTriangle, Mic, Clock, User, LogOut, Key } from "lucide-react";
 import { createClient } from "@/lib/supabase";
 import TeamTab from "./TeamTab";
-import { Users } from "lucide-react";
+import { Users, Navigation } from "lucide-react";
 const supabase = createClient();
 
 export type Settings = {
@@ -236,6 +236,38 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
           </div>
         </div>
       )}
+
+      {/* AI Call Handler Toggle */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${latestGpsPing && (Date.now() - new Date(latestGpsPing).getTime() < 15 * 60000) ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}>
+              <Navigation size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                Fleet Tracking Status
+                {latestGpsPing && (Date.now() - new Date(latestGpsPing).getTime() < 15 * 60000) ? (
+                   <span className="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                     Live & Working
+                   </span>
+                ) : (
+                   <span className="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-xs font-medium bg-gray-50 text-gray-700 border border-gray-200">
+                     <span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                     Offline / Waiting
+                   </span>
+                )}
+              </h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {latestGpsPing 
+                  ? `Last GPS ping received: ${new Date(latestGpsPing).toLocaleTimeString()}` 
+                  : "No background GPS data received yet. Open the mobile app to start tracking."}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* AI Call Handler Toggle */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
