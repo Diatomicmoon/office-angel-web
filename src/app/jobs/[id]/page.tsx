@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, MapPin, User, BadgeDollarSign, CalendarClock, Receipt, Package, Truck, ExternalLink, Copy, Check } from "lucide-react";
+import { ArrowLeft, MapPin, User, BadgeDollarSign, CalendarClock, Receipt, Package, Truck, ExternalLink, Copy, Check, Camera, Loader2 } from "lucide-react";
 
 type Job = {
   id: string;
@@ -69,6 +69,9 @@ export default function JobDetailsPage() {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [scanStatus, setScanStatus] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const copyPortalLink = () => {
     if (typeof window !== "undefined") {
@@ -76,6 +79,46 @@ export default function JobDetailsPage() {
       navigator.clipboard.writeText(url);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  
+  const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setScanning(true);
+    setScanStatus("Uploading image...");
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("job_id", id);
+
+    try {
+      setScanStatus("AI parsing receipt...");
+      const res = await fetch("/api/receipts/scan", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to scan receipt");
+      }
+
+      const data = await res.json();
+      if (data.receipt) {
+        setReceipts(prev => [data.receipt, ...prev]);
+        setScanStatus("Receipt added!");
+        setTimeout(() => setScanStatus(null), 3000);
+      }
+    } catch (err) {
+      console.error(err);
+      setScanStatus("Error scanning receipt");
+      setTimeout(() => setScanStatus(null), 3000);
+    } finally {
+      setScanning(false);
+      // clear the input
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -232,9 +275,30 @@ export default function JobDetailsPage() {
             </h2>
             <p className="text-sm text-gray-500 mt-0.5">Parsed from inbound supply house emails</p>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Total Materials</p>
-            <p className="text-lg font-bold text-red-600">{fmtMoney(totalMaterialCost)}</p>
+          <div className="flex flex-col items-end gap-3">
+            <div className="text-right">
+              <p className="text-xs text-gray-500 uppercase tracking-wider font-bold mb-1">Total Materials</p>
+              <p className="text-lg font-bold text-red-600">{fmtMoney(totalMaterialCost)}</p>
+            </div>
+            
+            <div>
+              <input 
+                type="file" 
+                accept="image/*" 
+                capture="environment" 
+                className="hidden" 
+                ref={fileInputRef}
+                onChange={handleScan}
+              />
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                disabled={scanning}
+                className="bg-red-50 text-red-600 hover:bg-red-100 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-1.5 transition-colors"
+              >
+                {scanning ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                {scanStatus || "Scan Receipt"}
+              </button>
+            </div>
           </div>
         </div>
         
