@@ -30,6 +30,10 @@ export async function POST(req: NextRequest) {
     };
 
     if (job_id) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(job_id)) {
+        return NextResponse.json({ error: 'Job ID must be a valid 36-character system UUID, or left completely blank.' }, { status: 400 });
+      }
       estimatePayload.job_id = job_id;
     }
 
