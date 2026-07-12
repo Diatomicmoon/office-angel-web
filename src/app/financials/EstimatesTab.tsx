@@ -77,7 +77,7 @@ export default function EstimatesTab() {
             <tbody className="divide-y divide-gray-100">
               {estimates.map((est, idx) => (
                 <tr key={idx} className="hover:bg-gray-50/50 transition">
-                  <td className="p-4 pl-6 font-medium text-gray-900">{est.id.substring(0, 8)}</td>
+                  <td className="p-4 pl-6 font-medium text-gray-900">E-{est.id.substring(0, 8)}</td>
                   <td className="p-4 text-gray-600 flex items-center gap-2">
                     <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs font-bold">
                       {est.customer_name?.charAt(0) || '?'}
