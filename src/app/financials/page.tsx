@@ -177,15 +177,35 @@ export default function FinancialsPage() {
           
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
               <div className="flex items-center justify-between text-gray-500 mb-4">
-                <h3 className="font-medium text-sm">Free Estimates Cost</h3>
+                <h3 className="font-medium text-sm">Free Estimates ROI</h3>
                 <div className="bg-orange-50 p-2 rounded-lg"><Clock size={18} className="text-orange-600" /></div>
               </div>
-              <p className="text-3xl font-bold text-gray-900">
-                ${(data.report?.freeEstimateMoneyLost || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}
-              </p>
-              <p className="text-sm text-orange-600 font-medium mt-2 flex items-center gap-1">
-                <TrendingUp size={14} className="rotate-180" /> {(data.report?.freeEstimateHoursLost || 0).toFixed(1)} labor hours lost
-              </p>
+              
+              <div className="flex justify-between items-end">
+                <div>
+                  <p className="text-xs text-gray-500 mb-1">Labor Cost</p>
+                  <p className="text-xl font-bold text-red-600">
+                    -${(data.report?.freeEstimateMoneyLost || 0).toLocaleString(undefined, {minimumFractionDigits: 0})}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500 mb-1">Rev Won</p>
+                  <p className="text-xl font-bold text-green-600">
+                    +${(data.report?.freeEstimateRevenueWon || 0).toLocaleString(undefined, {minimumFractionDigits: 0})}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <TrendingUp size={12} className="text-gray-400" /> {(data.report?.freeEstimateHoursLost || 0).toFixed(1)} hrs spent
+                </p>
+                <p className="text-xs font-medium bg-gray-100 px-2 py-1 rounded text-gray-600">
+                  {data.report?.freeEstimateJobsCount > 0 
+                    ? Math.round((data.report?.freeEstimateWonCount / data.report?.freeEstimateJobsCount) * 100) 
+                    : 0}% Close Rate
+                </p>
+              </div>
             </div>
           </div>
 

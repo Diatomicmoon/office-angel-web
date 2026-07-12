@@ -46,6 +46,41 @@ export async function GET(req: Request) {
       .sort((a, b) => b.knocks - a.knocks);
   }
 
+      let freeEstimateHoursLost = 0;
+    let freeEstimateMoneyLost = 0;
+    let freeEstimateJobsCount = 0;
+    let freeEstimateWonCount = 0;
+    let freeEstimateRevenueWon = 0;
+    const { data: freeJobs } = await supabase.from('jobs').select('id').eq('is_free_estimate', true).eq('company_id', companyId);
+    if (freeJobs && freeJobs.length > 0) {
+       freeEstimateJobsCount = freeJobs.length;
+       const freeJobIds = freeJobs.map((j: any) => j.id);
+       const { data: tsData } = await supabase.from('timesheets').select('*').in('job_id', freeJobIds);
+       const { data: techData } = await supabase.from('technicians').select('id, hourly_rate').eq('company_id', companyId);
+       
+       if (tsData) {
+          for (const ts of tsData) {
+             if (ts.clock_in && ts.clock_out) {
+                const ms = new Date(ts.clock_out).getTime() - new Date(ts.clock_in).getTime();
+                const hours = ms / (1000 * 60 * 60);
+                freeEstimateHoursLost += hours;
+                
+                const t = techData?.find((t: any) => t.id === ts.technician_id);
+                const rate = t ? Number(t.hourly_rate || 35) : 35;
+                freeEstimateMoneyLost += (hours * rate);
+             }
+          }
+       }
+       
+       const { data: globalInvoices } = await supabase.from('invoices').select('job_id, amount').eq('company_id', companyId);
+       if (globalInvoices) {
+          const wonInvoices = globalInvoices.filter((inv: any) => freeJobIds.includes(inv.job_id));
+          const wonJobIds = new Set(wonInvoices.map((inv: any) => inv.job_id));
+          freeEstimateWonCount = wonJobIds.size;
+          freeEstimateRevenueWon = wonInvoices.reduce((sum: number, inv: any) => sum + Number(inv.amount || 0), 0);
+       }
+    }
+
   if (error || !company || !company.quickbooks_access_token) {
     // Fallback to internal invoices if QuickBooks is not connected
     const { data: invoices } = await supabase.from('invoices').select('*').eq('company_id', companyId);
@@ -65,28 +100,7 @@ export async function GET(req: Request) {
     }
 
     
-    let freeEstimateHoursLost = 0;
-    let freeEstimateMoneyLost = 0;
-    const { data: freeJobs } = await supabase.from('jobs').select('id').eq('is_free_estimate', true).eq('company_id', companyId);
-    if (freeJobs && freeJobs.length > 0) {
-       const freeJobIds = freeJobs.map((j: any) => j.id);
-       const { data: tsData } = await supabase.from('timesheets').select('*').in('job_id', freeJobIds);
-       const { data: techData } = await supabase.from('technicians').select('id, hourly_rate').eq('company_id', companyId);
-       
-       if (tsData) {
-          for (const ts of tsData) {
-             if (ts.clock_in && ts.clock_out) {
-                const ms = new Date(ts.clock_out).getTime() - new Date(ts.clock_in).getTime();
-                const hours = ms / (1000 * 60 * 60);
-                freeEstimateHoursLost += hours;
-                
-                const t = techData?.find((t: any) => t.id === ts.technician_id);
-                const rate = t ? Number(t.hourly_rate || 35) : 35;
-                freeEstimateMoneyLost += (hours * rate);
-             }
-          }
-       }
-    }
+    
 
     const { data: calls } = await supabase.from("call_logs").select("id").eq("company_id", companyId).eq("urgency_flag", "high");
     const rescuedCalls = calls ? calls.length : 0;
@@ -110,6 +124,9 @@ export async function GET(req: Request) {
          openEstimatesValue,
          freeEstimateHoursLost,
          freeEstimateMoneyLost,
+         freeEstimateJobsCount,
+         freeEstimateWonCount,
+         freeEstimateRevenueWon,
          profitByCrew: [], 
          topExpenseCategories: [],
          aiRescued: { calls: rescuedCalls, value: rescuedValue },
@@ -251,6 +268,9 @@ export async function GET(req: Request) {
          openEstimatesValue,
          freeEstimateHoursLost,
          freeEstimateMoneyLost,
+         freeEstimateJobsCount,
+         freeEstimateWonCount,
+         freeEstimateRevenueWon,
          profitByCrew: [], 
          topExpenseCategories: topExpenseCategories.slice(0, 4),
          aiRescued: { calls: rescuedCalls, value: rescuedValue },
