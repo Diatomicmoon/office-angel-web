@@ -109,31 +109,49 @@ export default function InboxPage() {
   if (!isDemoMode) {
     return (
       <div className="max-w-7xl mx-auto p-4 md:p-8 pb-24 flex flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100vh-2rem)] overflow-y-auto space-y-8">
-        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-end gap-4">
+        <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">Material Cost Engine</h1>
             <p className="text-gray-500 mt-2">Auto-parse supply house receipts and allocate job costs.</p>
           </div>
-          <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2">
-            <Settings size={18} /> Routing Rules
-          </button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/material-catalog" className="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center gap-2 shadow-sm">
+              <Package size={18} /> Catalog
+            </Link>
+            <input 
+              type="file" 
+              accept="image/*" 
+              capture="environment" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleScan}
+            />
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              disabled={scanning}
+              className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+            >
+              {scanning ? <Loader2 size={18} className="animate-spin" /> : <Camera size={18} />}
+              {scanStatus || "Scan Receipt"}
+            </button>
+          </div>
         </div>
 
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-8 text-white shadow-lg flex items-center justify-between flex-shrink-0">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl p-6 md:p-8 text-white shadow-lg flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 flex-shrink-0">
           <div>
             <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
               <UploadCloud size={24} />
               Your Dedicated Ingestion Address
             </h2>
-            <p className="text-blue-100 max-w-xl text-sm">
+            <p className="text-blue-100 max-w-xl text-sm leading-relaxed">
               Set up auto-forwarding rules in your email for supply houses (Menards, Home Depot, CED). The AI will read the receipts, extract the totals, and log the job costs automatically.
             </p>
           </div>
           
-          <div className="bg-black/20 p-4 rounded-xl backdrop-blur-sm border border-white/10 min-w-[320px]">
+          <div className="bg-black/20 p-4 rounded-xl backdrop-blur-sm border border-white/10 w-full lg:w-auto lg:min-w-[320px]">
             <p className="text-xs text-blue-200 mb-1 font-semibold uppercase tracking-wider">Secret Forwarding Email</p>
-            <div className="flex items-center gap-3">
-              <code className="text-lg font-mono">{forwardAddress}</code>
+            <div className="flex items-center gap-3 w-full overflow-hidden">
+              <code className="text-sm md:text-base font-mono truncate">{forwardAddress}</code>
               <button 
                 onClick={handleCopy}
                 className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors flex-shrink-0"
