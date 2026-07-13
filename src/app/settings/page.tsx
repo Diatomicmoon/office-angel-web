@@ -38,6 +38,7 @@ export default function SettingsPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [resetMsg, setResetMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"general" | "team">("general");
+  const [latestGpsPing, setLatestGpsPing] = useState<string | null>(null);
   // Removed local createClient to use top-level instance
 
   useEffect(() => {
@@ -63,6 +64,15 @@ export default function SettingsPage() {
         setSettings(json.settings);
         setForwardPhone(json.settings?.forward_to_phone || "");
         setCompanyPhone(json.settings?.phone_number || "");
+        
+        if (json.settings?.id) {
+          supabase.from('fleet_locations').select('created_at').eq('company_id', json.settings.id).order('created_at', { ascending: false }).limit(1).then(({ data }) => {
+            if (data && data.length > 0) {
+              setLatestGpsPing(data[0].created_at);
+            }
+          });
+        }
+
         const toHHMM = (m?: number | null, fallback = "08:00") => {
           if (typeof m !== 'number' || !Number.isFinite(m)) return fallback;
           const hh = String(Math.floor(m / 60)).padStart(2, '0');

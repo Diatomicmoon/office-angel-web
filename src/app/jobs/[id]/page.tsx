@@ -88,11 +88,83 @@ export default function JobDetailsPage() {
     if (!file) return;
 
     setScanning(true);
-    setScanStatus("Uploading image...");
+    setScanStatus("Compressing image...");
 
-    const formData = new FormData();
-    formData.append("image", file);
-    formData.append("job_id", id);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const MAX_DIMENSION = 1200; // Max width or height
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_DIMENSION) {
+            height *= MAX_DIMENSION / width;
+            width = MAX_DIMENSION;
+          }
+        } else {
+          if (height > MAX_DIMENSION) {
+            width *= MAX_DIMENSION / height;
+            height = MAX_DIMENSION;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            setScanStatus("Error compressing image");
+            setScanning(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            return;
+          }
+
+          setScanStatus("Uploading image...");
+          const formData = new FormData();
+          formData.append("image", blob, "receipt.jpg");
+          formData.append("job_id", id);
+
+          try {
+            setScanStatus("AI parsing receipt...");
+            const res = await fetch("/api/receipts/scan", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!res.ok) {
+              throw new Error("Failed to scan receipt");
+            }
+
+            const data = await res.json();
+            if (data.receipt) {
+              setReceipts(prev => [data.receipt, ...prev]);
+              setScanStatus("Receipt added!");
+              setTimeout(() => setScanStatus(null), 3000);
+            }
+          } catch (err) {
+            console.error(err);
+            setScanStatus("Error scanning receipt");
+            setTimeout(() => setScanStatus(null), 3000);
+          } finally {
+            setScanning(false);
+            // clear the input
+            if (fileInputRef.current) fileInputRef.current.value = "";
+          }
+        }, 'image/jpeg', 0.7); // Quality 0.7
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+
+    // The rest of the `handleScan` function will be moved inside the `canvas.toBlob` callback
+    // block in the previous edit, so this line is removed.
+    // The original code was: formData.append("job_id", id);
 
     try {
       setScanStatus("AI parsing receipt...");

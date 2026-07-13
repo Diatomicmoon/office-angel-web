@@ -42,13 +42,22 @@ export default function EstimatesTab() {
             Draft proposals, send magic links, and get 1-tap approvals.
           </p>
         </div>
-        <button 
-          onClick={() => setView("create")}
-          className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 hover:bg-blue-700 transition shadow-sm"
-        >
-          <Plus className="w-5 h-5" />
-          Create Estimate
-        </button>
+        <div className="flex items-center gap-3">
+          <Link 
+            href="/material-catalog" 
+            className="bg-white text-gray-700 px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 hover:bg-gray-50 transition border border-gray-200 shadow-sm"
+          >
+            <Sparkles className="w-5 h-5" />
+            Material Cost Engine
+          </Link>
+          <button 
+            onClick={() => setView("create")}
+            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 hover:bg-blue-700 transition shadow-sm"
+          >
+            <Plus className="w-5 h-5" />
+            Create Estimate
+          </button>
+        </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">

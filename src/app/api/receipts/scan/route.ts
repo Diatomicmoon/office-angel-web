@@ -62,14 +62,22 @@ export async function POST(req: Request) {
           role: "system",
           content: `You are an expert receipt parser. Extract the supplier/vendor name, the total amount, and all line items from the provided receipt image. 
 Return ONLY a raw JSON object (no markdown formatting, no \`\`\`json) with the following structure:
+
+CRITICAL CLASSIFICATION RULES:
+FOR RECEIPTS / LINE ITEMS: Supply houses often use cryptic abbreviations, SKU codes, or raw manufacturer part numbers (e.g., "QBT GBD-1", "ARF 3300K", "1P CW-1-SP", "1P SYNC-159-1W"). For each line item, you MUST attempt to extract a precise "sku" (the exact part number/model number shown) and the "unit_of_measure" (e.g., "BOX", "FT", "EA", "ROLL"). If a formal SKU is not present, you can use the expanded description as the SKU, but prioritize actual part numbers. DO NOT just copy the raw cryptic part numbers into the "item_name" (description). Use your deep knowledge of electrical materials to translate and expand these into plain English trade names that an electrician would actually say on the jobsite (e.g., "Ground Bar", "LED Wafer Light 3000K", "Single Pole Switch", "1-Gang Faceplate"). If it's already clear (like "500' 12-2 WIRE NM ROMEX"), keep it.
+
+FOR SUPPLIER NAME (Receipts only): Do NOT use the contractor's name (e.g., Schlemmer Electric) as the supplier. Look for the wholesale supply house or store that actually generated the receipt (e.g., "JH Larson", "Viking Electric", "Home Depot", "CED", "Graybar", "Menards", "Lowe's"). Ensure "JH Larson" and similar companies are ALWAYS placed here in 'supplier_name', never in 'job_number_or_po'. If the receipt was forwarded, look at the original sender's email address domain.
+
 {
   "supplier_name": "string",
   "total_amount": 0.00,
   "line_items": [
     {
-      "description": "string",
-      "qty": 1,
+      "sku": "string or null",
+      "item_name": "string",
+      "quantity": 1,
       "unit_price": 0.00,
+      "unit_of_measure": "string or null",
       "total_price": 0.00
     }
   ]
@@ -109,6 +117,29 @@ Return ONLY a raw JSON object (no markdown formatting, no \`\`\`json) with the f
     if (dbError) {
       console.error("DB Error:", dbError);
       return NextResponse.json({ error: "Failed to save receipt record" }, { status: 500 });
+    }
+
+    // 4. Update the material_catalog
+    if (parsedData.line_items && parsedData.line_items.length > 0) {
+      const catalogUpserts = parsedData.line_items.map((item: any) => ({
+        company_id: companyId,
+        sku: item.sku || item.item_name || item.description, // Prioritize AI-extracted SKU, fallback to item_name/description
+        item_name: item.item_name || item.description, // Use AI's plain English name
+        unit_price: item.unit_price || 0,
+        unit_of_measure: item.unit_of_measure || 'EA', // Default to Each
+        supplier: parsedData.supplier_name || "Unknown Supplier",
+        last_updated: new Date().toISOString()
+      })).filter((item: any) => item.unit_price > 0 && item.sku);
+
+      if (catalogUpserts.length > 0) {
+        // Upsert into material_catalog (updates if company_id + sku exists, inserts if new)
+        const { error: catalogError } = await supabase
+          .from('material_catalog')
+          .upsert(catalogUpserts, { onConflict: 'company_id, sku' });
+          
+        if (catalogError) console.error('[Pricing Engine Upsert Error (Scan)]: ', catalogError);
+        else console.log(`[Pricing Engine (Scan)] Successfully updated ${catalogUpserts.length} prices for company ${companyId}`);
+      }
     }
 
     return NextResponse.json({ success: true, receipt: receiptRecord });
