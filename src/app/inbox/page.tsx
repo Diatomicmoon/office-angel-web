@@ -1,7 +1,8 @@
 "use client";
 
-import { Inbox, FileText, CheckCircle2, AlertCircle, HardHat, FileSignature, ArrowRight, Settings, UploadCloud, Copy, X, BarChart3, TrendingUp, Building2, Clock, Search, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { Inbox, FileText, CheckCircle2, AlertCircle, HardHat, FileSignature, ArrowRight, Settings, UploadCloud, Copy, X, BarChart3, TrendingUp, Building2, Clock, Search, RefreshCw, ChevronDown, ChevronUp, Camera, Loader2, Package } from "lucide-react";
+import { useEffect, useState, useMemo, useRef } from "react";
+import Link from "next/link";
 
 type LineItem = {
   description?: string;
@@ -33,6 +34,83 @@ export default function InboxPage() {
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [showPermitAnalytics, setShowPermitAnalytics] = useState(false);
   const [expandedReceiptId, setExpandedReceiptId] = useState<string | null>(null);
+
+  const [scanning, setScanning] = useState(false);
+  const [scanStatus, setScanStatus] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleScan = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setScanning(true);
+    setScanStatus("Compressing image...");
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas');
+        const MAX_DIMENSION = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_DIMENSION) {
+            height *= MAX_DIMENSION / width;
+            width = MAX_DIMENSION;
+          }
+        } else {
+          if (height > MAX_DIMENSION) {
+            width *= MAX_DIMENSION / height;
+            height = MAX_DIMENSION;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            setScanning(false);
+            setScanStatus("Compression failed.");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("image", blob, "receipt.jpg");
+
+          try {
+            setScanStatus("AI parsing receipt...");
+            const res = await fetch("/api/receipts/scan", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!res.ok) throw new Error("Failed to scan receipt");
+
+            const data = await res.json();
+            if (data.receipt) {
+              setReceipts(prev => [data.receipt, ...prev]);
+              setScanStatus("Catalog updated!");
+              setTimeout(() => setScanStatus(null), 3000);
+            }
+          } catch (err) {
+            console.error(err);
+            setScanStatus("Error scanning receipt");
+            setTimeout(() => setScanStatus(null), 3000);
+          } finally {
+            setScanning(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+          }
+        }, 'image/jpeg', 0.7);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
 
   const forwardAddress = "bbizjgfdgr7hc1s9p1y8q2qfn7le3h81@hook.us2.make.com";
 
