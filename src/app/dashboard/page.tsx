@@ -334,7 +334,7 @@ export default function Dashboard() {
                 <Truck size={18} className="text-gray-500" /> Live Field Status
               </h2>
               <div className="flex gap-2 items-center">
-                <div className="hidden sm:flex bg-white border border-gray-200 rounded-lg overflow-hidden">
+                <div className="flex bg-white border border-gray-200 rounded-lg overflow-hidden">
                   <button onClick={() => setFieldViewMode('list')} className={`px-3 py-1 text-xs font-bold ${fieldViewMode === 'list' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}>List</button>
                   <button onClick={() => setFieldViewMode('map')} className={`px-3 py-1 text-xs font-bold border-l border-gray-200 ${fieldViewMode === 'map' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}>Map</button>
                 </div>
