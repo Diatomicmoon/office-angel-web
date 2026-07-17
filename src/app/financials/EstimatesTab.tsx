@@ -2,6 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { FileText, Plus, CheckCircle, Clock, AlertCircle, Search, Trash2, Sparkles, Send } from "lucide-react";
 import { getCookie } from 'cookies-next';
+import Link from "next/link";
 
 export default function EstimatesTab() {
   const [view, setView] = useState<"list" | "create">("list");
