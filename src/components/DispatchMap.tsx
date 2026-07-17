@@ -1,6 +1,6 @@
 "use client";
 
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polyline, Tooltip, CircleMarker } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -22,6 +22,20 @@ type JobMapData = {
   job: any;
   pos: { lat: number; lng: number };
 };
+
+type StopData = {
+  lat: number;
+  lng: number;
+  start_time: string;
+  end_time: string;
+  duration: number;
+  is_current?: boolean;
+};
+
+type HistoryData = {
+  path: {lat: number, lng: number}[];
+  stops: StopData[];
+} | null;
 
 // Custom icons
 const getTechIcon = (speed?: number) => {
@@ -51,11 +65,13 @@ const jobIcon = new L.Icon({
 export default function DispatchMap({ 
   center, 
   techsData, 
-  jobsData = [] 
+  jobsData = [],
+  historyData = null
 }: { 
   center: {lat: number, lng: number}, 
   techsData: TechMapData[],
-  jobsData?: JobMapData[]
+  jobsData?: JobMapData[],
+  historyData?: HistoryData
 }) {
   return (
     <div className="relative w-full h-full">
@@ -103,6 +119,34 @@ export default function DispatchMap({
             </Marker>
           ))}
         </MarkerClusterGroup>
+
+        {historyData && historyData.path && historyData.path.length > 0 && (
+          <Polyline positions={historyData.path.map(p => [p.lat, p.lng])} color="#3b82f6" weight={4} opacity={0.6} dashArray="5, 10" />
+        )}
+
+        {historyData && historyData.stops && historyData.stops.map((stop, idx) => (
+          <CircleMarker 
+            key={`stop-${idx}`}
+            center={[stop.lat, stop.lng]}
+            radius={8}
+            pathOptions={{ 
+              color: stop.is_current ? "#10b981" : "#f59e0b", 
+              fillColor: stop.is_current ? "#10b981" : "#f59e0b", 
+              fillOpacity: 1,
+              weight: 2
+            }}
+          >
+            <Tooltip direction="top" offset={[0, -10]} opacity={1}>
+              <div className="text-xs font-sans">
+                <p className="font-bold">{stop.is_current ? "Current Location" : `Stop: ${stop.duration} min`}</p>
+                <p className="text-gray-600">
+                  {new Date(stop.start_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} 
+                  {!stop.is_current && ` - ${new Date(stop.end_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}
+                </p>
+              </div>
+            </Tooltip>
+          </CircleMarker>
+        ))}
       </MapContainer>
 
       {/* Territory / Legend Overlay */}

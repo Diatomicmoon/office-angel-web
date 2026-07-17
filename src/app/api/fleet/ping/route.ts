@@ -13,6 +13,29 @@ function getDistanceFromLatLonInFeet(lat1: number, lon1: number, lat2: number, l
   return R * c; // Distance in feet
 }
 
+async function reverseGeocode(lat: number, lng: number) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+    const res = await fetch(url, { headers: { 'User-Agent': 'HardHatSolutions/1.0' } });
+    const json = await res.json().catch(() => null);
+    if (!json || json.error) return null;
+    
+    // Make it a shorter, nicer address (e.g. street + city)
+    let nice = json.display_name;
+    if (json.address) {
+       const street = json.address.road || json.address.pedestrian || "";
+       const houseNumber = json.address.house_number || "";
+       const city = json.address.city || json.address.town || json.address.village || json.address.municipality || "";
+       if (street && city) {
+          nice = houseNumber ? `${houseNumber} ${street}, ${city}` : `${street}, ${city}`;
+       }
+    }
+    return nice;
+  } catch(e) {
+    return null;
+  }
+}
+
 async function geocode(address: string) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&countrycodes=us&limit=1`;
   const res = await fetch(url, { headers: { 'User-Agent': 'HardHatSolutions/1.0' } });
@@ -61,6 +84,25 @@ export async function POST(req: Request) {
     console.error("Fleet Location Error:", locError);
     return NextResponse.json({ error: locError.message }, { status: 400 });
   }
+
+  // Update the technicians table in the background so the dashboard sees it live
+  // Only reverse geocode if we haven't recently or if moving fast to save API calls
+  // For now, let's just do a quick background fetch for the address to keep it nice!
+  Promise.resolve().then(async () => {
+     let addressUpdate: any = { updated_at: new Date().toISOString() };
+     
+     // Update status to en_route if speed > 10 mph (roughly)
+     if (body.speed && body.speed > 10) {
+        addressUpdate.status = 'en_route';
+     }
+
+     const address = await reverseGeocode(body.latitude, body.longitude);
+     if (address) {
+       addressUpdate.last_location_address = address;
+     }
+
+     await supabase.from('technicians').update(addressUpdate).eq('id', body.technician_id);
+  }).catch(console.error);
 
   // --- 2. SMART AUTO-CLOCK LOGIC ---
   

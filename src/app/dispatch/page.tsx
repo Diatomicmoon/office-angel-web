@@ -238,6 +238,25 @@ export default function Dispatch() {
   const [aiSuggestions, setAiSuggestions] = useState<Record<string, Suggestion[]>>({});
   const [geoBusy, setGeoBusy] = useState(false);
   const [geoMsg, setGeoMsg] = useState<string | null>(null);
+  const [historyTechId, setHistoryTechId] = useState<string>('');
+  const [historyDate, setHistoryDate] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
+  const [historyData, setHistoryData] = useState<any>(null);
+  const [historyLoading, setHistoryLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!historyTechId || !historyDate) {
+      setHistoryData(null);
+      return;
+    }
+    setHistoryLoading(true);
+    fetch(`/api/fleet/history?tech_id=${historyTechId}&date=${historyDate}`)
+      .then(r => r.json())
+      .then(d => { setHistoryData(d); setHistoryLoading(false); })
+      .catch(() => setHistoryLoading(false));
+  }, [historyTechId, historyDate]);
   const [now, setNow] = useState<Date>(() => new Date());
   const dayScrollRef = useRef<HTMLDivElement | null>(null);
   const didAutoScrollRef = useRef(false);
@@ -1180,11 +1199,36 @@ export default function Dispatch() {
                   </button>
                   {geoMsg && <p className="text-[11px] text-gray-500">{geoMsg}</p>}
                 </div>
+
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <h3 className="text-[11px] font-bold text-gray-800 uppercase tracking-wider mb-2">Route History</h3>
+                  <select 
+                    className="w-full mb-2 text-xs border border-gray-300 rounded p-1 text-gray-700 font-medium"
+                    value={historyTechId}
+                    onChange={e => setHistoryTechId(e.target.value)}
+                  >
+                    <option value="">Select Technician...</option>
+                    {techs.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                  </select>
+                  <input 
+                    type="date" 
+                    className="w-full text-xs border border-gray-300 rounded p-1 mb-2 text-gray-700 font-medium"
+                    value={historyDate}
+                    onChange={e => setHistoryDate(e.target.value)}
+                  />
+                  {historyLoading && <p className="text-[10px] text-gray-500 font-bold animate-pulse">Loading route...</p>}
+                  {historyData && !historyLoading && (
+                     <p className="text-[10px] text-green-600 font-bold">
+                       Loaded {historyData.path?.length || 0} pings, {historyData.stops?.length || 0} stops.
+                     </p>
+                  )}
+                </div>
               </div>
               <DispatchMap 
                 center={center} 
                 techsData={techs.map((t) => ({ tech: t, pos: getLatLng((t as any).last_location) })).filter((x) => x.pos) as any} 
                 jobsData={[...unassignedJobs, ...assignedJobs].map((j) => ({ job: j, pos: getJobLatLng(j) })).filter(x => x.pos) as any}
+                historyData={historyData}
               />
             </div>
           ) : (

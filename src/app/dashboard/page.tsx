@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Bot, Briefcase, PhoneIncoming, Clock, AlertTriangle, CheckCircle2, TrendingUp, DollarSign, Truck, MapPin, ArrowRight, Activity, PhoneMissed, Zap, Calendar, FileText, Users, Tag, BarChart2 } from "lucide-react";
 import { VapiCallButton } from "@/components/VapiCallButton";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 
 type Technician = {
   id: string;
@@ -32,6 +33,20 @@ function statusPill(status?: string) {
   return { label: status || "Unknown", cls: "border-gray-200 bg-gray-50 text-gray-600" };
 }
 
+
+const DispatchMap = dynamic(() => import("@/components/DispatchMap"), { ssr: false });
+
+function getLatLng(loc: any): { lat: number; lng: number } | null {
+  if (!loc) return null;
+  if (typeof loc === 'string') {
+    try { loc = JSON.parse(loc); } catch { return null; }
+  }
+  const lat = Number(loc.lat ?? loc.latitude);
+  const lng = Number(loc.lng ?? loc.lon ?? loc.longitude);
+  if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+  return null;
+}
+
 export default function Dashboard() {
   const [data, setData] = useState<any>({ calls: [], technicians: [], techTableAvailable: true, actionItems: [], stats: { totalCalls: 0, emergencies: 0, actionItemsCount: 0 } });
   const [loading, setLoading] = useState(true);
@@ -42,6 +57,26 @@ export default function Dashboard() {
   const [ghlLoading, setGhlLoading] = useState(true);
   const [recentJobs, setRecentJobs] = useState<any[]>([]);
   const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const [fieldViewMode, setFieldViewMode] = useState<"list" | "map">("map");
+  const [historyTechId, setHistoryTechId] = useState<string>('');
+  const [historyDate, setHistoryDate] = useState<string>(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  });
+  const [historyData, setHistoryData] = useState<any>(null);
+  const [historyLoading, setHistoryLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!historyTechId || !historyDate) {
+      setHistoryData(null);
+      return;
+    }
+    setHistoryLoading(true);
+    fetch(`/api/fleet/history?tech_id=${historyTechId}&date=${historyDate}`)
+      .then(r => r.json())
+      .then(d => { setHistoryData(d); setHistoryLoading(false); })
+      .catch(() => setHistoryLoading(false));
+  }, [historyTechId, historyDate]);
 
   useEffect(() => {
     fetch('/api/me').then(r => r.json()).then(d => setTier(d.tier || 1)).catch(()=>{});
@@ -298,7 +333,13 @@ export default function Dashboard() {
               <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Truck size={18} className="text-gray-500" /> Live Field Status
               </h2>
-              <Link href="/dispatch" className="text-xs text-gray-700 hover:text-gray-900 font-bold bg-white border border-gray-200 px-3 py-1 rounded-full">Open Dispatch →</Link>
+              <div className="flex gap-2 items-center">
+                <div className="hidden sm:flex bg-white border border-gray-200 rounded-lg overflow-hidden">
+                  <button onClick={() => setFieldViewMode('list')} className={`px-3 py-1 text-xs font-bold ${fieldViewMode === 'list' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}>List</button>
+                  <button onClick={() => setFieldViewMode('map')} className={`px-3 py-1 text-xs font-bold border-l border-gray-200 ${fieldViewMode === 'map' ? 'bg-blue-50 text-blue-700' : 'text-gray-500 hover:bg-gray-50'}`}>Map</button>
+                </div>
+                <Link href="/dispatch" className="text-xs text-gray-700 hover:text-gray-900 font-bold bg-white border border-gray-200 px-3 py-1.5 rounded-lg">Full Dispatch →</Link>
+              </div>
             </div>
             {loading ? (
               <div className="p-6 text-gray-500">Loading technicians...</div>
