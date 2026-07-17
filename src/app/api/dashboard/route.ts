@@ -127,34 +127,37 @@ export async function GET() {
 
   const { data: technicians, error: techErr } = await supabase
     .from("technicians")
-    .select("*, fleet_locations(latitude, longitude, speed, heading, created_at)")
+    .select("*")
     .eq("company_id", companyId)
     .order("updated_at", { ascending: false });
 
-  // Enhance tech with the most recent fleet location if available
   let safeTechnicians = techErr ? [] : (technicians || []);
   if (safeTechnicians.length > 0) {
+     const techIds = safeTechnicians.map((t: any) => t.id);
+     const { data: allFleetLocations } = await supabase
+       .from("fleet_locations")
+       .select("technician_id, latitude, longitude, speed, heading, created_at")
+       .in("technician_id", techIds);
+
      safeTechnicians = safeTechnicians.map((t: any) => {
-        const fleetData = t.fleet_locations || [];
+        const fleetData = allFleetLocations?.filter((f: any) => f.technician_id === t.id) || [];
         if (fleetData.length > 0) {
            fleetData.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
            const latest = fleetData[0];
            
-           // If they have a live fleet ping but no text address, we could optionally format a generic string
-           // But since we can't block to reverse-geocode here, we'll at least ensure the updated_at timestamp reflects the ping!
            return {
               ...t,
-              live_lat: latest.latitude,
-              live_lng: latest.longitude,
-              live_speed: latest.speed,
-              live_heading: latest.heading,
-              // Fallback for UI if last_location_address is missing
+              last_location: {
+                lat: latest.latitude,
+                lng: latest.longitude,
+                speed: latest.speed,
+                heading: latest.heading
+              },
               last_location_address: t.last_location_address || `Live: ${latest.latitude.toFixed(3)}, ${latest.longitude.toFixed(3)}`,
-              updated_at: new Date(latest.created_at) > new Date(t.updated_at) ? latest.created_at : t.updated_at,
-              fleet_locations: undefined // strip out the array
+              updated_at: new Date(latest.created_at) > new Date(t.updated_at) ? latest.created_at : t.updated_at
            };
         }
-        return { ...t, fleet_locations: undefined };
+        return t;
      });
   }
   const techTableAvailable = !techErr;
