@@ -74,7 +74,7 @@ export default function DispatchMap({
   historyData?: HistoryData
 }) {
   return (
-    <div className="relative w-full h-full">
+    <div className="absolute inset-0 z-0 w-full h-full">
       <MapContainer 
         center={[center.lat, center.lng]} 
         zoom={10} 

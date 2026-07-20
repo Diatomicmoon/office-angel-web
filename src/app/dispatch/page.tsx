@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2 } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Users, Plus, ChevronLeft, ChevronRight, User, MapPin, Navigation, AlertCircle, Sun, CloudRain, Zap, Truck, CheckCircle2, ChevronUp, ChevronDown } from "lucide-react";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { createBrowserClient } from "@supabase/ssr";
@@ -218,6 +218,8 @@ export default function Dispatch() {
   const [viewMode, setViewMode] = useState<'day' | 'map'>('day');
   const [mobileTab, setMobileTab] = useState<'unassigned' | 'calendar' | 'map'>('calendar');
   const [mobileTechId, setMobileTechId] = useState<string>('all');
+  const [mapOverlayOpen, setMapOverlayOpen] = useState<boolean>(true);
+  useEffect(() => { if (typeof window !== "undefined" && window.innerWidth < 1024) setMapOverlayOpen(false); }, []);
 
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
   
@@ -1146,8 +1148,15 @@ export default function Dispatch() {
         <div className={`flex-1 bg-white rounded-xl border border-gray-200 shadow-sm flex-col relative min-h-0 min-w-0 ${mobileTab === 'unassigned' ? 'hidden lg:flex' : 'flex'}`}>
           {(viewMode === 'map' || mobileTab === 'map') ? (
             <div className="flex-1 relative overflow-hidden bg-gray-100 rounded-xl min-h-[500px] lg:min-h-0 border border-gray-200">
-              <div className="absolute top-4 left-4 bg-white p-3 rounded-xl shadow-md border border-gray-200 z-[999] w-[90%] max-w-sm md:w-72">
-                <h3 className="font-bold text-gray-900 text-sm mb-2 flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+              <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm p-3 rounded-xl shadow-md border border-gray-200 z-[999] w-[90%] max-w-sm md:w-72 transition-all max-h-[80vh] overflow-y-auto">
+                <div className="flex justify-between items-center mb-2 cursor-pointer" onClick={() => setMapOverlayOpen(!mapOverlayOpen)}>
+                  <h3 className="font-bold text-gray-900 text-sm flex items-center gap-2"><Navigation size={16} className="text-blue-600"/> Live Fleet Tracking</h3>
+                  <button className="p-1 hover:bg-gray-100 rounded-md text-gray-500">
+                    {mapOverlayOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+                </div>
+                {mapOverlayOpen && (
+                  <div className="animate-in fade-in slide-in-from-top-2 duration-200">
                 {!techTableAvailable ? (
                   <p className="text-xs text-gray-500">Technician table not set up yet.</p>
                 ) : techs.length === 0 ? (
@@ -1223,6 +1232,8 @@ export default function Dispatch() {
                      </p>
                   )}
                 </div>
+                </div>
+                )}
               </div>
               <DispatchMap 
                 center={center} 
