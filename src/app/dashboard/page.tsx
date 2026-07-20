@@ -371,7 +371,7 @@ export default function Dashboard() {
                       ? getLatLng(data.technicians[0].last_location) || {lat: 44.9778, lng: -93.2650} 
                       : {lat: 44.9778, lng: -93.2650}
                   } 
-                  techsData={(data.technicians as any[]).map((t) => ({ tech: t, pos: getLatLng(t.last_location) })).filter(x => x.pos)} 
+                  techsData={(data.technicians as any[]).map((t) => ({ tech: t, pos: getLatLng(t.last_location) || {lat: 0, lng: 0} })).filter(x => x.pos.lat !== 0) as any} 
                 />
               </div>
             ) : (

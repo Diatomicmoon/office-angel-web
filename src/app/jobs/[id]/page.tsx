@@ -126,18 +126,18 @@ export default function JobDetailsPage() {
           }
 
           setScanStatus("Uploading image...");
-          const formData = new FormData();
-          formData.append("image", blob, "receipt.jpg");
-          formData.append("job_id", id);
+          const fData = new FormData();
+          fData.append("image", blob, "receipt.jpg");
+          fData.append("job_id", id);
 
           try {
             setScanStatus("AI parsing receipt...");
             const res = await fetch("/api/receipts/scan", {
               method: "POST",
-              body: formData,
-            });
+              body: undefined,
+      });
 
-            if (!res.ok) {
+      if (!res.ok) {
               throw new Error("Failed to scan receipt");
             }
 
@@ -164,13 +164,13 @@ export default function JobDetailsPage() {
 
     // The rest of the `handleScan` function will be moved inside the `canvas.toBlob` callback
     // block in the previous edit, so this line is removed.
-    // The original code was: formData.append("job_id", id);
+    // The original code was: fData.append("job_id", id);
 
     try {
       setScanStatus("AI parsing receipt...");
       const res = await fetch("/api/receipts/scan", {
         method: "POST",
-        body: formData,
+        body: undefined,
       });
 
       if (!res.ok) {
