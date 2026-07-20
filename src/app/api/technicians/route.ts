@@ -2,6 +2,8 @@ import { resolveCompanyIdOrThrow } from "@/lib/tenant";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -17,44 +19,50 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  
   let q = supabase
     .from("technicians")
-    .select("*, fleet_locations(latitude, longitude, speed, heading, created_at)")
+    .select("*")
     .order("updated_at", { ascending: false });
 
   if (companyId) q = q.eq("company_id", companyId);
 
   const { data, error } = await q;
 
-  // Enhance tech with the most recent fleet location if available
+  if (error) return NextResponse.json({ technicians: [], tableAvailable: false });
+
   let enhancedData = data || [];
   if (data && data.length > 0) {
+     const techIds = data.map((t: any) => t.id);
+     const { data: locs } = await supabase
+       .from("fleet_locations")
+       .select("technician_id, latitude, longitude, speed, heading, created_at")
+       .in("technician_id", techIds)
+       .order("created_at", { ascending: false });
+       
+     const locMap: Record<string, any> = {};
+     if (locs) {
+        for (const loc of locs) {
+           if (!locMap[loc.technician_id]) locMap[loc.technician_id] = loc;
+        }
+     }
+     
      enhancedData = data.map((t: any) => {
-        const fleetData = t.fleet_locations || [];
-        if (fleetData.length > 0) {
-           // sort by created_at desc
-           fleetData.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-           const latest = fleetData[0];
+        const latest = locMap[t.id];
+        if (latest) {
            return {
               ...t,
               live_lat: latest.latitude,
               live_lng: latest.longitude,
               live_speed: latest.speed,
               live_heading: latest.heading,
-              live_updated_at: latest.created_at,
-              fleet_locations: undefined // strip out the array to keep payload small
+              live_updated_at: latest.created_at
            };
         }
-        return { ...t, fleet_locations: undefined };
+        return t;
      });
   }
 
-
-  // If the table doesn't exist yet, return an empty list instead of a hard error.
-  if (error) return NextResponse.json({ technicians: [], tableAvailable: false });
-
-  return NextResponse.json({ technicians: enhancedData || [], tableAvailable: true });
+  return NextResponse.json({ technicians: enhancedData, tableAvailable: true });
 }
 
 export async function POST(req: Request) {
@@ -84,7 +92,6 @@ export async function POST(req: Request) {
     updated_at: new Date().toISOString(),
   };
 
-  // remove undefined keys
   for (const k of Object.keys(payload)) if (payload[k] === undefined) delete payload[k];
 
   if (body.id) {
