@@ -24,10 +24,10 @@ export default function FieldAppMockup() {
   const [manualOut, setManualOut] = useState("");
   const [manualNotes, setManualNotes] = useState("");
 
-  const [techId, setTechId] = useState<string>("8dcd18c7-e3d7-4422-9f4b-6bb4e6df2f10");
+  const [techId, setTechId] = useState<string>("");
   const [techs, setTechs] = useState<{id: string, name: string}[]>([]);
   const [showTechPicker, setShowTechPicker] = useState(false);
-  const [selectedTechName, setSelectedTechName] = useState<string>("Steve");
+  const [selectedTechName, setSelectedTechName] = useState<string>("");
 
   const handleLogout = async () => {
     const supabase = createBrowserClient(
@@ -44,6 +44,7 @@ export default function FieldAppMockup() {
     const saved = localStorage.getItem("fieldTechId");
     const savedName = localStorage.getItem("fieldTechName");
     if (saved) { setTechId(saved); setSelectedTechName(savedName || ""); }
+    else { setShowTechPicker(true); }
     fetch("/api/technicians")
       .then(r => r.json())
       .then(json => setTechs(json.technicians || []))

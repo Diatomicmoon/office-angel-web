@@ -103,12 +103,18 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/dashboard")
-      .then(res => res.json())
-      .then(json => {
-        setData(json);
-        setLoading(false);
-      });
+    const loadData = () => {
+      fetch("/api/dashboard")
+        .then(res => res.json())
+        .then(json => {
+          setData(json);
+          setLoading(false);
+        });
+    };
+    
+    loadData();
+    const interval = setInterval(loadData, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const isRestricted = ['field_rep', 'tech', 'apprentice', 'sales'].includes((data?.user?.role || '').toLowerCase());
@@ -356,6 +362,17 @@ export default function Dashboard() {
                     <p className="text-sm">Add your first tech to start tracking live field status.</p>
                   </div>
                 )}
+              </div>
+            ) : fieldViewMode === 'map' ? (
+              <div className="h-[400px] w-full z-0 relative rounded-b-xl overflow-hidden">
+                <DispatchMap 
+                  center={
+                    data.technicians[0]?.last_location 
+                      ? getLatLng(data.technicians[0].last_location) || {lat: 44.9778, lng: -93.2650} 
+                      : {lat: 44.9778, lng: -93.2650}
+                  } 
+                  techsData={(data.technicians as any[]).map((t) => ({ tech: t, pos: getLatLng(t.last_location) })).filter(x => x.pos)} 
+                />
               </div>
             ) : (
               <div className="divide-y divide-gray-100">

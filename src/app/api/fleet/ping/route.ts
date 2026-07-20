@@ -85,10 +85,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: locError.message }, { status: 400 });
   }
 
-  // Update the technicians table in the background so the dashboard sees it live
-  // Only reverse geocode if we haven't recently or if moving fast to save API calls
-  // For now, let's just do a quick background fetch for the address to keep it nice!
-  Promise.resolve().then(async () => {
+  // Update the technicians table so the dashboard sees it live
+  try {
      let addressUpdate: any = { updated_at: new Date().toISOString() };
      
      // Update status to en_route if speed > 10 mph (roughly)
@@ -102,7 +100,9 @@ export async function POST(req: Request) {
      }
 
      await supabase.from('technicians').update(addressUpdate).eq('id', body.technician_id);
-  }).catch(console.error);
+  } catch (err) {
+     console.error("Address update error:", err);
+  }
 
   // --- 2. SMART AUTO-CLOCK LOGIC ---
   
