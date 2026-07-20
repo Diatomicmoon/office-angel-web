@@ -138,7 +138,8 @@ export default function DispatchMap({
           >
             <Tooltip direction="top" offset={[0, -10]} opacity={1}>
               <div className="text-xs font-sans">
-                <p className="font-bold">{stop.is_current ? "Current Location" : `Stop: ${stop.duration} min`}</p>
+                <p className="font-bold">{stop.is_current ? "Current Location" : `Stop: ${stop.duration >= 60 ? Math.floor(stop.duration / 60) + "h " + (stop.duration % 60) + "m" : stop.duration + " min"}`}</p>
+                {stop.address && <p className="text-[10px] text-gray-500 max-w-[150px] whitespace-normal leading-tight mt-0.5">{stop.address}</p>}
                 <p className="text-gray-600">
                   {new Date(stop.start_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })} 
                   {!stop.is_current && ` - ${new Date(stop.end_time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`}

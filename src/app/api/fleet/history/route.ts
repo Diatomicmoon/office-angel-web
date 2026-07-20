@@ -5,6 +5,19 @@ import { createClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+
+async function reverseGeocode(lat: number, lng: number) {
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`, {
+      headers: { 'User-Agent': 'HardHatSolutions/1.0' }
+    });
+    const json = await res.json();
+    return json.display_name || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(req: Request) {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL || '',
@@ -92,6 +105,13 @@ export async function GET(req: Request) {
         is_current: true
       });
     }
+  }
+
+  
+  for (const s of stops) {
+    s.address = await reverseGeocode(s.lat, s.lng);
+    // add small delay to respect Nominatim rate limit
+    await new Promise(r => setTimeout(r, 100)); 
   }
 
   return NextResponse.json({ path, stops });
