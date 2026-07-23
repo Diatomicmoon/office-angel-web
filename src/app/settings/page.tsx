@@ -406,7 +406,7 @@ if (loading) return <div className="flex-1 flex items-center justify-center text
           <h2 className="font-semibold text-gray-900 flex items-center gap-2">
             <Clock size={18} className="text-blue-600" /> Scheduling Hours
           </h2>
-          <p className="text-sm text-gray-500 mt-1">Hard Hat Solutions will only suggest times inside this window (Chicago time).</p>
+          <p className="text-sm text-gray-500 mt-1">Hard Hat Solutions will only suggest schedule times and track fleet GPS inside this window (Chicago time).</p>
         </div>
         <div className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">

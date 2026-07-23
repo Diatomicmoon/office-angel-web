@@ -68,6 +68,35 @@ export async function POST(req: Request) {
   
   company_id = company_id || '5341bfb2-8fce-4c7a-9a30-20e6aba60a8a';
 
+  // Check working hours
+  try {
+    const { data: companySettings } = await supabase
+      .from('companies')
+      .select('schedule_start_minute, schedule_end_minute')
+      .eq('id', company_id)
+      .single();
+
+    if (companySettings) {
+      // Default to 7:00 AM (420 mins) to 5:00 PM (1020 mins) if null
+      const startMin = typeof companySettings.schedule_start_minute === 'number' ? companySettings.schedule_start_minute : 420;
+      const endMin = typeof companySettings.schedule_end_minute === 'number' ? companySettings.schedule_end_minute : 1020;
+
+      const now = new Date();
+      // Get current local time in Chicago (central time)
+      const offsetStr = now.toLocaleString("en-US", { timeZone: "America/Chicago" });
+      const chicagoDate = new Date(offsetStr);
+      const currentMinutes = chicagoDate.getHours() * 60 + chicagoDate.getMinutes();
+
+      // If current time is strictly outside the scheduled bounds, ignore this ping entirely
+      if (currentMinutes < startMin || currentMinutes > endMin) {
+        console.log(`[Fleet Radar] Ping ignored outside working hours (${currentMinutes} min) for tech ${body.technician_id}`);
+        return NextResponse.json({ success: true, ignored: "Outside working hours" });
+      }
+    }
+  } catch (err) {
+    console.error("Working hours check error:", err);
+  }
+
   // 1. Insert into fleet_locations
   const { error: locError } = await supabase
     .from("fleet_locations")
