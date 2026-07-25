@@ -64,6 +64,15 @@ export default function FieldAppMockup() {
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
         (pos) => {
+          // Privacy Check: Re-evaluate time at the exact moment of every ping
+          const currentHour = new Date().getHours();
+          const isWorkingHours = currentHour >= 6 && currentHour < 18;
+          
+          // If it's after hours and they aren't clocked in, drop the ping dead in its tracks
+          if (!isClockedIn && !isWorkingHours) {
+             return; 
+          }
+
           fetch('/api/technicians/location', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -85,7 +94,7 @@ export default function FieldAppMockup() {
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, [techId]);
+  }, [techId, isClockedIn]);
 
   const fetchTimesheets = async () => {
     try {
