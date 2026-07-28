@@ -241,7 +241,7 @@ export const D2DAnimation = () => {
         style={{ translateX: "-50%", translateY: "-50%" }}
       >
         <div className="w-4 h-4 bg-purple-400 rounded-full animate-pulse" />
-        <div className="absolute -bottom-6 text-[9px] font-mono text-purple-300 bg-purple-900/40 px-1.5 rounded">ZAKI_REP</div>
+        <div className="absolute -bottom-6 text-[9px] font-mono text-purple-300 bg-purple-900/40 px-1.5 rounded">BEN_REP</div>
       </motion.div>
     </div>
   );
