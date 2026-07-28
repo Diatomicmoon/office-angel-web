@@ -19,7 +19,7 @@ export default function Navbar({ activePage }: NavbarProps) {
     }`;
 
   return (
-    <nav className="w-full bg-white border-b border-gray-200 z-50 relative">
+    <nav className="w-full bg-white/95 backdrop-blur-md border-b border-gray-200 z-50 sticky top-0">
       <div className="px-4 md:px-8 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export default function Navbar({ activePage }: NavbarProps) {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 flex flex-col gap-1">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-2xl px-4 py-4 flex flex-col gap-1 z-50">
           <Link
             href="/#features"
             onClick={() => setOpen(false)}
