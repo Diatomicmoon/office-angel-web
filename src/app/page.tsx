@@ -17,7 +17,7 @@ import {
 import AnimatedRevenueChart from "@/components/AnimatedRevenueChart";
 import AITerminal from "@/components/AITerminal";
 import Navbar from "@/components/Navbar";
-import { AIVoiceBlock, AICoPilotBlock, AutoScheduleBlock, HardwareShowcase, AIEmployeeShowcase } from "@/components/PremiumFeatureBlocks";
+import { AIVoiceBlock, AICoPilotBlock, AutoScheduleBlock, HardwareShowcase, AIEmployeeShowcase, D2DShowcase } from "@/components/PremiumFeatureBlocks";
 
 export default function LandingPage() {
   const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } };
@@ -97,6 +97,9 @@ export default function LandingPage() {
 
               {/* Hardware / IoT Showcase */}
               <motion.div variants={fadeUp}><HardwareShowcase /></motion.div>
+
+              {/* D2D / Canvassing Showcase */}
+              <motion.div variants={fadeUp}><D2DShowcase /></motion.div>
 
               {/* Huge AI Employee Final Showcase */}
               <motion.div variants={fadeUp}><AIEmployeeShowcase /></motion.div>

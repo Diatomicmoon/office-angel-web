@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Zap, Check, Smartphone, Wifi, MapPin } from "lucide-react";
+import { Zap, Check, Smartphone, Wifi, MapPin, Route } from "lucide-react";
 
 export const VoiceDispatcherAnimation = () => {
   return (
@@ -178,6 +178,70 @@ export const HardwareAnimation = () => {
           <div className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
         </div>
         <div className="text-[10px] font-mono text-cyan-300 bg-cyan-900/20 border border-cyan-500/20 px-2 py-1 rounded">OBD2_GPS</div>
+      </motion.div>
+    </div>
+  );
+};
+
+export const D2DAnimation = () => {
+  return (
+    <div className="w-full h-full min-h-[300px] bg-[#0a0d14] rounded-2xl border border-gray-800/60 flex items-center justify-center relative overflow-hidden group-hover:border-purple-500/30 transition-colors p-4">
+      {/* Map Background grid */}
+      <div className="absolute inset-0 bg-[#05080f] opacity-80" style={{ backgroundImage: "linear-gradient(#1f2937 1px, transparent 1px), linear-gradient(90deg, #1f2937 1px, transparent 1px)", backgroundSize: "40px 40px" }}></div>
+      
+      {/* Territory Polygon */}
+      <svg className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" viewBox="0 0 400 300" preserveAspectRatio="none">
+        <motion.polygon 
+          points="40,40 320,60 360,260 60,280" 
+          fill="rgba(168, 85, 247, 0.15)" 
+          stroke="#a855f7" 
+          strokeWidth="2" 
+          strokeDasharray="6,6"
+          animate={{ opacity: [0.3, 0.6, 0.3] }} 
+          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+        />
+      </svg>
+
+      {/* Ghost Trail Route */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 300" preserveAspectRatio="none">
+        <motion.path 
+          d="M80,240 L120,160 L200,190 L260,110 L320,140"
+          fill="none" 
+          stroke="#c084fc" 
+          strokeWidth="3" 
+          strokeDasharray="8,8"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+        />
+      </svg>
+
+      {/* Hot Lead Pin */}
+      <motion.div 
+        className="absolute flex flex-col items-center"
+        style={{ left: "65%", top: "35%" }}
+        animate={{ y: [0, -8, 0] }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      >
+        <div className="w-8 h-8 bg-red-500/20 rounded-full flex items-center justify-center relative shadow-[0_0_20px_rgba(239,68,68,0.5)] border border-red-500/50">
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <motion.div animate={{ scale: [1, 2.5], opacity: [0.8, 0] }} transition={{ repeat: Infinity, duration: 1.5 }} className="absolute inset-0 border-[2px] border-red-400 rounded-full" />
+        </div>
+        <div className="text-[10px] font-mono text-red-400 mt-1 bg-gray-900/90 px-1.5 py-0.5 rounded font-bold border border-red-500/30">HOT LEAD</div>
+      </motion.div>
+
+      {/* Moving Rep Avatar */}
+      <motion.div 
+        className="absolute w-10 h-10 bg-[#0d1117] border-2 border-purple-500 rounded-full shadow-[0_0_25px_rgba(168,85,247,0.6)] flex items-center justify-center z-10"
+        animate={{
+          left: ["20%", "30%", "50%", "65%", "80%"],
+          top: ["80%", "53%", "63%", "36%", "46%"]
+        }}
+        transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+        style={{ translateX: "-50%", translateY: "-50%" }}
+      >
+        <div className="w-4 h-4 bg-purple-400 rounded-full animate-pulse" />
+        <div className="absolute -bottom-6 text-[9px] font-mono text-purple-300 bg-purple-900/40 px-1.5 rounded">ZAKI_REP</div>
       </motion.div>
     </div>
   );

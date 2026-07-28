@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { PhoneIncoming, Mic, Calendar, BrainCircuit, Sparkles, TrendingDown, Clock, CheckCircle2, Cpu, MapPin, Smartphone } from "lucide-react";
-import { VoiceDispatcherAnimation, CoPilotAnimation, AutoSchedulingAnimation, HardwareAnimation } from "./FeatureAnimations";
+import { PhoneIncoming, Mic, Calendar, BrainCircuit, Sparkles, TrendingDown, Clock, CheckCircle2, Cpu, MapPin, Smartphone, Route } from "lucide-react";
+import { VoiceDispatcherAnimation, CoPilotAnimation, AutoSchedulingAnimation, HardwareAnimation, D2DAnimation } from "./FeatureAnimations";
 
 const voiceData = [
   { name: "Mon", missed: 12, ai: 2 },
@@ -172,6 +172,38 @@ export function HardwareShowcase() {
               <span><strong className="text-white">NFC Equipment Tags:</strong> Homeowners just tap the sticker on their water heater to summon your crew.</span>
             </li>
           </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function D2DShowcase() {
+  return (
+    <div className="bg-[#0d1117] rounded-3xl p-8 md:p-12 border border-gray-800 shadow-[0_0_40px_rgba(168,85,247,0.05)] relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+      <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
+        <div>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold mb-6 tracking-wide uppercase">
+            <Route size={14} /> Smart Canvassing Map
+          </div>
+          <h3 className="text-3xl font-bold mb-4 text-white">Dominate Your Territory.</h3>
+          <p className="text-gray-400 text-lg leading-relaxed mb-8">
+            Arm your door-to-door reps with military-grade intelligence. Our built-in canvassing map automatically scrapes new home permits, drops hot leads, and routes your team using ghost trails.
+          </p>
+          <ul className="space-y-4">
+            <li className="flex items-start gap-3 text-gray-300">
+              <MapPin size={20} className="text-purple-400 shrink-0 mt-0.5" /> 
+              <span><strong className="text-white">Predictive Heat Maps:</strong> See exactly where new certificates of occupancy are dropping.</span>
+            </li>
+            <li className="flex items-start gap-3 text-gray-300">
+              <Sparkles size={20} className="text-purple-400 shrink-0 mt-0.5" /> 
+              <span><strong className="text-white">Automated Territory Drawing:</strong> Owner draws the box, reps only see their active zones.</span>
+            </li>
+          </ul>
+        </div>
+        <div className="h-[350px] w-full">
+          <D2DAnimation />
         </div>
       </div>
     </div>
