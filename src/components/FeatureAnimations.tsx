@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Zap, Check } from "lucide-react";
+import { Zap, Check, Smartphone, Wifi, MapPin } from "lucide-react";
 
 export const VoiceDispatcherAnimation = () => {
   return (
@@ -114,6 +114,71 @@ export const AutoSchedulingAnimation = () => {
           ))}
         </div>
       </div>
+    </div>
+  );
+};
+
+export const HardwareAnimation = () => {
+  return (
+    <div className="w-full h-full min-h-[300px] bg-[#0a0d14] rounded-2xl border border-gray-800 flex items-center justify-center relative overflow-hidden">
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+      <div className="absolute inset-0" style={{ backgroundImage: "radial-gradient(#1f2937 1px, transparent 1px)", backgroundSize: "20px 20px" }}></div>
+      
+      {/* Central Hub (Truck/Bin) */}
+      <div className="relative z-10 w-24 h-24 bg-gray-900 border-2 border-cyan-500/50 rounded-2xl flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.2)]">
+        <Wifi size={32} className="text-cyan-400 mb-2" />
+        <motion.div 
+          animate={{ scale: [1, 2.5], opacity: [0.8, 0] }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
+          className="absolute inset-0 border-2 border-cyan-400 rounded-2xl"
+        />
+        <div className="absolute bottom-2 text-[9px] font-mono text-cyan-300 tracking-wider">SYNCING</div>
+      </div>
+
+      {/* Connection Lines & Nodes */}
+      {/* Top Left - NFC */}
+      <motion.div 
+        className="absolute top-12 left-12 flex flex-col items-center gap-2"
+        animate={{ y: [0, -5, 0] }}
+        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+      >
+        <div className="w-12 h-12 bg-gray-800 border border-gray-600 rounded-full flex items-center justify-center shadow-lg">
+          <Smartphone size={20} className="text-gray-300" />
+        </div>
+        <div className="text-[10px] font-mono text-gray-400 bg-gray-900/80 px-2 py-1 rounded">NFC_TAG</div>
+      </motion.div>
+
+      {/* Top Right - Smart Bin */}
+      <motion.div 
+        className="absolute top-12 right-12 flex flex-col items-center gap-2"
+        animate={{ y: [0, 5, 0] }}
+        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+      >
+        <div className="w-12 h-12 bg-gray-800 border border-gray-600 rounded-lg flex items-center justify-center shadow-lg">
+          <div className="w-4 h-6 bg-gray-600 rounded-sm flex flex-col justify-end p-0.5">
+             <motion.div 
+              animate={{ height: ["20%", "80%", "40%"] }} 
+              transition={{ repeat: Infinity, duration: 5, ease: "linear" }}
+              className="w-full bg-emerald-400 rounded-sm"
+             />
+          </div>
+        </div>
+        <div className="text-[10px] font-mono text-gray-400 bg-gray-900/80 px-2 py-1 rounded">IoT_BIN</div>
+      </motion.div>
+
+      {/* Bottom Center - Fleet */}
+      <motion.div 
+        className="absolute bottom-12 right-1/4 flex flex-col items-center gap-2"
+        animate={{ x: [0, 10, 0] }}
+        transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+      >
+        <div className="w-12 h-12 bg-gray-800 border border-cyan-500/30 rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.1)] relative">
+          <MapPin size={20} className="text-cyan-400" />
+          <div className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+        </div>
+        <div className="text-[10px] font-mono text-cyan-300 bg-cyan-900/20 border border-cyan-500/20 px-2 py-1 rounded">OBD2_GPS</div>
+      </motion.div>
     </div>
   );
 };

@@ -2,8 +2,8 @@
 
 import { motion } from "framer-motion";
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { PhoneIncoming, Mic, Calendar, BrainCircuit, Sparkles, TrendingDown, Clock, CheckCircle2 } from "lucide-react";
-import { VoiceDispatcherAnimation, CoPilotAnimation, AutoSchedulingAnimation } from "./FeatureAnimations";
+import { PhoneIncoming, Mic, Calendar, BrainCircuit, Sparkles, TrendingDown, Clock, CheckCircle2, Cpu, MapPin, Smartphone } from "lucide-react";
+import { VoiceDispatcherAnimation, CoPilotAnimation, AutoSchedulingAnimation, HardwareAnimation } from "./FeatureAnimations";
 
 const voiceData = [
   { name: "Mon", missed: 12, ai: 2 },
@@ -140,6 +140,38 @@ export function AutoScheduleBlock() {
               <Bar dataKey="ai" name="AI Booked" stackId="a" fill="#10b981" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function HardwareShowcase() {
+  return (
+    <div className="bg-[#0d1117] rounded-3xl p-8 md:p-12 border border-gray-800 shadow-[0_0_40px_rgba(6,182,212,0.05)] relative overflow-hidden group">
+      <div className="absolute inset-0 bg-gradient-to-tl from-cyan-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+      <div className="grid md:grid-cols-2 gap-12 items-center relative z-10 flex-col-reverse">
+        <div className="h-[350px] w-full order-2 md:order-1">
+          <HardwareAnimation />
+        </div>
+        <div className="order-1 md:order-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold mb-6 tracking-wide uppercase">
+            <Cpu size={14} /> Custom Hardware Integration
+          </div>
+          <h3 className="text-3xl font-bold mb-4 text-white">Beyond the Screen.</h3>
+          <p className="text-gray-400 text-lg leading-relaxed mb-8">
+            We don't just build software. We connect your physical world to the cloud. From white-labeled OBD-II fleet GPS trackers to NFC-enabled smart bins that auto-reorder materials when they run low.
+          </p>
+          <ul className="space-y-4">
+            <li className="flex items-start gap-3 text-gray-300">
+              <MapPin size={20} className="text-cyan-400 shrink-0 mt-0.5" /> 
+              <span><strong className="text-white">Live Fleet Tracking:</strong> Monitor trucks, geofence timesheets, and dispatch the closest tech instantly.</span>
+            </li>
+            <li className="flex items-start gap-3 text-gray-300">
+              <Smartphone size={20} className="text-cyan-400 shrink-0 mt-0.5" /> 
+              <span><strong className="text-white">NFC Equipment Tags:</strong> Homeowners just tap the sticker on their water heater to summon your crew.</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
