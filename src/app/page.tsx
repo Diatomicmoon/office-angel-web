@@ -29,32 +29,41 @@ export default function LandingPage() {
       <main className="flex-1">
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden pt-20 md:pt-32 pb-20 md:pb-32 text-center">
-          {/* Animated Background Gradients */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-5xl z-0 pointer-events-none">
-            <div className="absolute top-20 left-0 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-[pulse_6s_ease-in-out_infinite] translate-x-10"></div>
-            <div className="absolute top-40 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-[pulse_6s_ease-in-out_infinite] delay-1000 -translate-x-10"></div>
+        <section className="relative overflow-hidden pt-20 md:pt-32 pb-20 md:pb-32 text-center min-h-[90vh] flex flex-col justify-center">
+          {/* Video Background Layer */}
+          <div className="absolute inset-0 z-0 bg-black">
+            <video 
+              autoPlay 
+              loop 
+              muted 
+              playsInline 
+              className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-screen"
+            >
+              <source src="/assets/hardhat-hero.mp4" type="video/mp4" />
+            </video>
+            {/* Dark overlay to ensure text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/80 via-gray-900/40 to-gray-50"></div>
           </div>
           
           <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-md border border-gray-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-blue-700 text-sm font-bold mb-8 tracking-wide uppercase">
-              <Zap size={16} className="text-blue-600" /> The AI Back-Office for Contractors
+            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-lg text-blue-300 text-sm font-bold mb-8 tracking-wide uppercase">
+              <Zap size={16} className="text-blue-400" /> The AI Back-Office for Contractors
             </motion.div>
             
-            <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
+            <motion.h1 variants={fadeUp} className="text-5xl md:text-7xl font-extrabold tracking-tight text-white leading-[1.1] mb-6 drop-shadow-2xl">
               Your entire office.<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 bg-[length:200%_auto] animate-[pulse_3s_ease-in-out_infinite]">Running on autopilot.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-blue-400 bg-[length:200%_auto] animate-[pulse_3s_ease-in-out_infinite]">Running on autopilot.</span>
             </motion.h1>
             
-            <motion.p variants={fadeUp} className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
+            <motion.p variants={fadeUp} className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto mb-12 leading-relaxed drop-shadow-md">
               Hard Hat Solutions is a full AI back-office platform built for home service contractors. From the first inbound call to the final invoice — handled automatically.
             </motion.p>
             
             <motion.div variants={fadeUp} className="flex flex-col sm:flex-row justify-center gap-4 mb-20">
-              <Link href="#demo" className="bg-gray-900 hover:bg-black text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-xl hover:shadow-2xl flex items-center justify-center gap-2 transform hover:-translate-y-1">
+              <Link href="#demo" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_30px_rgba(37,99,235,0.6)] flex items-center justify-center gap-2 transform hover:-translate-y-1">
                 See It Live <ArrowRight size={20} />
               </Link>
-              <Link href="#features" className="bg-white border border-gray-200 text-gray-900 hover:bg-gray-50 px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-sm flex items-center justify-center gap-2 hover:-translate-y-1">
+              <Link href="#features" className="bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 px-8 py-4 rounded-2xl font-bold text-lg transition-all shadow-sm flex items-center justify-center gap-2 hover:-translate-y-1">
                 Explore Features
               </Link>
             </motion.div>
