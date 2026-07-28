@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Bot, Menu, X } from "lucide-react";
 
 interface NavbarProps {
-  activePage?: "features" | "pricing" | "about" | "login" | "contact";
+  activePage?: "features" | "ai-employee" | "pricing" | "about" | "login" | "contact";
 }
 
 export default function Navbar({ activePage }: NavbarProps) {
@@ -30,6 +30,7 @@ export default function Navbar({ activePage }: NavbarProps) {
         {/* Desktop links */}
         <div className="hidden md:flex items-center gap-6">
           <Link href="/#features" className={linkClass("features")}>Features</Link>
+          <Link href="/ai-employee" className={linkClass("ai-employee")}>AI Employee</Link>
           <Link href="/pricing" className={linkClass("pricing")}>Pricing</Link>
           <Link href="/about" className={linkClass("about")}>About</Link>
           <Link href="/contact" className={linkClass("contact")}>Contact</Link>
@@ -62,6 +63,13 @@ export default function Navbar({ activePage }: NavbarProps) {
             className="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Features
+          </Link>
+          <Link
+            href="/ai-employee"
+            onClick={() => setOpen(false)}
+            className="px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            AI Employee
           </Link>
           <Link
             href="/pricing"

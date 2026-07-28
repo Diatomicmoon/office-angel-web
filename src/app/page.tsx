@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   PhoneIncoming,
   Zap,
@@ -18,6 +19,9 @@ import FinancialPulse from "@/components/FinancialPulse";
 import Navbar from "@/components/Navbar";
 
 export default function LandingPage() {
+  const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } };
+  const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.15 } } };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col font-sans text-gray-900">
       <Navbar />
@@ -32,26 +36,26 @@ export default function LandingPage() {
             <div className="absolute top-40 right-0 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-[pulse_6s_ease-in-out_infinite] delay-1000 -translate-x-10"></div>
           </div>
           
-          <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.3)] text-blue-700 text-sm font-medium mb-6 animate-bounce">
+          <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="relative z-10">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.3)] text-blue-700 text-sm font-medium mb-6 animate-bounce">
             <Zap size={16} /> The AI Back-Office for Contractors
-          </div>
-          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
+          </motion.div>
+          <motion.h1 variants={fadeUp} className="text-4xl md:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
             Your entire office.<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-500 to-blue-600 bg-[length:200%_auto] animate-[pulse_3s_ease-in-out_infinite]">Running on autopilot.</span>
-          </h1>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
+          </motion.h1>
+          <motion.p variants={fadeUp} className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-10 leading-relaxed">
             Hard Hat Solutions is a full AI back-office platform built for home service contractors. From the first inbound call to the final invoice — handled automatically, around the clock.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          </motion.p>
+          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="#demo" className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3.5 rounded-xl font-bold text-lg transition-all shadow-[0_0_20px_rgba(59,130,246,0.6)] hover:shadow-[0_0_30px_rgba(59,130,246,0.8)] flex items-center justify-center gap-2 transform hover:-translate-y-1">
               See It Live <ArrowRight size={20} />
             </Link>
             <Link href="#features" className="bg-white border border-gray-200 text-gray-900 hover:bg-gray-50 px-8 py-3.5 rounded-xl font-bold text-lg transition-all shadow-sm flex items-center justify-center gap-2 hover:-translate-y-1">
               See All Features
             </Link>
-          </div>
-          </div>
+          </motion.div>
+          </motion.div>
         </section>
 
         {/* Industry Bar */}
@@ -72,10 +76,10 @@ export default function LandingPage() {
         {/* Feature Suite */}
         <section id="features" className="bg-gray-50 py-16 md:py-24 border-t border-gray-200">
           <div className="max-w-6xl mx-auto px-4 md:px-8">
-            <div className="text-center mb-12 md:mb-16">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} className="text-center mb-12 md:mb-16">
               <h2 className="text-2xl md:text-3xl font-bold text-gray-900">Everything your office needs. Nothing it doesn't.</h2>
               <p className="text-gray-500 mt-2 text-base md:text-lg">One platform. Built for the trades.</p>
-            </div>
+            </motion.div>
 
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
 
@@ -173,9 +177,9 @@ export default function LandingPage() {
 
         {/* How It Plugs In */}
         <section className="bg-white py-16 md:py-24 border-t border-gray-200">
-          <div className="max-w-4xl mx-auto px-4 md:px-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">Plugs into what you already use.</h2>
-            <p className="text-gray-500 text-base md:text-lg mb-10 md:mb-12">No new hardware. No app installs for your crew. No retraining anyone.</p>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="max-w-4xl mx-auto px-4 md:px-8 text-center">
+            <motion.h2 variants={fadeUp} className="text-2xl md:text-3xl font-bold mb-4">Plugs into what you already use.</motion.h2>
+            <motion.p variants={fadeUp} className="text-gray-500 text-base md:text-lg mb-10 md:mb-12">No new hardware. No app installs for your crew. No retraining anyone.</motion.p>
             <div className="grid sm:grid-cols-3 gap-6 text-left">
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 hover:bg-white hover:shadow-lg hover:border-gray-200 transition-all duration-300 transform hover:-translate-y-1">
                 <p className="font-bold text-base md:text-lg mb-2">Your existing phone number</p>
@@ -190,7 +194,7 @@ export default function LandingPage() {
                 <p className="text-gray-600 text-sm">Web leads route automatically into your scheduling inbox alongside your calls.</p>
               </div>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* CTA / Demo */}
@@ -199,15 +203,15 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-30 animate-pulse"></div>
             <div className="absolute inset-0 bg-indigo-600 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-pulse delay-75"></div>
           </div>
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to scale your crew?</h2>
-            <p className="text-lg md:text-xl text-gray-400 mb-10 md:mb-12">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer} className="max-w-4xl mx-auto text-center relative z-10">
+            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-bold mb-4">Ready to scale your crew?</motion.h2>
+            <motion.p variants={fadeUp} className="text-lg md:text-xl text-gray-400 mb-10 md:mb-12">
               Stop losing $1,500 service calls to voicemail. Let us show you exactly how it works.
-            </p>
+            </motion.p>
             <Link href="/contact" className="inline-flex items-center gap-2 bg-white text-gray-900 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition-all shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] hover:scale-105">
               Get in Touch
             </Link>
-          </div>
+          </motion.div>
         </section>
       </main>
 
