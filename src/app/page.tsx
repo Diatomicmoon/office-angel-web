@@ -17,6 +17,7 @@ import {
 import AnimatedRevenueChart from "@/components/AnimatedRevenueChart";
 import AITerminal from "@/components/AITerminal";
 import Navbar from "@/components/Navbar";
+import { AIVoiceBlock, AICoPilotBlock, AutoScheduleBlock, AIEmployeeShowcase } from "@/components/PremiumFeatureBlocks";
 
 export default function LandingPage() {
   const fadeUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } };
@@ -84,77 +85,18 @@ export default function LandingPage() {
               <motion.p variants={fadeUp} className="text-gray-400 mt-4 text-xl">One platform. Built explicitly for the trades.</motion.p>
             </motion.div>
 
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer} className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer} className="flex flex-col gap-8 md:gap-12">
 
               {/* Dynamic Animated Chart taking full width */}
               <AnimatedRevenueChart />
 
-              {/* Feature Cards */}
-              <motion.div variants={fadeUp} className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800 hover:bg-[#161b22] hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:border-blue-500/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                <div className="w-14 h-14 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shadow-sm relative">
-                  <PhoneIncoming size={28} className="relative z-10" />
-                  <motion.div 
-                    animate={{ scale: [1, 1.8], opacity: [0.4, 0] }} 
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }} 
-                    className="absolute inset-0 bg-blue-400 rounded-2xl z-0"
-                  />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-white flex items-center gap-2">
-                  AI Voice Dispatcher
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500"></span>
-                  </span>
-                </h3>
-                <p className="text-gray-400 leading-relaxed text-base relative z-10">
-                  Handles overflow and after-hours calls using your company name. Captures job details and keeps your pipeline full while you sleep.
-                </p>
-              </motion.div>
+              {/* Premium Graph & Animation Feature Blocks */}
+              <motion.div variants={fadeUp}><AIVoiceBlock /></motion.div>
+              <motion.div variants={fadeUp}><AICoPilotBlock /></motion.div>
+              <motion.div variants={fadeUp}><AutoScheduleBlock /></motion.div>
 
-              <motion.div variants={fadeUp} className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800 hover:bg-[#161b22] hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] hover:border-indigo-500/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                <div className="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-sm relative overflow-hidden">
-                  <Mic size={28} className="relative z-10" />
-                  <div className="absolute inset-x-2 bottom-2 h-4 flex items-end justify-between opacity-40 group-hover:opacity-100 transition-opacity">
-                    <motion.div animate={{ height: ["30%", "80%", "40%", "90%", "30%"] }} transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }} className="w-1 bg-indigo-400 rounded-t-sm" />
-                    <motion.div animate={{ height: ["70%", "30%", "100%", "50%", "70%"] }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }} className="w-1 bg-indigo-400 rounded-t-sm" />
-                    <motion.div animate={{ height: ["40%", "90%", "20%", "70%", "40%"] }} transition={{ repeat: Infinity, duration: 1.0, ease: "linear" }} className="w-1 bg-indigo-400 rounded-t-sm" />
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-white flex items-center gap-2">
-                  AI Co-Pilot Mode
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
-                  </span>
-                </h3>
-                <p className="text-gray-400 leading-relaxed text-base relative z-10">
-                  Assists your team during live calls in real time. By the time you hang up, the job is already drafted and ready to confirm.
-                </p>
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800 hover:bg-[#161b22] hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:border-emerald-500/30 transition-all duration-500 transform hover:-translate-y-2 group relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
-                <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-sm relative">
-                  <Calendar size={28} className="relative z-10" />
-                  <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ repeat: Infinity, duration: 8, ease: "linear" }} 
-                    className="absolute inset-0 border-[2px] border-dashed border-emerald-500/30 rounded-2xl pointer-events-none group-hover:border-white/50 transition-colors"
-                  />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-white flex items-center gap-2">
-                  Auto Scheduling
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                </h3>
-                <p className="text-gray-400 leading-relaxed text-base relative z-10">
-                  Confirmed jobs are pushed directly to your crew's existing calendar. Field techs see the update instantly — no back and forth.
-                </p>
-              </motion.div>
+              {/* Huge AI Employee Final Showcase */}
+              <motion.div variants={fadeUp}><AIEmployeeShowcase /></motion.div>
 
             </motion.div>
           </div>
