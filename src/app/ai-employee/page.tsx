@@ -46,7 +46,7 @@ export default function AIEmployeePage() {
         </section>
 
         {/* Comparison Section */}
-        <section className="bg-white py-20 border-t border-gray-200">
+        <section className="bg-[#050505] py-20 border-t border-gray-800">
           <div className="max-w-6xl mx-auto px-4 md:px-8">
             <motion.div 
               initial="hidden" 
@@ -55,8 +55,8 @@ export default function AIEmployeePage() {
               variants={fadeUp}
               className="text-center mb-16"
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">The new way to scale your back office.</h2>
-              <p className="text-gray-500 text-lg">Stop paying $50k+ a year for an office admin.</p>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">The new way to scale your back office.</h2>
+              <p className="text-gray-400 text-lg">Stop paying $50k+ a year for an office admin.</p>
             </motion.div>
 
             <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -66,17 +66,17 @@ export default function AIEmployeePage() {
                 whileInView="visible" 
                 viewport={{ once: true }} 
                 variants={fadeUp}
-                className="bg-gray-50 rounded-3xl p-8 border border-gray-200"
+                className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800"
               >
-                <h3 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                  <Clock className="text-gray-400" /> Traditional Office Hire
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                  <Clock className="text-gray-500" /> Traditional Office Hire
                 </h3>
                 <ul className="space-y-4">
-                  <li className="flex gap-3 text-gray-600"><span className="text-red-500 font-bold">✕</span> Costs $45,000 - $60,000/year</li>
-                  <li className="flex gap-3 text-gray-600"><span className="text-red-500 font-bold">✕</span> Works 9 to 5, Monday to Friday</li>
-                  <li className="flex gap-3 text-gray-600"><span className="text-red-500 font-bold">✕</span> Misses calls when on the other line</li>
-                  <li className="flex gap-3 text-gray-600"><span className="text-red-500 font-bold">✕</span> Takes weeks to train</li>
-                  <li className="flex gap-3 text-gray-600"><span className="text-red-500 font-bold">✕</span> Calls in sick & takes PTO</li>
+                  <li className="flex gap-3 text-gray-400"><span className="text-red-500 font-bold">✕</span> Costs $45,000 - $60,000/year</li>
+                  <li className="flex gap-3 text-gray-400"><span className="text-red-500 font-bold">✕</span> Works 9 to 5, Monday to Friday</li>
+                  <li className="flex gap-3 text-gray-400"><span className="text-red-500 font-bold">✕</span> Misses calls when on the other line</li>
+                  <li className="flex gap-3 text-gray-400"><span className="text-red-500 font-bold">✕</span> Takes weeks to train</li>
+                  <li className="flex gap-3 text-gray-400"><span className="text-red-500 font-bold">✕</span> Calls in sick & takes PTO</li>
                 </ul>
               </motion.div>
 

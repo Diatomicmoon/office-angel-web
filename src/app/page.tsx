@@ -77,11 +77,11 @@ export default function LandingPage() {
         </section>
 
         {/* Feature Suite */}
-        <section id="features" className="bg-white py-20 md:py-32 border-t border-gray-200 relative overflow-hidden">
+        <section id="features" className="bg-[#050505] py-20 md:py-32 border-t border-gray-800 relative overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 md:px-8">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer} className="text-center mb-16 md:mb-24">
-              <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight">Everything your office needs.</motion.h2>
-              <motion.p variants={fadeUp} className="text-gray-500 mt-4 text-xl">One platform. Built explicitly for the trades.</motion.p>
+              <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl font-bold text-white tracking-tight">Everything your office needs.</motion.h2>
+              <motion.p variants={fadeUp} className="text-gray-400 mt-4 text-xl">One platform. Built explicitly for the trades.</motion.p>
             </motion.div>
 
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={staggerContainer} className="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
@@ -90,32 +90,32 @@ export default function LandingPage() {
               <AnimatedRevenueChart />
 
               {/* Feature Cards */}
-              <motion.div variants={fadeUp} className="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:bg-white hover:shadow-2xl hover:border-blue-100 transition-all duration-500 transform hover:-translate-y-2 group">
-                <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
+              <motion.div variants={fadeUp} className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800 hover:bg-[#161b22] hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:border-blue-500/30 transition-all duration-500 transform hover:-translate-y-2 group">
+                <div className="w-14 h-14 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300 shadow-sm">
                   <PhoneIncoming size={28} />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">AI Voice Dispatcher</h3>
-                <p className="text-gray-600 leading-relaxed text-base">
+                <h3 className="text-xl font-bold mb-3 text-white">AI Voice Dispatcher</h3>
+                <p className="text-gray-400 leading-relaxed text-base">
                   Handles overflow and after-hours calls using your company name. Captures job details and keeps your pipeline full while you sleep.
                 </p>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:bg-white hover:shadow-2xl hover:border-indigo-100 transition-all duration-500 transform hover:-translate-y-2 group">
-                <div className="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300 shadow-sm">
+              <motion.div variants={fadeUp} className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800 hover:bg-[#161b22] hover:shadow-[0_0_30px_rgba(99,102,241,0.15)] hover:border-indigo-500/30 transition-all duration-500 transform hover:-translate-y-2 group">
+                <div className="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-sm">
                   <Mic size={28} />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">AI Co-Pilot Mode</h3>
-                <p className="text-gray-600 leading-relaxed text-base">
+                <h3 className="text-xl font-bold mb-3 text-white">AI Co-Pilot Mode</h3>
+                <p className="text-gray-400 leading-relaxed text-base">
                   Assists your team during live calls in real time. By the time you hang up, the job is already drafted and ready to confirm.
                 </p>
               </motion.div>
 
-              <motion.div variants={fadeUp} className="bg-gray-50 rounded-3xl p-8 border border-gray-100 hover:bg-white hover:shadow-2xl hover:border-emerald-100 transition-all duration-500 transform hover:-translate-y-2 group">
-                <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm">
+              <motion.div variants={fadeUp} className="bg-[#0d1117] rounded-3xl p-8 border border-gray-800 hover:bg-[#161b22] hover:shadow-[0_0_30px_rgba(16,185,129,0.15)] hover:border-emerald-500/30 transition-all duration-500 transform hover:-translate-y-2 group">
+                <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-sm">
                   <Calendar size={28} />
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-gray-900">Auto Scheduling</h3>
-                <p className="text-gray-600 leading-relaxed text-base">
+                <h3 className="text-xl font-bold mb-3 text-white">Auto Scheduling</h3>
+                <p className="text-gray-400 leading-relaxed text-base">
                   Confirmed jobs are pushed directly to your crew's existing calendar. Field techs see the update instantly — no back and forth.
                 </p>
               </motion.div>

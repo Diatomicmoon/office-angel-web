@@ -21,18 +21,18 @@ export default function AnimatedRevenueChart() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="col-span-1 sm:col-span-2 md:col-span-3 bg-white rounded-3xl p-6 md:p-8 border border-gray-100 shadow-lg hover:shadow-2xl hover:border-blue-200 transition-all duration-500 overflow-hidden relative group"
+      className="col-span-1 sm:col-span-2 md:col-span-3 bg-[#0d1117] rounded-3xl p-6 md:p-8 border border-gray-800 shadow-[0_0_40px_rgba(59,130,246,0.1)] hover:shadow-[0_0_60px_rgba(59,130,246,0.2)] hover:border-blue-500/50 transition-all duration-500 overflow-hidden relative group"
     >
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 relative z-10">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 text-white rounded-xl flex items-center justify-center shadow-sm">
               <DollarSign size={20} className="drop-shadow-sm" />
             </div>
-            <h3 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">Live Financial Pulse</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight">Live Financial Pulse</h3>
           </div>
-          <p className="text-gray-500 text-sm md:text-base">AI automatically reconciles Stripe income & OCR expenses.</p>
+          <p className="text-gray-400 text-sm md:text-base">AI automatically reconciles Stripe income & OCR expenses.</p>
         </div>
         <div className="mt-4 md:mt-0 bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-full flex items-center gap-2 text-emerald-700 font-semibold shadow-sm text-sm">
           <TrendingUp size={16} /> +42% Profit Margin
@@ -53,7 +53,7 @@ export default function AnimatedRevenueChart() {
                 <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1f2937" />
             <XAxis 
               dataKey="name" 
               axisLine={false} 
@@ -70,10 +70,11 @@ export default function AnimatedRevenueChart() {
             <Tooltip
               contentStyle={{ 
                 borderRadius: '16px', 
-                border: '1px solid #e5e7eb', 
-                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                border: '1px solid #374151', 
+                backgroundColor: '#111827',
+                boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)',
                 fontWeight: 600,
-                color: '#1f2937'
+                color: '#f9fafb'
               }}
               itemStyle={{ fontWeight: 700 }}
               formatter={(value: number) => [`$${value.toLocaleString()}`, undefined]}
