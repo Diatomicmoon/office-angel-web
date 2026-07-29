@@ -116,7 +116,16 @@ export async function POST(req: Request) {
 
   // Update the technicians table so the dashboard sees it live
   try {
-     let addressUpdate: any = { updated_at: new Date().toISOString() };
+     let addressUpdate: any = { 
+       updated_at: new Date().toISOString(),
+       last_location: { 
+         lat: body.latitude, 
+         lng: body.longitude, 
+         source: "fleet_radar", 
+         speed: body.speed,
+         heading: body.heading 
+       }
+     };
      
      // Update status to en_route if speed > 10 mph (roughly)
      if (body.speed && body.speed > 10) {
