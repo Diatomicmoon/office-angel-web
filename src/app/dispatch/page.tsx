@@ -651,7 +651,7 @@ export default function Dispatch() {
                   lng: ping.longitude,
                   heading: ping.heading,
                   speed: ping.speed,
-                  timestamp: ping.timestamp
+                  timestamp: ping.created_at
                 }
               };
             }
@@ -668,6 +668,7 @@ export default function Dispatch() {
                 ...tech,
                 status: updatedTech.status,
                 name: updatedTech.name, // Also update name in case it changes
+                last_location: updatedTech.last_location || tech.last_location,
               };
             }
             return tech;
